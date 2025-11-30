@@ -64,7 +64,7 @@ body {
 
 // Firebase IMPORTS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged }
 from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getFirestore, doc, setDoc }
 from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
@@ -84,34 +84,42 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// AUTO LOGIN – If user already logged in → go home
+
+// If already logged in → Move home
 onAuthStateChanged(auth, (user) => {
     if (user) {
         window.location.href = "home.html";
     }
 });
 
-// GOOGLE LOGIN FUNCTION
-async function googleLogin(){
+
+// GOOGLE LOGIN (REDIRECT)
+function googleLogin() {
     const provider = new GoogleAuthProvider();
-
-    try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-
-        // Save user data to Firestore
-        await setDoc(doc(db, "users", user.uid), {
-            name: user.displayName,
-            email: user.email,
-            coins: 0
-        }, { merge: true });
-
-        window.location.href = "home.html";
-
-    } catch (error) {
-        alert("Login failed: " + error.message);
-    }
+    signInWithRedirect(auth, provider);
 }
+
+
+// When user returns after selecting Google account
+getRedirectResult(auth)
+    .then(async (result) => {
+        if (result) {
+            const user = result.user;
+
+            // Save user in database
+            await setDoc(doc(db, "users", user.uid), {
+                name: user.displayName,
+                email: user.email,
+                coins: 0
+            }, { merge: true });
+
+            window.location.href = "home.html";
+        }
+    })
+    .catch((error) => {
+        console.log("Login Error:", error.message);
+    });
+
 </script>
 
 </body>
