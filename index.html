@@ -10,10 +10,9 @@
         margin: 0;
         padding: 0;
         font-family: Arial;
-        background: linear-gradient(to bottom, #7EC8E3, #C4EBFF); /* Attractive Sky Blue */
+        background: linear-gradient(to bottom, #7EC8E3, #C4EBFF);
     }
 
-    /* Top Bar */
     .topbar {
         width: 100%;
         padding: 14px 20px;
@@ -23,7 +22,6 @@
         color: white;
     }
 
-    /* Left Menu Button */
     .menu-btn {
         font-size: 30px;
         cursor: pointer;
@@ -31,7 +29,6 @@
         flex: 1;
     }
 
-    /* Center Title */
     .title {
         flex: 2;
         text-align: center;
@@ -41,7 +38,6 @@
         text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
     }
 
-    /* Right Coins */
     .coins {
         flex: 1;
         display: flex;
@@ -60,7 +56,6 @@
         margin-right: 7px;
     }
 
-    /* Box Layout */
     .box-container {
         padding: 20px;
     }
@@ -75,7 +70,6 @@
         box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
     }
 
-    /* Fullscreen Menu */
     .menu-screen {
         position: fixed;
         top: 0;
@@ -119,20 +113,16 @@
 <!-- TOP BAR -->
 <div class="topbar">
 
-    <!-- MENU LEFT -->
     <div class="menu-btn" onclick="openMenu()">三</div>
 
-    <!-- CENTER TITLE -->
     <div class="title">KSSM ROCK TAMIL</div>
 
-    <!-- COINS RIGHT -->
     <div class="coins">
         <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png">
         <span id="coinValue">0</span>
     </div>
 
 </div>
-
 
 <!-- BOXES -->
 <div class="box-container">
@@ -147,11 +137,48 @@
     <div class="menu-box">
         <div>Redeem History</div>
         <div>Redeem Selection</div>
-        <div>Logout</div>
+        <div onclick="logoutUser()">Logout</div>
         <div>Delete Account</div>
         <button class="close-btn" onclick="closeMenu()">Close</button>
     </div>
 </div>
+
+<!-- LOGIN SYSTEM (ADDED NOW) -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+// FIREBASE CONFIG
+const firebaseConfig = {
+    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+    authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+    projectId: "kssm-rock-tam-ad",
+    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+    messagingSenderId: "28268633766",
+    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Auto-redirect if not logged in
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+    }
+});
+
+// Logout function
+function logoutUser(){
+    signOut(auth).then(() => {
+        window.location.href = "login.html";
+    });
+}
+window.logoutUser = logoutUser;
+
+</script>
 
 <script>
 function openMenu(){
