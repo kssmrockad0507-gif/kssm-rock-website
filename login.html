@@ -5,13 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KSSM Rock - Login</title>
 
-  <!-- Google Auth -->
-  <meta name="google-signin-client_id" content="28268633766-m4516901bjc8m9dj3ifl8impsv40ie95.apps.googleusercontent.com">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-
   <style>
     body {
       background: linear-gradient(135deg, #0047ab, #002f6c);
@@ -42,6 +35,11 @@
       background: #e0e0e0;
     }
   </style>
+
+  <!-- Firebase 9 (Modular) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
 </head>
 <body>
 
@@ -62,22 +60,18 @@
       appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
     };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-
-    // Google Provider
     const provider = new firebase.auth.GoogleAuthProvider();
 
-    document.getElementById("googleBtn").addEventListener("click", function() {
+    document.getElementById("googleBtn").addEventListener("click", function () {
       auth.signInWithPopup(provider)
         .then((result) => {
           alert("Login Successful 🎉");
-          window.location.href = "index.html"; // redirect page
+          window.location.href = "index.html";
         })
         .catch((error) => {
-          console.error(error);
-          alert("Login Failed ❌");
+          alert("Login Failed ❌ " + error.message);
         });
     });
   </script>
