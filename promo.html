@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promo Code</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: #E2F4FF;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: #16B8FF;
+        color: white;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .back-arrow {
+        margin-right: 10px;
+        font-size: 28px;
+        cursor: pointer;
+    }
+
+    .coin-box {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        background: white;
+        padding: 7px 15px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+    }
+
+    .coin-box img {
+        width: 25px;
+        margin-right: 5px;
+    }
+
+    .card {
+        width: 90%;
+        margin: auto;
+        margin-top: 20px;
+        background: #D8F2FF;
+        border-radius: 20px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .promo-icon img {
+        width: 140px;
+    }
+
+    input {
+        width: 80%;
+        padding: 12px;
+        font-size: 18px;
+        margin-top: 20px;
+        border-radius: 10px;
+        border: none;
+        outline: none;
+        text-align: center;
+    }
+
+    .submit-btn {
+        margin-top: 20px;
+        width: 85%;
+        padding: 14px;
+        background: #05B4FF;
+        border-radius: 12px;
+        border: none;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .telegram-box {
+        margin-top: 25px;
+        padding: 15px;
+        background: #0EA5FF;
+        color: white;
+        font-size: 18px;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <span class="back-arrow" onclick="history.back()">←</span>
+    PromoCode
+</div>
+
+<!-- Coins Auto Display -->
+<div class="coin-box">
+    <img src="coin.png">
+    <span id="coinCount">1394</span>
+</div>
+
+<div class="card">
+    <div class="promo-icon">
+        <img src="promo.png">
+    </div>
+
+    <input type="text" id="promoCode" placeholder="Enter Code">
+
+    <button class="submit-btn">Submit</button>
+
+    <div class="telegram-box" onclick="goToTelegram()">
+        Join Telegram Channel to get PromoCode daily.
+    </div>
+</div>
+
+<script>
+function goToTelegram() {
+    window.location.href = "https://t.me/kssmrockreward";
+}
+
+// TODO: Fetch coins from backend later
+// document.getElementById("coinCount").innerText = userCoins;
+</script>
+
+</body>
+</html>
