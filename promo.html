@@ -106,7 +106,7 @@ window.applyCode = async function () {
     if (!user) return alert("Please login first!");
 
     const code = document.getElementById("promoCode").value.trim();
-    if (code === "") return alert("Enter a promo code");
+    if (code === "") return alert("Enter a promo code hare");
 
     const promoRef = doc(db, "promoCodes", code);
     const promoSnap = await getDoc(promoRef);
