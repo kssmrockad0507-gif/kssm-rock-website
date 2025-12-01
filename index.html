@@ -3,197 +3,185 @@
 <head>      
 <meta charset="UTF-8">      
 <meta name="viewport" content="width=device-width, initial-scale=1">      
-  
-<meta name="google-site-verification" content="L_jw_LDJGiZrbWjpBJN1LNxOuqdcC6Z1fWZXpQ24rFE" />    
 <title>Rewards UI</title>      
-<style>      
-    body {      
-        margin: 0;      
-        padding: 0;      
-        font-family: Arial;      
-        background: linear-gradient(to bottom, #7EC8E3, #C4EBFF);      
-    }      
-      
-    .topbar {      
-        width: 100%;      
-        padding: 14px 20px;      
-        display: flex;      
-        justify-content: space-between;       
-        align-items: center;      
-        color: white;      
-    }      
-      
-    .menu-btn {      
-        font-size: 30px;      
-        cursor: pointer;      
-        user-select: none;      
-        flex: 1;      
-    }      
-      
-    .title {      
-        flex: 2;      
-        text-align: center;      
-        font-size: 23px;      
-        font-weight: bold;      
-        letter-spacing: 1px;      
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);      
-    }      
-      
-    .coins {      
-        flex: 1;      
-        display: flex;      
-        justify-content: right;      
-        align-items: center;      
-        font-size: 20px;      
-        background: rgba(255,255,255,0.35);      
-        padding: 8px 14px;      
-        border-radius: 12px;      
-        backdrop-filter: blur(6px);      
-    }      
-      
-    .coins img {      
-        width: 24px;      
-        height: 24px;      
-        margin-right: 7px;      
-    }      
-      
-    .box-container {      
-        padding: 20px;      
-    }      
-      
-    .big-box {      
-        background: white;      
-        margin-top: 18px;      
-        padding: 22px;      
-        border-radius: 18px;      
-        font-size: 22px;      
-        font-weight: bold;      
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.2);      
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial;
+        background: linear-gradient(to bottom, #7EC8E3, #C4EBFF);
+    }
+
+    .topbar {
+        width: 100%;
+        padding: 14px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+    }
+
+    .menu-btn {
+        font-size: 30px;
         cursor: pointer;
-    }      
-      
-    .menu-screen {      
-        position: fixed;      
-        top: 0;      
-        left: 0;      
-        width: 100%;      
-        height: 100%;      
-        background: rgba(0,0,0,0.75);      
-        display: none;      
-        justify-content: center;      
-        align-items: center;      
-    }      
-      
-    .menu-box {      
-        width: 80%;      
-        background: white;      
-        padding: 25px;      
-        border-radius: 18px;      
-        text-align: center;      
-    }      
-      
-    .menu-box div {      
-        font-size: 22px;      
-        padding: 14px;      
-        border-bottom: 1px solid #ccc;      
-    }      
-      
-    .close-btn {      
-        margin-top: 15px;      
-        padding: 10px 18px;      
-        font-size: 18px;      
-        border: none;      
-        border-radius: 8px;      
-        background: skyblue;      
-        color: white;      
-    }      
-</style>      
-</head>      
-<body>      
-  
-<!-- TOP BAR -->      
-<div class="topbar">      
-    <div class="menu-btn" onclick="openMenu()">三</div>      
-    <div class="title">KSSM ROCK TAMIL</div>      
-    <div class="coins">      
-        <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png">      
-        <span id="coinValue">0</span>      
-    </div>      
-</div>      
-  
-<!-- BOXES -->      
-<div class="box-container">      
-    <div class="big-box">Daily Coin</div>      
-    <div class="big-box">Task</div>      
-    <div class="big-box">Task</div>      
+        user-select: none;
+        flex: 1;
+    }
 
-    <!-- Promo Code box connected -->
+    .title {
+        flex: 2;
+        text-align: center;
+        font-size: 23px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .coins {
+        flex: 1;
+        display: flex;
+        justify-content: right;
+        align-items: center;
+        font-size: 20px;
+        background: rgba(255,255,255,0.35);
+        padding: 8px 14px;
+        border-radius: 12px;
+        backdrop-filter: blur(6px);
+    }
+
+    .coins img {
+        width: 24px;
+        height: 24px;
+        margin-right: 7px;
+    }
+
+    .box-container {
+        padding: 20px;
+    }
+
+    .big-box {
+        background: white;
+        margin-top: 18px;
+        padding: 22px;
+        border-radius: 18px;
+        font-size: 22px;
+        font-weight: bold;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+        cursor: pointer;
+    }
+
+    .menu-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.75);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .menu-box {
+        width: 80%;
+        background: white;
+        padding: 25px;
+        border-radius: 18px;
+        text-align: center;
+    }
+
+    .menu-box div {
+        font-size: 22px;
+        padding: 14px;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .close-btn {
+        margin-top: 15px;
+        padding: 10px 18px;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        background: skyblue;
+        color: white;
+    }
+</style>
+
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <div class="menu-btn" onclick="openMenu()">三</div>
+    <div class="title">KSSM ROCK TAMIL</div>
+    <div class="coins">
+        <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png">
+        <span id="coinValue">0</span>
+    </div>
+</div>
+
+<!-- BOXES -->
+<div class="box-container">
+    <div class="big-box">Daily Coin</div>
+    <div class="big-box">Task</div>
+    <div class="big-box">Task</div>
     <div class="big-box" onclick="goPromo()">Promo Code</div>
+</div>
 
-</div>      
-  
-<!-- MENU FULLSCREEN -->      
-<div id="menuPage" class="menu-screen">      
-    <div class="menu-box">      
-        <div>Redeem History</div>      
-        <div>Redeem Selection</div>      
-        <div onclick="logoutUser()">Logout</div>      
-        <div>Delete Account</div>      
-        <button class="close-btn" onclick="closeMenu()">Close</button>      
-    </div>      
-</div>      
-  
-<!-- LOGIN + AUTO COIN SYSTEM -->      
-<script type="module">  
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";  
-import { getAuth, onAuthStateChanged, signOut }  
-from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";  
-import { getFirestore, doc, getDoc }  
-from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";  
-  
-const firebaseConfig = {  
-    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",  
-    authDomain: "kssm-rock-tam-ad.firebaseapp.com",  
-    projectId: "kssm-rock-tam-ad",  
-    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",  
-    messagingSenderId: "28268633766",  
-    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"  
-};  
-  
-const app = initializeApp(firebaseConfig);  
-const auth = getAuth(app);  
-const db = getFirestore(app);  
-  
-onAuthStateChanged(auth, async (user) => {  
-    if (!user) {  
-        window.location.href = "login.html";  
-        return;  
-    }  
-    const snap = await getDoc(doc(db, "users", user.uid));  
-    if (snap.exists()) {  
-        const coins = snap.data().coins || 0;  
-        document.getElementById("coinValue").innerText = coins;  
-    }  
-});  
-  
-function logoutUser() {  
-    signOut(auth).then(() => {  
-        window.location.href = "login.html";  
-    });  
-}  
-window.logoutUser = logoutUser;  
-</script>  
-  
-<!-- MENU + PROMO JS -->  
-<script>  
-function openMenu() { document.getElementById("menuPage").style.display = "flex"; }  
-function closeMenu() { document.getElementById("menuPage").style.display = "none"; }  
+<!-- MENU PAGE -->
+<div id="menuPage" class="menu-screen">
+    <div class="menu-box">
+        <div>Redeem History</div>
+        <div>Redeem Selection</div>
+        <div onclick="logoutUser()">Logout</div>
+        <div>Delete Account</div>
+        <button class="close-btn" onclick="closeMenu()">Close</button>
+    </div>
+</div>
 
-// Promo page redirect
-function goPromo() {
-    window.location.href = "promo.html";
+<!-- LOAD COINS + USER LOGIN CHECK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { loadCoins } from "./coins.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+    authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+    projectId: "kssm-rock-tam-ad",
+    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+    messagingSenderId: "28268633766",
+    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Check login + load coins automatically
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+    } else {
+        loadCoins();   // 🔥 Coins auto update
+    }
+});
+
+function logoutUser() {
+    signOut(auth).then(() => {
+        window.location.href = "login.html";
+    });
 }
-</script>  
-  
-</body>      
+window.logoutUser = logoutUser;
+</script>
+
+<!-- MENU + NAV -->
+<script>
+function openMenu() { document.getElementById("menuPage").style.display = "flex"; }
+function closeMenu() { document.getElementById("menuPage").style.display = "none"; }
+function goPromo() { window.location.href = "promo.html"; }
+</script>
+
+</body>
 </html>
