@@ -6,90 +6,37 @@
 <title>Promo Code</title>
 
 <style>
-    body {
-        margin: 0;
-        font-family: Arial;
-        background: #E2F4FF;
-    }
-
+    body { margin: 0; font-family: Arial; background: #E2F4FF; }
     .header {
-        display: flex;
-        align-items: center;
-        padding: 15px;
-        background: #16B8FF;
-        color: white;
-        font-size: 22px;
-        font-weight: bold;
+        display: flex; align-items: center; padding: 15px;
+        background: #16B8FF; color: white; font-size: 22px; font-weight: bold;
     }
-
-    .back-arrow {
-        margin-right: 10px;
-        font-size: 28px;
-        cursor: pointer;
-    }
-
+    .back-arrow { margin-right: 10px; font-size: 28px; cursor: pointer; }
     .coin-box {
-        position: absolute;
-        right: 15px;
-        top: 10px;
-        background: white;
-        padding: 7px 15px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        font-weight: bold;
+        position: absolute; right: 15px; top: 10px;
+        background: white; padding: 7px 15px; border-radius: 20px;
+        display: flex; align-items: center; font-weight: bold;
     }
-
-    .coin-box img {
-        width: 25px;
-        margin-right: 5px;
-    }
+    .coin-box img { width: 25px; margin-right: 5px; }
 
     .card {
-        width: 90%;
-        margin: auto;
-        margin-top: 20px;
-        background: #D8F2FF;
-        border-radius: 20px;
-        padding: 20px;
-        text-align: center;
+        width: 90%; margin: auto; margin-top: 20px;
+        background: #D8F2FF; border-radius: 20px;
+        padding: 20px; text-align: center;
     }
-
-    .promo-icon img {
-        width: 140px;
-    }
-
     input {
-        width: 80%;
-        padding: 12px;
-        font-size: 18px;
-        margin-top: 20px;
-        border-radius: 10px;
-        border: none;
-        outline: none;
-        text-align: center;
+        width: 80%; padding: 12px; font-size: 18px;
+        margin-top: 20px; border-radius: 10px;
+        border: none; outline: none; text-align: center;
     }
-
     .submit-btn {
-        margin-top: 20px;
-        width: 85%;
-        padding: 14px;
-        background: #05B4FF;
-        border-radius: 12px;
-        border: none;
-        color: white;
-        font-size: 20px;
-        font-weight: bold;
-        cursor: pointer;
+        margin-top: 20px; width: 85%; padding: 14px;
+        background: #05B4FF; border-radius: 12px; border: none;
+        color: white; font-size: 20px; font-weight: bold;
     }
-
     .telegram-box {
-        margin-top: 25px;
-        padding: 15px;
-        background: #0EA5FF;
-        color: white;
-        font-size: 18px;
-        border-radius: 20px;
+        margin-top: 25px; padding: 15px; background: #0EA5FF;
+        color: white; font-size: 18px; border-radius: 20px;
         cursor: pointer;
     }
 </style>
@@ -113,7 +60,6 @@
     </div>
 
     <input type="text" id="promoCode" placeholder="Enter Code">
-
     <button class="submit-btn" onclick="applyCode()">Submit</button>
 
     <div class="telegram-box" onclick="goToTelegram()">
@@ -121,12 +67,12 @@
     </div>
 </div>
 
-<!-- FIREBASE + PROMO SYSTEM -->
+<!-- FIREBASE + PROMO SCRIPT -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } 
 from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, arrayUnion }
+import { getFirestore, doc, getDoc, updateDoc }
 from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -142,64 +88,57 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let userID = "";
-let userCoins = 0;
-let usedCodes = [];
-
+// AUTO LOAD USER COINS
 onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-        window.location.href = "login.html";
-        return;
-    }
+    if (!user) return;
 
-    userID = user.uid;
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
 
-    const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists()) {
-        userCoins = snap.data().coins || 0;
-        usedCodes = snap.data().usedCodes || [];
-        document.getElementById("coinCount").innerText = userCoins;
+        document.getElementById("coinCount").innerText = snap.data().coins;
     }
 });
 
 // APPLY PROMO CODE
-window.applyCode = async function() {
+window.applyCode = async function () {
+    const user = auth.currentUser;
+    if (!user) return alert("Please login first!");
+
     const code = document.getElementById("promoCode").value.trim();
+    if (code === "") return alert("Enter a promo code");
 
-    if (code === "") {
-        alert("Enter a code first!");
-        return;
-    }
+    const promoRef = doc(db, "promoCodes", code);
+    const promoSnap = await getDoc(promoRef);
 
-    if (usedCodes.includes(code)) {
-        alert("You already used this promo code!");
-        return;
-    }
+    if (!promoSnap.exists()) return alert("Invalid Code ❌");
 
-    const codeSnap = await getDoc(doc(db, "promoCodes", code));
-    if (!codeSnap.exists()) {
-        alert("Invalid Promo Code!");
-        return;
-    }
+    const coinsToAdd = promoSnap.data().coins;
 
-    const codeCoins = codeSnap.data().coins;
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
 
-    await updateDoc(doc(db, "users", userID), {
-        coins: userCoins + codeCoins,
-        usedCodes: arrayUnion(code)
+    let data = userSnap.data();
+    let used = data.usedCodes || [];
+
+    if (used.includes(code))
+        return alert("Already Used ❗");
+
+    used.push(code);
+
+    await updateDoc(userRef, {
+        coins: data.coins + coinsToAdd,
+        usedCodes: used
     });
 
-    alert("Code Applied! +" + codeCoins + " Coins Added");
-
-    location.reload();
+    alert("Coins Added Successfully! 🎉");
+    document.getElementById("coinCount").innerText = data.coins + coinsToAdd;
 };
 
-</script>
-
-<script>
-function goToTelegram() {
+// TELEGRAM BTN
+window.goToTelegram = function () {
     window.location.href = "https://t.me/kssmrockreward";
-}
+};
 </script>
 
 </body>
