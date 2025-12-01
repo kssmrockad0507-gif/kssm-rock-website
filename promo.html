@@ -102,10 +102,9 @@
     PromoCode
 </div>
 
-<!-- Coins Auto Display -->
 <div class="coin-box">
     <img src="coin.png">
-    <span id="coinCount">1394</span>
+    <span id="coinCount">0</span>
 </div>
 
 <div class="card">
@@ -115,20 +114,92 @@
 
     <input type="text" id="promoCode" placeholder="Enter Code">
 
-    <button class="submit-btn">Submit</button>
+    <button class="submit-btn" onclick="applyCode()">Submit</button>
 
     <div class="telegram-box" onclick="goToTelegram()">
         Join Telegram Channel to get PromoCode daily.
     </div>
 </div>
 
+<!-- FIREBASE + PROMO SYSTEM -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, arrayUnion }
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+    authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+    projectId: "kssm-rock-tam-ad",
+    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+    messagingSenderId: "28268633766",
+    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let userID = "";
+let userCoins = 0;
+let usedCodes = [];
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    userID = user.uid;
+
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (snap.exists()) {
+        userCoins = snap.data().coins || 0;
+        usedCodes = snap.data().usedCodes || [];
+        document.getElementById("coinCount").innerText = userCoins;
+    }
+});
+
+// APPLY PROMO CODE
+window.applyCode = async function() {
+    const code = document.getElementById("promoCode").value.trim();
+
+    if (code === "") {
+        alert("Enter a code first!");
+        return;
+    }
+
+    if (usedCodes.includes(code)) {
+        alert("You already used this promo code!");
+        return;
+    }
+
+    const codeSnap = await getDoc(doc(db, "promoCodes", code));
+    if (!codeSnap.exists()) {
+        alert("Invalid Promo Code!");
+        return;
+    }
+
+    const codeCoins = codeSnap.data().coins;
+
+    await updateDoc(doc(db, "users", userID), {
+        coins: userCoins + codeCoins,
+        usedCodes: arrayUnion(code)
+    });
+
+    alert("Code Applied! +" + codeCoins + " Coins Added");
+
+    location.reload();
+};
+
+</script>
+
 <script>
 function goToTelegram() {
     window.location.href = "https://t.me/kssmrockreward";
 }
-
-// TODO: Fetch coins from backend later
-// document.getElementById("coinCount").innerText = userCoins;
 </script>
 
 </body>
