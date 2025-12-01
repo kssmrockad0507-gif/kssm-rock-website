@@ -1,99 +1,221 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Promo Code</title>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promo Code</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #ffffff;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        padding: 18px;
+        background: #008CFF;
+        color: white;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .back-arrow {
+        margin-right: 12px;
+        font-size: 28px;
+        cursor: pointer;
+    }
+
+    .coin-box {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        background: #f0f0f0;
+        padding: 7px 15px;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+    }
+
+    .coin-box img {
+        width: 25px;
+        margin-right: 5px;
+    }
+
+    .card {
+        width: 90%;
+        margin: auto;
+        margin-top: 30px;
+        background: #f7f7f7;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+        border-radius: 20px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    input {
+        width: 80%;
+        padding: 14px;
+        font-size: 18px;
+        margin-top: 20px;
+        border-radius: 12px;
+        border: 1px solid #ccc;
+        outline: none;
+        text-align: center;
+        background: #ffffff;
+    }
+
+    .submit-btn {
+        margin-top: 20px;
+        width: 85%;
+        padding: 15px;
+        background: #008CFF;
+        border-radius: 12px;
+        border: none;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .telegram-box {
+        margin-top: 25px;
+        padding: 18px;
+        background: #00A2FF;
+        color: white;
+        font-size: 18px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+</style>
 </head>
 
 <body>
+
+<div class="header">
+    <span class="back-arrow" onclick="history.back()">←</span>
+    Promo Code
+</div>
+
+<div class="coin-box">
+    <img src="coin.png">
+    <span id="coinCount">0</span>
+</div>
+
+<div class="card">
     <h2>Enter Promo Code</h2>
 
-    <input id="promoInput" type="text" placeholder="Enter Code">
-    <button onclick="applyPromo()">Apply</button>
+    <input type="text" id="promoInput" placeholder="Enter Promo Code">
 
-    <p id="msg"></p>
+    <button class="submit-btn" onclick="applyPromo()">Submit</button>
 
-<script>
-    // YOUR FIREBASE CONFIG
-    const firebaseConfig = {
-        apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-        authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-        projectId: "kssm-rock-tam-ad",
-        storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
-        messagingSenderId: "28268633766",
-        appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
-    };
+    <div class="telegram-box" onclick="goToTelegram()">
+        🔥 Get Latest Promo Codes (Join Telegram)
+    </div>
+</div>
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
 
-    async function applyPromo() {
-        const code = document.getElementById("promoInput").value.trim();
-        const msgBox = document.getElementById("msg");
 
-        if (code === "") {
-            msgBox.innerHTML = "❌ Please enter a code";
-            return;
-        }
+<!-- FIREBASE -->
+<script type="module">
 
-        // Check user login
-        const user = auth.currentUser;
-        if (!user) {
-            msgBox.innerHTML = "❌ Please login first";
-            return;
-        }
+// --- Firebase Config ---
+const firebaseConfig = {
+    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+    authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+    projectId: "kssm-rock-tam-ad",
+    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+    messagingSenderId: "28268633766",
+    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+};
 
-        const uid = user.uid;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc, arrayUnion }
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-        try {
-            // Fetch promo code details
-            const promoRef = db.collection("promoCodes").doc(code);
-            const promoSnap = await promoRef.get();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-            if (!promoSnap.exists) {
-                msgBox.innerHTML = "❌ Invalid Promo Code!";
-                return;
-            }
+let currentUID = null;
 
-            const promoData = promoSnap.data();
+onAuthStateChanged(auth, async (user) => {
+    if (!user) return;
 
-            // Check expiry
-            const today = new Date();
-            const expiryDate = new Date(promoData.expireAt);
+    currentUID = user.uid;
 
-            if (today > expiryDate) {
-                msgBox.innerHTML = "❌ Promo code expired!";
-                return;
-            }
+    const ref = doc(db, "users", currentUID);
+    const snap = await getDoc(ref);
 
-            // Fetch user data
-            const userRef = db.collection("users").doc(uid);
-            const userSnap = await userRef.get();
-            const userData = userSnap.data();
-
-            // Check already used
-            if (userData.usedCodes.includes(code)) {
-                msgBox.innerHTML = "❌ You already used this code!";
-                return;
-            }
-
-            // Add coins
-            const newCoins = userData.coins + promoData.coins;
-
-            await userRef.update({
-                coins: newCoins,
-                usedCodes: [...userData.usedCodes, code]
-            });
-
-            msgBox.innerHTML = "✅ Success! Coins added: " + promoData.coins;
-
-        } catch (err) {
-            msgBox.innerHTML = "❌ Error: " + err.message;
-        }
+    if (snap.exists()) {
+        document.getElementById("coinCount").innerText = snap.data().coins;
     }
+});
+
+
+// 🔥 APPLY PROMO
+async function applyPromo() {
+    const code = document.getElementById("promoInput").value.trim();
+    if (code === "") {
+        alert("Enter promo code");
+        return;
+    }
+
+    if (!currentUID) {
+        alert("Please login first");
+        return;
+    }
+
+    const promoRef = doc(db, "promoCodes", code);
+    const promoSnap = await getDoc(promoRef);
+
+    if (!promoSnap.exists()) {
+        alert("❌ Invalid promo code");
+        return;
+    }
+
+    const promo = promoSnap.data();
+
+    // Expiry check
+    const today = new Date().toISOString().slice(0, 10);
+    if (promo.expireAt < today) {
+        alert("❌ This promo code has expired");
+        return;
+    }
+
+    const userRef = doc(db, "users", currentUID);
+    const userSnap = await getDoc(userRef);
+
+    const user = userSnap.data();
+
+    if (user.usedCodes && user.usedCodes.includes(code)) {
+        alert("⚠️ You already used this code");
+        return;
+    }
+
+    const newCoins = user.coins + promo.coins;
+
+    await updateDoc(userRef, {
+        coins: newCoins,
+        usedCodes: arrayUnion(code)
+    });
+
+    document.getElementById("coinCount").innerText = newCoins;
+
+    alert("🎉 Promo applied! +" + promo.coins + " coins added");
+}
+
+
+window.goToTelegram = function() {
+    window.location.href = "https://t.me/kssmrockreward";
+};
+
 </script>
 
 </body>
