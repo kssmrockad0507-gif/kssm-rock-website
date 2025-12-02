@@ -232,6 +232,12 @@ window.finishAd = function() {
 /* ---------------- CLAIM FIXED FUNCTION ---------------- */
 window.claimCoins = async function() {
 
+    // userID loadedஆகலனா update பண்ணாதீங்க
+    if (!userID) {
+        alert("User not loaded. Please wait a second and try again.");
+        return;
+    }
+
     const ref = doc(db, "users", userID);
 
     // Add +10 coins in DB
@@ -262,4 +268,4 @@ window.claimCoins = async function() {
 };
 </script>
 </body>
-    </html>
+</html>
