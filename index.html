@@ -1,9 +1,9 @@
-<!DOCTYPE html>      
-<html lang="en">      
-<head>      
-<meta charset="UTF-8">      
-<meta name="viewport" content="width=device-width, initial-scale=1">      
-<title>Rewards UI</title>      
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rewards UI</title>
 
 <style>
     body {
@@ -107,7 +107,6 @@
         color: white;
     }
 </style>
-
 </head>
 <body>
 
@@ -123,9 +122,9 @@
 
 <!-- BOXES -->
 <div class="box-container">
-    <div class="big-box">Daily Coin</div>
-    <div class="big-box">Task</div>
-    <div class="big-box">Task</div>
+    <div class="big-box" onclick="goDaily()">Daily Coin</div>
+    <div class="big-box" onclick="goTask()">Task</div>
+    <div class="big-box" onclick="goTask()">Task</div>
     <div class="big-box" onclick="goPromo()">Promo Code</div>
 </div>
 
@@ -159,12 +158,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Check login + load coins automatically
 onAuthStateChanged(auth, (user) => {
     if (!user) {
         window.location.href = "login.html";
     } else {
-        loadCoins();   // 🔥 Coins auto update
+        loadCoins();   // Auto coin update
     }
 });
 
@@ -180,7 +178,10 @@ window.logoutUser = logoutUser;
 <script>
 function openMenu() { document.getElementById("menuPage").style.display = "flex"; }
 function closeMenu() { document.getElementById("menuPage").style.display = "none"; }
+
 function goPromo() { window.location.href = "promo.html"; }
+function goDaily() { window.location.href = "daily.html"; }
+function goTask() { window.location.href = "task.html"; }
 </script>
 
 </body>
