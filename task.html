@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Task Page</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial;
+        background: linear-gradient(to bottom, #ffffff, #cce6ff);
+    }
+
+    .topbar {
+        width: 100%;
+        padding: 14px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #007bff;
+        color: white;
+    }
+
+    .title {
+        flex: 2;
+        text-align: center;
+        font-size: 23px;
+        font-weight: bold;
+    }
+
+    #limitBox {
+        margin: 20px auto;
+        width: 180px;
+        background: white;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+    }
+
+    #questionBox {
+        width: 80%;
+        margin: 30px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 18px;
+        text-align: center;
+        font-size: 22px;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.25);
+    }
+
+    .optionBtn {
+        width: 90%;
+        padding: 15px;
+        margin: 10px auto;
+        border-radius: 12px;
+        border: none;
+        background: #007bff;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .popup {
+        width: 80%;
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        font-size: 22px;
+    }
+
+    .btn {
+        margin-top: 15px;
+        padding: 12px 20px;
+        font-size: 18px;
+        border: none;
+        border-radius: 10px;
+        background: #007bff;
+        color: white;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="title">TASK</div>
+</div>
+
+<div id="limitBox">0 / 15</div>
+
+<div id="questionBox">
+    <div id="questionText">Loading...</div>
+    <button class="optionBtn" onclick="checkAnswer(0)">Option 1</button>
+    <button class="optionBtn" onclick="checkAnswer(1)">Option 2</button>
+    <button class="optionBtn" onclick="checkAnswer(2)">Option 3</button>
+    <button class="optionBtn" onclick="checkAnswer(3)">Option 4</button>
+</div>
+
+<!-- Correct Answer Screen -->
+<div id="correctScreen" class="screen">
+    <div class="popup">
+        ✅ Correct Answer!
+        <br><br>
+        <button class="btn" onclick="showAdScreen()">Continue</button>
+    </div>
+</div>
+
+<!-- Ad Screen -->
+<div id="adScreen" class="screen">
+    <div class="popup">
+        Watching Ad...
+        <br><br>
+        <button class="btn" onclick="endAd()">Close Ad</button>
+    </div>
+</div>
+
+<!-- Claim Screen -->
+<div id="claimScreen" class="screen">
+    <div class="popup">
+        🎉 +10 Coins Added!
+        <br><br>
+        <button class="btn" onclick="claimCoins()">Claim</button>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+  authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+  projectId: "kssm-rock-tam-ad",
+  storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+  messagingSenderId: "28268633766",
+  appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentCount = 0;
+const limit = 15;
+
+const question = "What is 2 + 2?";
+const options = ["3", "4", "5", "6"];
+const correctIndex = 1;
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+    }
+});
+
+document.getElementById("questionText").innerText = question;
+const btns = document.getElementsByClassName("optionBtn");
+for (let i = 0; i < 4; i++) btns[i].innerText = options[i];
+
+window.checkAnswer = function(index) {
+    if (index === correctIndex) {
+        document.getElementById("correctScreen").style.display = "flex";
+    }
+};
+
+window.showAdScreen = function() {
+    document.getElementById("correctScreen").style.display = "none";
+    document.getElementById("adScreen").style.display = "flex";
+};
+
+window.endAd = function() {
+    document.getElementById("adScreen").style.display = "none";
+    document.getElementById("claimScreen").style.display = "flex";
+};
+
+window.claimCoins = async function() {
+    const user = auth.currentUser;
+    const ref = doc(db, "users", user.uid);
+
+    await updateDoc(ref, {
+        coins: increment(10)
+    });
+
+    currentCount++;
+    document.getElementById("limitBox").innerText = currentCount + " / " + limit;
+
+    document.getElementById("claimScreen").style.display = "none";
+
+    if (currentCount >= limit) {
+        alert("Task Completed!");
+        window.location.href = "index.html";
+    }
+};
+
+</script>
+
+</body>
+</html>
