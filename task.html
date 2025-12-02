@@ -1,146 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Task Page</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Premium Task</title>
+
 <style>
     body {
         margin: 0;
         padding: 0;
-        font-family: Arial;
-        background: linear-gradient(to bottom, #ffffff, #cce6ff);
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to bottom, #d9f0ff, #ffffff);
     }
 
     .topbar {
         width: 100%;
-        padding: 14px 20px;
+        padding: 16px 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         background: #007bff;
         color: white;
+        font-weight: bold;
+        font-size: 22px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
 
-    .title {
-        flex: 2;
-        text-align: center;
-        font-size: 23px;
-        font-weight: bold;
+    #coinBox {
+        background: rgba(255,255,255,0.2);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 19px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        backdrop-filter: blur(5px);
     }
 
     #limitBox {
         margin: 20px auto;
         width: 180px;
-        background: white;
         padding: 10px;
-        border-radius: 10px;
         text-align: center;
         font-size: 22px;
         font-weight: bold;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
     #questionBox {
-        width: 80%;
-        margin: 30px auto;
-        background: white;
+        width: 85%;
+        margin: 25px auto;
         padding: 25px;
+        background: #ffffffee;
         border-radius: 18px;
         text-align: center;
         font-size: 22px;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.25);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {opacity: 0; transform: translateY(20px);}
+        to   {opacity: 1; transform: translateY(0);}
     }
 
     .optionBtn {
         width: 90%;
-        padding: 15px;
+        padding: 14px;
         margin: 10px auto;
         border-radius: 12px;
-        border: none;
         background: #007bff;
         color: white;
         font-size: 20px;
+        font-weight: bold;
+        border: none;
         cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .optionBtn:hover {
+        transform: scale(1.03);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
     .screen {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
+        top: 0; left: 0;
+        width: 100%; height: 100%;
         display: none;
+        background: rgba(0,0,0,0.7);
         justify-content: center;
         align-items: center;
+        animation: fadeIn 0.4s ease-out;
     }
 
     .popup {
         width: 80%;
-        background: white;
         padding: 25px;
+        background: white;
         border-radius: 15px;
         text-align: center;
         font-size: 22px;
+        animation: zoomIn 0.3s ease;
+    }
+
+    @keyframes zoomIn {
+        from {transform: scale(0.7); opacity: 0;}
+        to   {transform: scale(1); opacity: 1;}
     }
 
     .btn {
         margin-top: 15px;
         padding: 12px 20px;
         font-size: 18px;
-        border: none;
         border-radius: 10px;
         background: #007bff;
+        border: none;
         color: white;
         cursor: pointer;
     }
 </style>
 </head>
+
 <body>
 
 <div class="topbar">
-    <div class="title">TASK</div>
+    TASK
+    <div id="coinBox">🪙 <span id="userCoins">0</span></div>
 </div>
 
 <div id="limitBox">0 / 15</div>
 
 <div id="questionBox">
     <div id="questionText">Loading...</div>
-    <button class="optionBtn" onclick="checkAnswer(0)">Option 1</button>
-    <button class="optionBtn" onclick="checkAnswer(1)">Option 2</button>
-    <button class="optionBtn" onclick="checkAnswer(2)">Option 3</button>
-    <button class="optionBtn" onclick="checkAnswer(3)">Option 4</button>
+    <button class="optionBtn" onclick="checkAnswer(0)">Option</button>
+    <button class="optionBtn" onclick="checkAnswer(1)">Option</button>
+    <button class="optionBtn" onclick="checkAnswer(2)">Option</button>
+    <button class="optionBtn" onclick="checkAnswer(3)">Option</button>
 </div>
 
-<!-- Correct Answer Screen -->
+<!-- Correct Screen -->
 <div id="correctScreen" class="screen">
-    <div class="popup">
-        ✅ Correct Answer!
-        <br><br>
-        <button class="btn" onclick="showAdScreen()">Continue</button>
-    </div>
+    <div class="popup">✅ Correct!<br><br><button class="btn" onclick="showAd()">Continue</button></div>
 </div>
 
 <!-- Ad Screen -->
 <div id="adScreen" class="screen">
-    <div class="popup">
-        Watching Ad...
-        <br><br>
-        <button class="btn" onclick="endAd()">Close Ad</button>
-    </div>
+    <div class="popup">⌛ Watching Ad...<br><br><button class="btn" onclick="finishAd()">Close Ad</button></div>
 </div>
 
 <!-- Claim Screen -->
 <div id="claimScreen" class="screen">
-    <div class="popup">
-        🎉 +10 Coins Added!
-        <br><br>
-        <button class="btn" onclick="claimCoins()">Claim</button>
-    </div>
+    <div class="popup">🎉 +10 Coins<br><br><button class="btn" onclick="claimCoins()">Claim</button></div>
 </div>
 
 <script type="module">
+
+/* ---------------- FIREBASE ---------------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
@@ -158,51 +176,79 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+/* ---------------- DATA ---------------- */
 let currentCount = 0;
 const limit = 15;
 
-const question = "What is 2 + 2?";
-const options = ["3", "4", "5", "6"];
+const question = "What is 5 × 5 ?";
+const options = ["20", "25", "35", "30"];
 const correctIndex = 1;
+
+document.getElementById("questionText").innerText = question;
+
+const btns = document.getElementsByClassName("optionBtn");
+for (let i = 0; i < 4; i++) btns[i].innerText = options[i];
+
+/* ---------------- AUTH ---------------- */
+let userID = null;
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
         window.location.href = "login.html";
+    } else {
+        userID = user.uid;
+        loadCoins();
     }
 });
 
-document.getElementById("questionText").innerText = question;
-const btns = document.getElementsByClassName("optionBtn");
-for (let i = 0; i < 4; i++) btns[i].innerText = options[i];
+/* ---------------- COINS LOAD ---------------- */
+async function loadCoins() {
+    const ref = doc(db, "users", userID);
+    const snap = await getDoc(ref);
 
+    if (snap.exists()) {
+        const coins = snap.data().coins || 0;
+        document.getElementById("userCoins").innerText = coins;
+    }
+}
+
+/* ---------------- CHECK ANSWER ---------------- */
 window.checkAnswer = function(index) {
     if (index === correctIndex) {
         document.getElementById("correctScreen").style.display = "flex";
     }
 };
 
-window.showAdScreen = function() {
+/* ---------------- AD FLOW ---------------- */
+window.showAd = function() {
     document.getElementById("correctScreen").style.display = "none";
     document.getElementById("adScreen").style.display = "flex";
 };
 
-window.endAd = function() {
+window.finishAd = function() {
     document.getElementById("adScreen").style.display = "none";
     document.getElementById("claimScreen").style.display = "flex";
 };
 
+/* ---------------- CLAIM COINS ---------------- */
 window.claimCoins = async function() {
-    const user = auth.currentUser;
-    const ref = doc(db, "users", user.uid);
+    const ref = doc(db, "users", userID);
 
-    await updateDoc(ref, {
-        coins: increment(10)
-    });
+    await updateDoc(ref, { coins: increment(10) });
 
+    /* Update on screen */
+    let currentCoins = parseInt(document.getElementById("userCoins").innerText);
+    document.getElementById("userCoins").innerText = currentCoins + 10;
+
+    /* Update task counter */
     currentCount++;
     document.getElementById("limitBox").innerText = currentCount + " / " + limit;
 
     document.getElementById("claimScreen").style.display = "none";
+
+    /* Reload next question */
+    document.getElementById("questionBox").style.animation = "fadeIn 0.5s ease";
+    document.getElementById("questionText").innerText = question;
 
     if (currentCount >= limit) {
         alert("Task Completed!");
@@ -211,6 +257,5 @@ window.claimCoins = async function() {
 };
 
 </script>
-
 </body>
 </html>
