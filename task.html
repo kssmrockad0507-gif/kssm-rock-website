@@ -1,115 +1,201 @@
+{"id":"48327","variant":"standard"}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Task System Final Working</title>
+<title>KSSM Task</title>
+
 <style>
-body { margin:0; padding:0; font-family:Poppins, sans-serif; background:#e9f3ff; }
-.topbar { width:100%; padding:15px 20px; background:#0066ff; color:white; font-size:22px; font-weight:bold; display:flex; justify-content:space-between; align-items:center; }
-#coinBox { background:rgba(255,255,255,0.25); padding:6px 14px; border-radius:20px; font-size:18px; backdrop-filter:blur(6px); }
-#limitBox { width:170px; margin:20px auto; background:#fff; padding:10px; font-size:20px; font-weight:bold; border-radius:10px; text-align:center; box-shadow:0 3px 8px rgba(0,0,0,0.2); }
-#questionBox { width:85%; margin:20px auto; background:white; padding:25px; border-radius:15px; text-align:center; font-size:21px; box-shadow:0 3px 12px rgba(0,0,0,0.2); }
-.optionBtn { width:90%; padding:12px; margin:10px auto; display:block; background:#007bff; border:none; color:white; font-size:18px; border-radius:10px; }
-.screen { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; }
-.popup { background:white; padding:20px; width:75%; border-radius:15px; text-align:center; font-size:22px; }
-.btn { background:#007bff; border:none; padding:12px 20px; color:white; font-size:19px; border-radius:10px; margin-top:15px; }
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #8FD3FF, #D7F3FF);
+    font-family: Arial;
+}
+
+.container {
+    padding: 20px;
+    text-align: center;
+}
+
+.main-box {
+    margin-top: 40px;
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+}
+
+.count {
+    background: #0077FF;
+    color: white;
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 12px;
+    font-size: 20px;
+}
+
+.answer-btn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background: #00A82D;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#adBox, #claimBox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.75);
+    justify-content: center;
+    align-items: center;
+}
+
+.ad-content, .claim-content {
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    text-align: center;
+    width: 80%;
+}
+
+.claim-btn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background: #FFA500;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
 </style>
 </head>
+
 <body>
 
-<div class="topbar">TASK <div id="coinBox">🪙 <span id="userCoins">0</span></div></div>
-<div id="limitBox">0 / 15</div>
+<div class="container">
 
-<div id="questionBox">
-    <div id="questionText">Loading...</div>
-    <button class="optionBtn" id="b0"></button>
-    <button class="optionBtn" id="b1"></button>
-    <button class="optionBtn" id="b2"></button>
-    <button class="optionBtn" id="b3"></button>
+    <div class="main-box">
+        Today’s Question:<br><br>
+        <b>What is 10 + 10 ?</b>
+    </div>
+
+    <div class="count">
+        Attempts Left: <span id="leftCount">15</span>/15
+    </div>
+
+    <button class="answer-btn" onclick="submitAnswer()">Submit Answer</button>
+
 </div>
 
-<div id="correctScreen" class="screen">
-    <div class="popup">✅ Correct!<br><button class="btn" id="continueBtn">Continue</button></div>
+<!-- AD POPUP -->
+<div id="adBox">
+    <div class="ad-content">
+        <h2>Advertisement</h2>
+        <p>Your ad is playing...</p>
+        <button onclick="closeAd()">Close Ad</button>
+    </div>
 </div>
 
-<div id="adScreen" class="screen">
-    <div class="popup">⌛ Showing Ad...<br><button class="btn" id="adCloseBtn">Close Ad</button></div>
+<!-- CLAIM POPUP -->
+<div id="claimBox">
+    <div class="claim-content">
+        <h2>+10 Coins Earned!</h2>
+        <button class="claim-btn" onclick="claimCoins()">Claim</button>
+    </div>
 </div>
 
-<div id="claimScreen" class="screen">
-    <div class="popup">🎉 +10 Coins<br><button class="btn" id="claimBtn">Claim</button></div>
-</div>
 
 <script type="module">
+
+// Firebase IMPORTS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc } 
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
+// Firebase Config
 const firebaseConfig = {
-  apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-  authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-  projectId: "kssm-rock-tam-ad",
-  storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
-  messagingSenderId: "28268633766",
-  appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+    authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+    projectId: "kssm-rock-tam-ad",
+    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+    messagingSenderId: "28268633766",
+    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
 };
 
+// Init Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-let uid = null;
-let count = 0;
-const limit = 15;
+let attemptsLeft = 15;
+let currentUser = null;
 
-const question = "What is 5 x 5?";
-const options = ["20","25","35","30"];
-const answer = 1;
-
-document.getElementById("questionText").innerText = question;
-options.forEach((t,i)=>document.getElementById("b"+i).innerText=t);
-
-onAuthStateChanged(auth, async user => {
-    if(!user) return;
-    uid = user.uid;
-    const ref = doc(db,"users",uid);
-    let snap = await getDoc(ref);
-    document.getElementById("userCoins").innerText = snap.data().coins;
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+    currentUser = user;
 });
 
-[0,1,2,3].forEach(i=>{
-    document.getElementById("b"+i).onclick = ()=>{
-        if(i===answer){
-            document.getElementById("correctScreen").style.display="flex";
-        }
-    };
-});
 
-document.getElementById("continueBtn").onclick = ()=>{
-    document.getElementById("correctScreen").style.display="none";
-    document.getElementById("adScreen").style.display="flex";
-};
+// Question Answer Click
+function submitAnswer(){
+    if(attemptsLeft <= 0){
+        alert("Today's tasks completed!");
+        return;
+    }
 
-document.getElementById("adCloseBtn").onclick = ()=>{
-    document.getElementById("adScreen").style.display="none";
-    document.getElementById("claimScreen").style.display="flex";
-};
+    // Open Ad
+    document.getElementById("adBox").style.display = "flex";
+}
 
-document.getElementById("claimBtn").onclick = async ()=>{
-    const ref = doc(db,"users",uid);
-    await updateDoc(ref,{ coins: increment(10) });
 
-    let c = parseInt(document.getElementById("userCoins").innerText);
-    document.getElementById("userCoins").innerText = c + 10;
+// Close Ad
+function closeAd(){
+    document.getElementById("adBox").style.display = "none";
 
-    count++;
-    document.getElementById("limitBox").innerText = count+" / "+limit;
+    // Show Claim UI
+    document.getElementById("claimBox").style.display = "flex";
+}
 
-    document.getElementById("claimScreen").style.display="none";
 
-    if(count>=limit){ alert("Task Completed!"); return; }
-};
+// Claim Coins
+async function claimCoins(){
+    document.getElementById("claimBox").style.display = "none";
+
+    attemptsLeft--;
+    document.getElementById("leftCount").innerText = attemptsLeft;
+
+    // Update coins in Firestore
+    const ref = doc(db, "users", currentUser.uid);
+    const snap = await getDoc(ref);
+
+    let oldCoins = snap.data().coins;
+    let newCoins = oldCoins + 10;
+
+    await updateDoc(ref, { coins: newCoins });
+
+    if(attemptsLeft === 0){
+        alert("All tasks completed for today!");
+    }
+}
+
 </script>
+
 </body>
 </html>
