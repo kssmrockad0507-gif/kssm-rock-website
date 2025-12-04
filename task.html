@@ -1,90 +1,145 @@
-<!DOCTYPE html><html lang="ta">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>KSSM - Tasks</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KSSM ROCK – Math Puzzle</title>
+
 <style>
-  :root{
-    --bg1:#8FD3FF; --bg2:#D7F3FF;
-    --card:#fff; --accent:#0077FF; --green:#00A82D; --orange:#FFA500;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; font-family:Inter,Arial,Helvetica,sans-serif;
-    background: linear-gradient(180deg,var(--bg1),var(--bg2));
-    color:#0b1220; -webkit-font-smoothing:antialiased;
-  }
-  .wrap{max-width:720px;margin:28px auto;padding:20px;}
-  .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .title{font-weight:800;font-size:18px}
-  .coins{background:rgba(255,255,255,0.85);padding:8px 12px;border-radius:12px;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
-  .main{margin-top:18px;background:var(--card);border-radius:16px;padding:22px;box-shadow:0 8px 30px rgba(15,23,42,0.06)}
-  .question{font-size:20px;font-weight:700;margin-bottom:14px}
-  .opts{display:flex;flex-direction:column;gap:10px}
-  .opt{
-    border-radius:12px;padding:12px 14px;background:#f3f7fb;border:1px solid #e6eef9;
-    cursor:pointer;font-weight:700;
-  }
-  .opt.selected{background:linear-gradient(90deg,#e6f2ff,#fefcff);border-color:var(--accent)}
-  .controls{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-  .btn{padding:12px 18px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
-  .btn.submit{background:var(--accent);color:white}
-  .btn.claim{background:var(--orange);color:white;display:none}
-  .info{margin-top:14px;color:#475569}
-  .count{display:inline-block;background:var(--accent);color:white;padding:8px 10px;border-radius:10px;font-weight:800}
-  /* Ad placeholder & Claim modal */
-  .overlay{position:fixed;inset:0;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,0.7);z-index:999}
-  .adbox{width:88%;max-width:520px;background:white;padding:20px;border-radius:14px;text-align:center}
-  .ad-title{font-weight:800;margin-bottom:12px}
-  .ad-close{margin-top:16px;padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:white;display:none}
-  .claimbox{position:fixed;right:18px;bottom:18px;display:none;z-index:1000}
-  .claimbtn{background:var(--orange);color:white;padding:12px 16px;border-radius:12px;border:none;font-weight:800}
-  .disabled{opacity:0.55;pointer-events:none}
-  @media (max-width:520px){
-    .wrap{padding:12px}
-    .question{font-size:18px}
-  }
+    body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(180deg, #0e5d63, #07404b);
+        font-family: Arial, sans-serif;
+        color: white;
+    }
+
+    .topBar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        font-size: 20px;
+    }
+
+    .back {
+        font-size: 25px;
+        cursor: pointer;
+    }
+
+    .coinBox {
+        background: white;
+        color: black;
+        display: flex;
+        align-items: center;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    .coinBox img {
+        width: 22px;
+        margin-right: 5px;
+    }
+
+    .card {
+        width: 85%;
+        margin: auto;
+        margin-top: 10px;
+        background: white;
+        border-radius: 25px;
+        padding: 20px;
+        color: black;
+        text-align: center;
+    }
+
+    .questionBox {
+        background: #d9e3e6;
+        padding: 35px;
+        border-radius: 20px;
+        margin-top: 10px;
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+    .ans {
+        width: 80%;
+        margin: auto;
+        background: linear-gradient(180deg, #195c63, #0d434a);
+        padding: 18px;
+        text-align: center;
+        border-radius: 15px;
+        margin-top: 20px;
+        font-size: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        color: white;
+    }
+
+    .adBox {
+        width: 90%;
+        margin: auto;
+        margin-top: 25px;
+        background: white;
+        height: 180px;
+        border-radius: 15px;
+    }
+
+    #overlayScreen {
+        display: none;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.75);
+        position: fixed;
+        top: 0;
+        left: 0;
+        color: white;
+        text-align: center;
+        padding-top: 200px;
+        font-size: 28px;
+    }
+
+    #claimBtn {
+        margin-top: 25px;
+        background: white;
+        color: black;
+        padding: 12px 30px;
+        border-radius: 12px;
+        font-size: 22px;
+        cursor: pointer;
+    }
 </style>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
 </head>
 <body>
-<div class="wrap">  <div class="top">
-    <div class="title">KSSM - Daily Task</div>
-    <div class="coins">Coins: <span id="coinValue">0</span></div>
-  </div>  <div class="main" id="mainCard">
-    <div class="question">Question (same one repeat 15 times):<br><br><span id="qtext">What is 10 + 10 ?</span></div><div class="opts" id="opts">
-  <div class="opt" data-value="A">A) 15</div>
-  <div class="opt" data-value="B">B) 18</div>
-  <div class="opt" data-value="C">C) 20</div>
-  <div class="opt" data-value="D">D) 22</div>
+
+<div class="topBar">
+    <div class="back" onclick="history.back()">←</div>
+    <div style="font-size:22px;">Math Puzzle</div>
+    <div class="coinBox">
+        <img src="https://i.imgur.com/4xP3GZp.png">
+        <span id="coinCount">0</span>
+    </div>
 </div>
 
-<div class="controls">
-  <button class="btn submit" id="submitBtn">Submit Answer</button>
-  <div style="flex:1"></div>
-  <div class="info">Attempts left: <span class="count" id="attemptsLeft">15</span></div>
+<div class="card">
+    <div class="questionBox" id="questionText">3 + 5 = ?</div>
 </div>
 
-<div class="info" id="statusText">Select correct option and press Submit — after ad closes you can Claim +10 coins.</div>
+<div class="ans" onclick="checkAnswer(8)">8</div>
+<div class="ans" onclick="checkAnswer(9)">9</div>
 
-  </div></div><!-- AD OVERLAY (white ad placeholder) --><div id="adOverlay" class="overlay" aria-hidden="true">
-  <div class="adbox">
-    <div class="ad-title">Advertisement</div>
-    <div id="adMsg">Please wait... Ad playing</div>
-    <button id="adCloseBtn" class="ad-close">Close Ad</button>
-  </div>
-</div><!-- CLAIM FLOAT --><div class="claimbox" id="claimBox" aria-hidden="true">
-  <button id="claimBtn" class="claimbtn">Claim +10 Coins</button>
-</div><script type="module">
-// Firebase imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import {
-  getAuth, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import {
-  getFirestore, doc, getDoc, setDoc, updateDoc, increment
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+<div class="adBox"></div>
 
-// --- Firebase config (use your own already active config) ---
+<!-- Overlay -->
+<div id="overlayScreen"></div>
+
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
   authDomain: "kssm-rock-tam-ad.firebaseapp.com",
@@ -94,177 +149,75 @@ const firebaseConfig = {
   appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
 };
 
-// init
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-let currentUser = null;
-const DAILY_LIMIT = 15;
-const QUESTION_TEXT = "What is 10 + 10 ?";
-const CORRECT_VALUE = "C"; // option C is correct (20)
+let userUID = null;
+let coins = 0;
 
-// UI elements
-const coinValueEl = document.getElementById('coinValue');
-const attemptsLeftEl = document.getElementById('attemptsLeft');
-const optsContainer = document.getElementById('opts');
-const submitBtn = document.getElementById('submitBtn');
-const adOverlay = document.getElementById('adOverlay');
-const adCloseBtn = document.getElementById('adCloseBtn');
-const claimBox = document.getElementById('claimBox');
-const claimBtn = document.getElementById('claimBtn');
-const statusText = document.getElementById('statusText');
-const qtext = document.getElementById('qtext');
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        userUID = user.uid;
 
-qtext.textContent = QUESTION_TEXT;
+        const ref = db.collection("users").doc(userUID);
+        const snap = await ref.get();
 
-// selection handling
-let selectedOpt = null;
-optsContainer.addEventListener('click', (e) => {
-  const target = e.target.closest('.opt');
-  if (!target) return;
-  // deselect others
-  document.querySelectorAll('.opt').forEach(el => el.classList.remove('selected'));
-  target.classList.add('selected');
-  selectedOpt = target.getAttribute('data-value');
-});
+        if (snap.exists)
+            coins = snap.data().coins || 0;
+        else
+            ref.set({ coins: 0 });
 
-// auth check + load user info
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    // not logged in → redirect to login page
-    window.location.href = 'login.html';
-    return;
-  }
-  currentUser = user;
-  await ensureUserRecord();
-  await refreshUI();
-});
-
-// ensure user doc exists and attempts are set for today
-async function ensureUserRecord() {
-  const userRef = doc(db, 'users', currentUser.uid);
-  const snap = await getDoc(userRef);
-  const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
-  if (!snap.exists()) {
-    await setDoc(userRef, {
-      email: currentUser.email || '',
-      uid: currentUser.uid,
-      coins: 0,
-      attemptsDate: today,
-      attemptsLeft: DAILY_LIMIT
-    });
-    return;
-  }
-  const data = snap.data();
-  if (!data.attemptsDate || data.attemptsDate !== today) {
-    // reset for new day
-    await updateDoc(userRef, { attemptsDate: today, attemptsLeft: DAILY_LIMIT });
-  }
-}
-
-// refresh UI values from firestore
-async function refreshUI(){
-  const userRef = doc(db, 'users', currentUser.uid);
-  const snap = await getDoc(userRef);
-  if (!snap.exists()) return;
-  const data = snap.data();
-  coinValueEl.textContent = data.coins ?? 0;
-  attemptsLeftEl.textContent = (typeof data.attemptsLeft === 'number') ? data.attemptsLeft : DAILY_LIMIT;
-  // disable submit if no attempts left
-  const left = data.attemptsLeft ?? DAILY_LIMIT;
-  if (left <= 0) {
-    submitBtn.classList.add('disabled');
-    statusText.textContent = "Today's tasks completed. Come back tomorrow.";
-  } else {
-    submitBtn.classList.remove('disabled');
-    statusText.textContent = "Select correct option and press Submit — after ad closes you can Claim +10 coins.";
-  }
-}
-
-// Submit answer -> show ad placeholder if correct
-submitBtn.addEventListener('click', () => {
-  if (!selectedOpt) {
-    alert('Please select an option.');
-    return;
-  }
-  // check attempts left from firestore one more time to avoid race
-  submitBtn.disabled = true;
-  (async () => {
-    const userRef = doc(db, 'users', currentUser.uid);
-    const snap = await getDoc(userRef);
-    const left = (snap.exists() && snap.data().attemptsLeft != null) ? snap.data().attemptsLeft : DAILY_LIMIT;
-    if (left <= 0) {
-      alert("No attempts left for today.");
-      submitBtn.disabled = false;
-      return;
+        document.getElementById("coinCount").innerText = coins;
     }
-    // check answer
-    if (selectedOpt === CORRECT_VALUE) {
-      // open ad placeholder
-      showAdPlaceholder();
+});
+
+
+function checkAnswer(ans) {
+    if (ans === 8) {
+        showOverlay("Correct Answer! 🎉<br><br><button id='claimBtn' onclick='startAd()'>Continue</button>");
     } else {
-      alert('Wrong answer. Try again.');
+        alert("Wrong Answer ❌");
     }
-    submitBtn.disabled = false;
-  })();
-});
-
-// show ad placeholder (white screen) and enable close after 10s
-function showAdPlaceholder(){
-  adOverlay.style.display = 'flex';
-  adCloseBtn.style.display = 'none';
-  document.getElementById('adMsg').textContent = 'Ad playing... please wait';
-  let countdown = 10;
-  const timer = setInterval(() => {
-    countdown--;
-    document.getElementById('adMsg').textContent = `Ad playing... please wait (${countdown}s)`;
-    if (countdown <= 0) {
-      clearInterval(timer);
-      adCloseBtn.style.display = 'inline-block';
-      document.getElementById('adMsg').textContent = 'You can close the ad now';
-    }
-  }, 1000);
 }
 
-// when ad closed → show claim button (prevent double-claim)
-let adViewed = false;
-adCloseBtn.addEventListener('click', () => {
-  adOverlay.style.display = 'none';
-  adViewed = true;
-  claimBox.style.display = 'block';
-});
+function showOverlay(html) {
+    const o = document.getElementById("overlayScreen");
+    o.style.display = "block";
+    o.innerHTML = html;
+}
 
-// Claim coins: update Firestore atomically (coins +=10, attemptsLeft -=1)
-claimBtn.addEventListener('click', async () => {
-  if (!adViewed) {
-    alert('Please watch the ad first.');
-    return;
-  }
-  claimBtn.disabled = true;
-  const userRef = doc(db, 'users', currentUser.uid);
-  // update atomically
-  try {
-    await updateDoc(userRef, {
-      coins: increment(10),
-      attemptsLeft: increment(-1)
-    });
-    // refresh UI
-    await refreshUI();
-    // hide claim button & reset adViewed
-    claimBox.style.display = 'none';
-    adViewed = false;
-    alert('+10 coins added to your account!');
-    // reset selected option
-    document.querySelectorAll('.opt').forEach(el => el.classList.remove('selected'));
-    selectedOpt = null;
-  } catch (err) {
-    console.error(err);
-    alert('Error updating coins: ' + err.message);
-  } finally {
-    claimBtn.disabled = false;
-  }
-});
+function startAd() {
+    let sec = 10;
+    showOverlay("Showing Ad… " + sec + " sec");
 
-</script></body>
+    let timer = setInterval(() => {
+        sec--;
+        showOverlay("Showing Ad… " + sec + " sec");
+
+        if (sec <= 0) {
+            clearInterval(timer);
+            showClaimScreen();
+        }
+    }, 1000);
+}
+
+function showClaimScreen() {
+    showOverlay(`
+        +10 Coins Added! 🎉<br><br>
+        <button id="claimBtn" onclick="claimNow()">Claim</button>
+    `);
+}
+
+async function claimNow() {
+    coins += 10;
+
+    await db.collection("users").doc(userUID).update({ coins });
+    document.getElementById("coinCount").innerText = coins;
+
+    document.getElementById("overlayScreen").style.display = "none";
+}
+</script>
+
+</body>
 </html>
