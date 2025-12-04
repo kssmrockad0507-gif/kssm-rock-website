@@ -3,54 +3,103 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KSSM Rock - Login</title>
+
+  <title>KSSM ROCK Free Reward – Login</title>
+
+  <!-- META TAGS (Important for Ads Approval) -->
+  <meta name="title" content="KSSM ROCK Free Reward – Earn Coins by Completing Tasks">
+  <meta name="description" content="Earn free rewards & redeem codes by completing simple tasks. 100% safe | Fast rewards | Google Login.">
+  <meta name="keywords" content="free rewards, earn coins, redeem codes, puzzle reward, KSSM ROCK">
+  <meta name="author" content="KSSM ROCK TEAM">
 
   <style>
     body {
-      background: linear-gradient(135deg, #4fc3f7, #0288d1); /* SKY BLUE COLORS */
-      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+
+      /* PREMIUM BLUE–TEAL GRADIENT */
+      background: linear-gradient(135deg, #0288d1, #26c6da, #00bcd4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "Poppins", sans-serif;
       color: white;
+    }
+
+    .card {
+      width: 340px;
+      padding: 40px 30px;
       text-align: center;
-      padding-top: 100px;
-    }
-    .box {
+      border-radius: 20px;
+
       background: rgba(255, 255, 255, 0.15);
-      padding: 40px;
-      margin: auto;
-      width: 300px;
-      border-radius: 15px;
-      backdrop-filter: blur(5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      backdrop-filter: blur(10px);
+      animation: fadeIn 1s ease-in-out;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    p {
+      margin-bottom: 25px;
+      opacity: 0.9;
+    }
+
     button {
+      width: 100%;
+      padding: 12px;
       background: white;
       color: #0288d1;
-      padding: 10px 20px;
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
+      border-radius: 10px;
       font-size: 16px;
       font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
     }
+
     button:hover {
-      background: #e0e0e0;
+      background: #e0f7fa;
+      transform: translateY(-2px);
+    }
+
+    /* Small footer text */
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      opacity: 0.8;
     }
   </style>
 
-  <!-- Firebase 9 (Modular) -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
 </head>
 <body>
 
-  <div class="box">
-    <h2>Welcome to KSSM ROCK 💙</h2>
-    <p>Login to continue</p>
-    <button id="googleBtn">Continue with Google</button>
+  <div class="card">
+    <h1>KSSM ROCK</h1>
+    <p>Free Reward System<br>Login with Google to continue</p>
+
+    <button id="googleBtn">🌐 Continue with Google</button>
+
+    <div class="footer">
+      © 2025 KSSM ROCK – Free Reward
+    </div>
   </div>
 
   <script>
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
       authDomain: "kssm-rock-tam-ad.firebaseapp.com",
@@ -64,10 +113,9 @@
     const auth = firebase.auth();
     const provider = new firebase.auth.GoogleAuthProvider();
 
-    document.getElementById("googleBtn").addEventListener("click", function () {
+    document.getElementById("googleBtn").addEventListener("click", () => {
       auth.signInWithPopup(provider)
-        .then((result) => {
-          alert("Login Successful 🎉");
+        .then(() => {
           window.location.href = "index.html";
         })
         .catch((error) => {
