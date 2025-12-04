@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rewards UI</title>
+<title>KSSM ROCK FREE REWARD</title>
 
 <style>
     body {
         margin: 0;
         padding: 0;
         font-family: Arial;
-        background: linear-gradient(to bottom, #7EC8E3, #C4EBFF);
+        background: linear-gradient(135deg, #0288d1, #26c6da, #00bcd4);
+        background-size: cover;
     }
 
     .topbar {
@@ -20,6 +21,9 @@
         justify-content: space-between;
         align-items: center;
         color: white;
+        background: rgba(255,255,255,0.12);
+        backdrop-filter: blur(10px);
+        box-shadow: 0px 4px 20px rgba(0,0,0,0.25);
     }
 
     .menu-btn {
@@ -35,7 +39,7 @@
         font-size: 23px;
         font-weight: bold;
         letter-spacing: 1px;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        text-shadow: 0px 0px 8px rgba(255,255,255,0.6);
     }
 
     .coins {
@@ -44,10 +48,11 @@
         justify-content: right;
         align-items: center;
         font-size: 20px;
-        background: rgba(255,255,255,0.35);
+        background: rgba(255,255,255,0.25);
         padding: 8px 14px;
         border-radius: 12px;
         backdrop-filter: blur(6px);
+        box-shadow: 0px 3px 12px rgba(0,0,0,0.2);
     }
 
     .coins img {
@@ -60,15 +65,25 @@
         padding: 20px;
     }
 
+    /* ✅ BIG BUTTONS WHITE COLOR */
     .big-box {
         background: white;
+        color: #0288d1;
         margin-top: 18px;
         padding: 22px;
         border-radius: 18px;
         font-size: 22px;
         font-weight: bold;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+        backdrop-filter: blur(6px);
+        box-shadow: 0px 6px 20px rgba(0,0,0,0.25);
         cursor: pointer;
+        transition: 0.3s;
+        text-align: center;
+    }
+
+    .big-box:hover {
+        transform: scale(1.03);
+        background: #f1f1f1;
     }
 
     .menu-screen {
@@ -85,10 +100,11 @@
 
     .menu-box {
         width: 80%;
-        background: white;
+        background: rgba(255,255,255,0.95);
         padding: 25px;
         border-radius: 18px;
         text-align: center;
+        box-shadow: 0px 6px 20px rgba(0,0,0,0.35);
     }
 
     .menu-box div {
@@ -103,17 +119,20 @@
         font-size: 18px;
         border: none;
         border-radius: 8px;
-        background: skyblue;
+        background: #0288d1;
         color: white;
+        cursor: pointer;
     }
+
 </style>
 </head>
+
 <body>
 
 <!-- TOP BAR -->
 <div class="topbar">
     <div class="menu-btn" onclick="openMenu()">三</div>
-    <div class="title">KSSM ROCK TAMIL</div>
+    <div class="title">KSSM ROCK FREE REWARD</div>
     <div class="coins">
         <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png">
         <span id="coinValue">0</span>
@@ -159,7 +178,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Load coins from Firestore
 async function loadCoins(uid) {
     const ref = doc(db, "users", uid);
     const snap = await getDoc(ref);
@@ -177,7 +195,6 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Logout function
 function logoutUser() {
     signOut(auth).then(() => {
         window.location.href = "login.html";
