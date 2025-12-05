@@ -22,10 +22,7 @@
         font-size: 20px;
     }
 
-    .back {
-        font-size: 25px;
-        cursor: pointer;
-    }
+    .back { font-size: 25px; cursor: pointer; }
 
     .coinBox {
         background: white;
@@ -110,7 +107,6 @@
     }
 </style>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -128,15 +124,13 @@
 </div>
 
 <div class="card">
-    <div class="questionBox" id="questionText">3 + 5 = ?</div>
+    <div class="questionBox" id="questionText">Loading...</div>
 </div>
 
-<div class="ans" onclick="checkAnswer(8)">8</div>
-<div class="ans" onclick="checkAnswer(9)">9</div>
+<div id="ansArea"></div>
 
 <div class="adBox"></div>
 
-<!-- Overlay -->
 <div id="overlayScreen"></div>
 
 <script>
@@ -155,6 +149,23 @@ const db = firebase.firestore();
 
 let userUID = null;
 let coins = 0;
+let dailyCount = 0;
+const DAILY_LIMIT = 15;
+
+// Question List (5 questions)
+let questions = [
+  { q: "3 + 5 = ?", a: 8, o1: 8, o2: 9 },
+  { q: "Identify the letter: A", a: "A", o1: "A", o2: "B" },
+  { q: "10 - 4 = ?", a: 6, o1: 6, o2: 5 },
+  { q: "Which is a vowel?", a: "E", o1: "E", o2: "K" },
+  { q: "2 × 6 = ?", a: 12, o1: 12, o2: 10 }
+];
+
+function randomQuestion() {
+  return questions[Math.floor(Math.random() * questions.length)];
+}
+
+let current = null;
 
 auth.onAuthStateChanged(async (user) => {
     if (user) {
@@ -163,18 +174,38 @@ auth.onAuthStateChanged(async (user) => {
         const ref = db.collection("users").doc(userUID);
         const snap = await ref.get();
 
-        if (snap.exists)
+        if (snap.exists) {
             coins = snap.data().coins || 0;
-        else
-            ref.set({ coins: 0 });
+            dailyCount = snap.data().dailyCount || 0;
+        } else {
+            ref.set({ coins: 0, dailyCount: 0 });
+        }
 
         document.getElementById("coinCount").innerText = coins;
+
+        loadNewQuestion();
     }
 });
 
+// Load next random question
+function loadNewQuestion() {
+    current = randomQuestion();
+    document.getElementById("questionText").innerText = current.q;
+
+    document.getElementById("ansArea").innerHTML = `
+        <div class="ans" onclick="checkAnswer('${current.o1}')">${current.o1}</div>
+        <div class="ans" onclick="checkAnswer('${current.o2}')">${current.o2}</div>
+    `;
+}
 
 function checkAnswer(ans) {
-    if (ans === 8) {
+
+    if (dailyCount >= DAILY_LIMIT) {
+        showOverlay("Today Limit is Over! ❌<br><br>Come back Tomorrow ❤️");
+        return;
+    }
+
+    if (ans == current.a) {
         showOverlay("Correct Answer! 🎉<br><br><button id='claimBtn' onclick='startAd()'>Continue</button>");
     } else {
         alert("Wrong Answer ❌");
@@ -210,12 +241,19 @@ function showClaimScreen() {
 }
 
 async function claimNow() {
+
+    dailyCount += 1;
     coins += 10;
 
-    await db.collection("users").doc(userUID).update({ coins });
-    document.getElementById("coinCount").innerText = coins;
+    await db.collection("users").doc(userUID).update({
+        coins: coins,
+        dailyCount: dailyCount
+    });
 
+    document.getElementById("coinCount").innerText = coins;
     document.getElementById("overlayScreen").style.display = "none";
+
+    loadNewQuestion();
 }
 </script>
 
