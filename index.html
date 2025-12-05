@@ -1,218 +1,222 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KSSM ROCK FREE REWARD</title>
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+<title>KSSM ROCK FREE REWARD</title>  
+  
+<style>  
+    body {  
+        margin: 0;  
+        padding: 0;  
+        font-family: Arial;  
+        background: linear-gradient(135deg, #0288d1, #26c6da, #00bcd4);  
+        background-size: cover;  
+    }  
+  
+    .topbar {  
+        width: 100%;  
+        padding: 14px 20px;  
+        display: flex;  
+        justify-content: space-between;  
+        align-items: center;  
+        color: white;  
+        background: rgba(255,255,255,0.12);  
+        backdrop-filter: blur(10px);  
+        box-shadow: 0px 4px 20px rgba(0,0,0,0.25);  
+    }  
+  
+    .menu-btn {  
+        font-size: 30px;  
+        cursor: pointer;  
+        user-select: none;  
+        flex: 1;  
+    }  
+  
+    .title {  
+        flex: 2;  
+        text-align: center;  
+        font-size: 23px;  
+        font-weight: bold;  
+        letter-spacing: 1px;  
+        text-shadow: 0px 0px 8px rgba(255,255,255,0.6);  
+    }  
+  
+    .coins {  
+        flex: 1;  
+        display: flex;  
+        justify-content: right;  
+        align-items: center;  
+        font-size: 20px;  
+        background: rgba(255,255,255,0.25);  
+        padding: 8px 14px;  
+        border-radius: 12px;  
+        backdrop-filter: blur(6px);  
+        box-shadow: 0px 3px 12px rgba(0,0,0,0.2);  
+    }  
+  
+    .coins img {  
+        width: 24px;  
+        height: 24px;  
+        margin-right: 7px;  
+    }  
+  
+    .box-container {  
+        padding: 20px;  
+    }  
+  
+    /* WHITE TASK BUTTONS */  
+    .big-box {  
+        background: white;  
+        color: #0288d1;  
+        margin-top: 18px;  
+        padding: 22px;  
+        border-radius: 18px;  
+        font-size: 22px;  
+        font-weight: bold;  
+        backdrop-filter: blur(6px);  
+        box-shadow: 0px 6px 20px rgba(0,0,0,0.25);  
+        cursor: pointer;  
+        transition: 0.3s;  
+        text-align: center;  
+    }  
+  
+    .big-box:hover {  
+        transform: scale(1.03);  
+        background: #f1f1f1;  
+    }  
+  
+    .menu-screen {  
+        position: fixed;  
+        top: 0;  
+        left: 0;  
+        width: 100%;  
+        height: 100%;  
+        background: rgba(0,0,0,0.75);  
+        display: none;  
+        justify-content: center;  
+        align-items: center;  
+    }  
+  
+    .menu-box {  
+        width: 80%;  
+        background: rgba(255,255,255,0.95);  
+        padding: 25px;  
+        border-radius: 18px;  
+        text-align: center;  
+        box-shadow: 0px 6px 20px rgba(0,0,0,0.35);  
+    }  
+  
+    .menu-box div {  
+        font-size: 22px;  
+        padding: 14px;  
+        border-bottom: 1px solid #ccc;  
+    }  
+  
+    .close-btn {  
+        margin-top: 15px;  
+        padding: 10px 18px;  
+        font-size: 18px;  
+        border: none;  
+        border-radius: 8px;  
+        background: #0288d1;  
+        color: white;  
+        cursor: pointer;  
+    }  
+  
+</style>  
+</head>  
+  
+<body>  
+  
+<!-- TOP BAR -->  
+<div class="topbar">  
+    <div class="menu-btn" onclick="openMenu()">三</div>  
+    <div class="title">KSSM ROCK FREE REWARD</div>  
+    <div class="coins">  
+        <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png">  
+        <span id="coinValue">0</span>  
+    </div>  
+</div>  
+  
+<!-- TASK BOXES -->  
+<div class="box-container">  
+    <div class="big-box" onclick="goDaily()">Daily Coin</div>  
 
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial;
-        background: linear-gradient(135deg, #0288d1, #26c6da, #00bcd4);
-        background-size: cover;
-    }
+    <!-- TASK 1 (Math Quiz) -->
+    <div class="big-box" onclick="window.location.href='task.html'">Maths Quiz</div>
 
-    .topbar {
-        width: 100%;
-        padding: 14px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        background: rgba(255,255,255,0.12);
-        backdrop-filter: blur(10px);
-        box-shadow: 0px 4px 20px rgba(0,0,0,0.25);
-    }
+    <!-- TASK 2 (Alphabet Identifier) -->
+    <div class="big-box" onclick="window.location.href='task2.html'">Alphabet Identifier</div>
 
-    .menu-btn {
-        font-size: 30px;
-        cursor: pointer;
-        user-select: none;
-        flex: 1;
-    }
-
-    .title {
-        flex: 2;
-        text-align: center;
-        font-size: 23px;
-        font-weight: bold;
-        letter-spacing: 1px;
-        text-shadow: 0px 0px 8px rgba(255,255,255,0.6);
-    }
-
-    .coins {
-        flex: 1;
-        display: flex;
-        justify-content: right;
-        align-items: center;
-        font-size: 20px;
-        background: rgba(255,255,255,0.25);
-        padding: 8px 14px;
-        border-radius: 12px;
-        backdrop-filter: blur(6px);
-        box-shadow: 0px 3px 12px rgba(0,0,0,0.2);
-    }
-
-    .coins img {
-        width: 24px;
-        height: 24px;
-        margin-right: 7px;
-    }
-
-    .box-container {
-        padding: 20px;
-    }
-
-    /* ✅ BIG BUTTONS WHITE COLOR */
-    .big-box {
-        background: white;
-        color: #0288d1;
-        margin-top: 18px;
-        padding: 22px;
-        border-radius: 18px;
-        font-size: 22px;
-        font-weight: bold;
-        backdrop-filter: blur(6px);
-        box-shadow: 0px 6px 20px rgba(0,0,0,0.25);
-        cursor: pointer;
-        transition: 0.3s;
-        text-align: center;
-    }
-
-    .big-box:hover {
-        transform: scale(1.03);
-        background: #f1f1f1;
-    }
-
-    .menu-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.75);
-        display: none;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .menu-box {
-        width: 80%;
-        background: rgba(255,255,255,0.95);
-        padding: 25px;
-        border-radius: 18px;
-        text-align: center;
-        box-shadow: 0px 6px 20px rgba(0,0,0,0.35);
-    }
-
-    .menu-box div {
-        font-size: 22px;
-        padding: 14px;
-        border-bottom: 1px solid #ccc;
-    }
-
-    .close-btn {
-        margin-top: 15px;
-        padding: 10px 18px;
-        font-size: 18px;
-        border: none;
-        border-radius: 8px;
-        background: #0288d1;
-        color: white;
-        cursor: pointer;
-    }
-
-</style>
-</head>
-
-<body>
-
-<!-- TOP BAR -->
-<div class="topbar">
-    <div class="menu-btn" onclick="openMenu()">三</div>
-    <div class="title">KSSM ROCK FREE REWARD</div>
-    <div class="coins">
-        <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png">
-        <span id="coinValue">0</span>
-    </div>
-</div>
-
-<!-- BOXES -->
-<div class="box-container">
-    <div class="big-box" onclick="goDaily()">Daily Coin</div>
-    <div class="big-box" onclick="goTask()">Task</div>
-    <div class="big-box" onclick="goTask()">Task</div>
-    <div class="big-box" onclick="goPromo()">Promo Code</div>
-</div>
-
-<!-- MENU PAGE -->
-<div id="menuPage" class="menu-screen">
-    <div class="menu-box">
-        <div>Redeem History</div>
-        <div>Redeem Selection</div>
-        <div onclick="logoutUser()">Logout</div>
-        <button class="close-btn" onclick="closeMenu()">Close</button>
-    </div>
-</div>
-
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { getFirestore, doc, getDoc }
-from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-    authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-    projectId: "kssm-rock-tam-ad",
-    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
-    messagingSenderId: "28268633766",
-    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-async function loadCoins(uid) {
-    const ref = doc(db, "users", uid);
-    const snap = await getDoc(ref);
-
-    if (snap.exists()) {
-        document.getElementById("coinValue").innerText = snap.data().coins;
-    }
-}
-
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = "login.html";
-    } else {
-        loadCoins(user.uid);
-    }
-});
-
-function logoutUser() {
-    signOut(auth).then(() => {
-        window.location.href = "login.html";
-    });
-}
-
-window.logoutUser = logoutUser;
-</script>
-
-<!-- MENU + NAV -->
-<script>
-function openMenu() { document.getElementById("menuPage").style.display = "flex"; }
-function closeMenu() { document.getElementById("menuPage").style.display = "none"; }
-
-function goPromo() { window.location.href = "promo.html"; }
-function goDaily() { window.location.href = "daily.html"; }
-function goTask() { window.location.href = "task.html"; }
-</script>
-
-</body>
+    <div class="big-box" onclick="goPromo()">Promo Code</div>  
+</div>  
+  
+<!-- MENU PAGE -->  
+<div id="menuPage" class="menu-screen">  
+    <div class="menu-box">  
+        <div>Redeem History</div>  
+        <div>Redeem Selection</div>  
+        <div onclick="logoutUser()">Logout</div>  
+        <button class="close-btn" onclick="closeMenu()">Close</button>  
+    </div>  
+</div>  
+  
+<!-- FIREBASE -->  
+<script type="module">  
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";  
+import { getAuth, onAuthStateChanged, signOut }  
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";  
+import { getFirestore, doc, getDoc }  
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";  
+  
+const firebaseConfig = {  
+    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",  
+    authDomain: "kssm-rock-tam-ad.firebaseapp.com",  
+    projectId: "kssm-rock-tam-ad",  
+    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",  
+    messagingSenderId: "28268633766",  
+    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"  
+};  
+  
+const app = initializeApp(firebaseConfig);  
+const auth = getAuth(app);  
+const db = getFirestore(app);  
+  
+async function loadCoins(uid) {  
+    const ref = doc(db, "users", uid);  
+    const snap = await getDoc(ref);  
+  
+    if (snap.exists()) {  
+        document.getElementById("coinValue").innerText = snap.data().coins;  
+    }  
+}  
+  
+onAuthStateChanged(auth, (user) => {  
+    if (!user) {  
+        window.location.href = "login.html";  
+    } else {  
+        loadCoins(user.uid);  
+    }  
+});  
+  
+function logoutUser() {  
+    signOut(auth).then(() => {  
+        window.location.href = "login.html";  
+    });  
+}  
+  
+window.logoutUser = logoutUser;  
+</script>  
+  
+<!-- MENU + NAV -->  
+<script>  
+function openMenu() { document.getElementById("menuPage").style.display = "flex"; }  
+function closeMenu() { document.getElementById("menuPage").style.display = "none"; }  
+  
+function goPromo() { window.location.href = "promo.html"; }  
+function goDaily() { window.location.href = "daily.html"; }  
+</script>  
+  
+</body>  
 </html>
