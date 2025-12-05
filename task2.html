@@ -128,11 +128,11 @@
 </div>
 
 <div class="card">
-    <div class="questionBox" id="questionText">Identify: A</div>
+    <div class="questionBox" id="questionText">Loading...</div>
 </div>
 
-<div class="ans" onclick="checkAnswer('A')">A</div>
-<div class="ans" onclick="checkAnswer('B')">B</div>
+<div class="ans" id="opt1"></div>
+<div class="ans" id="opt2"></div>
 
 <div class="adBox"></div>
 
@@ -155,7 +155,52 @@ const db = firebase.firestore();
 
 let userUID = null;
 let coins = 0;
-let correctAnswer = "A";  // correct answer changed for task-2
+let correctAnswer = "";
+ 
+// All English Easy Identify Questions
+const questions = [
+    { q: "Identify: A", ans: "A", opt: ["A", "B"] },
+    { q: "Identify: B", ans: "B", opt: ["B", "C"] },
+    { q: "Identify: C", ans: "C", opt: ["C", "D"] },
+    { q: "Identify: D", ans: "D", opt: ["D", "E"] },
+    { q: "Identify: E", ans: "E", opt: ["E", "F"] },
+    { q: "Identify: F", ans: "F", opt: ["F", "G"] },
+    { q: "Identify: G", ans: "G", opt: ["G", "H"] },
+    { q: "Identify: H", ans: "H", opt: ["H", "I"] },
+    { q: "Identify: I", ans: "I", opt: ["I", "J"] },
+    { q: "Identify: J", ans: "J", opt: ["J", "K"] },
+    { q: "Identify: K", ans: "K", opt: ["K", "L"] },
+    { q: "Identify: L", ans: "L", opt: ["L", "M"] },
+    { q: "Identify: M", ans: "M", opt: ["M", "N"] },
+    { q: "Identify: N", ans: "N", opt: ["N", "O"] },
+    { q: "Identify: O", ans: "O", opt: ["O", "P"] },
+    { q: "Identify: P", ans: "P", opt: ["P", "Q"] },
+    { q: "Identify: Q", ans: "Q", opt: ["Q", "R"] },
+    { q: "Identify: R", ans: "R", opt: ["R", "S"] },
+    { q: "Identify: S", ans: "S", opt: ["S", "T"] },
+    { q: "Identify: T", ans: "T", opt: ["T", "U"] },
+    { q: "Identify: U", ans: "U", opt: ["U", "V"] },
+    { q: "Identify: V", ans: "V", opt: ["V", "W"] },
+    { q: "Identify: W", ans: "W", opt: ["W", "X"] },
+    { q: "Identify: X", ans: "X", opt: ["X", "Y"] },
+    { q: "Identify: Y", ans: "Y", opt: ["Y", "Z"] },
+    { q: "Identify: Z", ans: "Z", opt: ["Z", "A"] }
+];
+
+
+function loadQuestion() {
+    const q = questions[Math.floor(Math.random() * questions.length)];
+    document.getElementById("questionText").innerText = q.q;
+
+    correctAnswer = q.ans;
+
+    document.getElementById("opt1").innerText = q.opt[0];
+    document.getElementById("opt2").innerText = q.opt[1];
+
+    document.getElementById("opt1").onclick = () => checkAnswer(q.opt[0]);
+    document.getElementById("opt2").onclick = () => checkAnswer(q.opt[1]);
+}
+
 
 auth.onAuthStateChanged(async (user) => {
     if (user) {
@@ -170,6 +215,8 @@ auth.onAuthStateChanged(async (user) => {
             ref.set({ coins: 0 });
 
         document.getElementById("coinCount").innerText = coins;
+
+        loadQuestion();
     }
 });
 
@@ -217,6 +264,8 @@ async function claimNow() {
     document.getElementById("coinCount").innerText = coins;
 
     document.getElementById("overlayScreen").style.display = "none";
+
+    loadQuestion(); // next question
 }
 </script>
 
