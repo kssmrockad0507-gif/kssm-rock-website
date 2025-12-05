@@ -22,7 +22,10 @@
         font-size: 20px;
     }
 
-    .back { font-size: 25px; cursor: pointer; }
+    .back {
+        font-size: 25px;
+        cursor: pointer;
+    }
 
     .coinBox {
         background: white;
@@ -33,7 +36,6 @@
         border-radius: 20px;
         font-weight: bold;
     }
-
     .coinBox img {
         width: 22px;
         margin-right: 5px;
@@ -124,10 +126,11 @@
 </div>
 
 <div class="card">
-    <div class="questionBox" id="questionText">Loading...</div>
+    <div class="questionBox" id="questionText"></div>
 </div>
 
-<div id="ansArea"></div>
+<div class="ans" id="opt1" onclick="choose(1)"></div>
+<div class="ans" id="opt2" onclick="choose(2)"></div>
 
 <div class="adBox"></div>
 
@@ -149,21 +152,27 @@ const db = firebase.firestore();
 
 let userUID = null;
 let coins = 0;
-let dailyCount = 0;
-const DAILY_LIMIT = 15;
+let todayCount = 0;
+const limit = 15;
 
-// Question List (5 questions)
-let questions = [
-  { q: "3 + 5 = ?", a: 8, o1: 8, o2: 9 },
-  { q: "Identify the letter: A", a: "A", o1: "A", o2: "B" },
-  { q: "10 - 4 = ?", a: 6, o1: 6, o2: 5 },
-  { q: "Which is a vowel?", a: "E", o1: "E", o2: "K" },
-  { q: "2 × 6 = ?", a: 12, o1: 12, o2: 10 }
+// 🔥 ONLY MATH QUESTIONS (15 QUESTIONS)
+const questions = [
+    {q: "3 + 5 = ?", a1: 8, a2: 9, correct: 1},
+    {q: "7 - 2 = ?", a1: 5, a2: 4, correct: 1},
+    {q: "9 + 4 = ?", a1: 12, a2: 13, correct: 2},
+    {q: "6 - 1 = ?", a1: 4, a2: 5, correct: 2},
+    {q: "4 + 4 = ?", a1: 8, a2: 9, correct: 1},
+    {q: "10 - 7 = ?", a1: 2, a2: 3, correct: 2},
+    {q: "5 + 3 = ?", a1: 7, a2: 8, correct: 2},
+    {q: "12 - 5 = ?", a1: 7, a2: 8, correct: 1},
+    {q: "8 + 6 = ?", a1: 14, a2: 13, correct: 1},
+    {q: "15 - 9 = ?", a1: 7, a2: 6, correct: 2},
+    {q: "2 + 9 = ?", a1: 11, a2: 10, correct: 1},
+    {q: "18 - 6 = ?", a1: 11, a2: 12, correct: 2},
+    {q: "7 + 7 = ?", a1: 14, a2: 15, correct: 1},
+    {q: "20 - 11 = ?", a1: 8, a2: 9, correct: 2},
+    {q: "9 + 5 = ?", a1: 14, a2: 13, correct: 1}
 ];
-
-function randomQuestion() {
-  return questions[Math.floor(Math.random() * questions.length)];
-}
 
 let current = null;
 
@@ -176,37 +185,32 @@ auth.onAuthStateChanged(async (user) => {
 
         if (snap.exists) {
             coins = snap.data().coins || 0;
-            dailyCount = snap.data().dailyCount || 0;
+            todayCount = snap.data().todayCount || 0;
         } else {
-            ref.set({ coins: 0, dailyCount: 0 });
+            ref.set({ coins: 0, todayCount: 0 });
         }
 
         document.getElementById("coinCount").innerText = coins;
-
-        loadNewQuestion();
+        loadQuestion();
     }
 });
 
-// Load next random question
-function loadNewQuestion() {
-    current = randomQuestion();
-    document.getElementById("questionText").innerText = current.q;
-
-    document.getElementById("ansArea").innerHTML = `
-        <div class="ans" onclick="checkAnswer('${current.o1}')">${current.o1}</div>
-        <div class="ans" onclick="checkAnswer('${current.o2}')">${current.o2}</div>
-    `;
-}
-
-function checkAnswer(ans) {
-
-    if (dailyCount >= DAILY_LIMIT) {
-        showOverlay("Today Limit is Over! ❌<br><br>Come back Tomorrow ❤️");
+function loadQuestion() {
+    if (todayCount >= limit) {
+        showOverlay("Today Limit Over! Come Tomorrow ❤️");
         return;
     }
 
-    if (ans == current.a) {
-        showOverlay("Correct Answer! 🎉<br><br><button id='claimBtn' onclick='startAd()'>Continue</button>");
+    current = questions[Math.floor(Math.random() * questions.length)];
+
+    document.getElementById("questionText").innerText = current.q;
+    document.getElementById("opt1").innerText = current.a1;
+    document.getElementById("opt2").innerText = current.a2;
+}
+
+function choose(op) {
+    if (op === current.correct) {
+        showOverlay("Correct 🎉<br><br><button id='claimBtn' onclick='startAd()'>Continue</button>");
     } else {
         alert("Wrong Answer ❌");
     }
@@ -234,26 +238,24 @@ function startAd() {
 }
 
 function showClaimScreen() {
-    showOverlay(`
-        +10 Coins Added! 🎉<br><br>
+    showOverlay(`+10 Coins Added 🎉<br><br>
         <button id="claimBtn" onclick="claimNow()">Claim</button>
     `);
 }
 
 async function claimNow() {
-
-    dailyCount += 1;
     coins += 10;
+    todayCount++;
 
     await db.collection("users").doc(userUID).update({
-        coins: coins,
-        dailyCount: dailyCount
+        coins,
+        todayCount
     });
 
     document.getElementById("coinCount").innerText = coins;
     document.getElementById("overlayScreen").style.display = "none";
 
-    loadNewQuestion();
+    loadQuestion();
 }
 </script>
 
