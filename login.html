@@ -6,7 +6,7 @@
 
   <title>KSSM ROCK Free Reward – Login</title>
 
-  <!-- META TAGS -->
+  <!-- META TAGS (Important for Ads Approval) -->
   <meta name="title" content="KSSM ROCK Free Reward – Earn Coins by Completing Tasks">
   <meta name="description" content="Earn free rewards & redeem codes by completing simple tasks. 100% safe | Fast rewards | Google Login.">
   <meta name="keywords" content="free rewards, earn coins, redeem codes, puzzle reward, KSSM ROCK">
@@ -18,8 +18,8 @@
       padding: 0;
       height: 100vh;
 
-      /* SAME PREMIUM GRADIENT (INDEX PAGE STYLE) */
-      background: linear-gradient(135deg, #007ea7, #00a8e8, #0096c7, #48cae4);
+      /* SAME COLOR AS IDENTIFY LETTER PAGE */
+      background: linear-gradient(180deg, #0e5d63, #07404b);
 
       display: flex;
       justify-content: center;
@@ -32,11 +32,13 @@
       width: 340px;
       padding: 40px 30px;
       text-align: center;
-      border-radius: 20px;
+      border-radius: 25px;
 
-      background: rgba(255, 255, 255, 0.15);
-      box-shadow: 0px 6px 25px rgba(0,0,0,0.25);
-      backdrop-filter: blur(10px);
+      /* SAME WHITE GLASS CARD STYLE */
+      background: white;
+      color: black;
+
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
       animation: fadeIn 1s ease-in-out;
     }
 
@@ -49,8 +51,7 @@
       margin-bottom: 10px;
       font-size: 26px;
       font-weight: 700;
-      letter-spacing: 1px;
-      text-shadow: 0px 0px 8px rgba(255,255,255,0.6);
+      color: #0d434a; /* Deep dark teal */
     }
 
     p {
@@ -61,20 +62,22 @@
 
     button {
       width: 100%;
-      padding: 12px;
-      background: white;
-      color: #0288d1;
+      padding: 14px;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 15px;
+
+      /* BUTTON COLOR MATCHED TO IDENTIFY PAGE */
+      background: linear-gradient(180deg, #195c63, #0d434a);
+
+      color: white;
+      font-size: 17px;
       font-weight: bold;
       cursor: pointer;
       transition: 0.2s;
-      box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
     }
 
     button:hover {
-      background: #e0f7fa;
+      opacity: 0.9;
       transform: translateY(-2px);
     }
 
@@ -82,6 +85,7 @@
       margin-top: 20px;
       font-size: 12px;
       opacity: 0.8;
+      color: white;
     }
   </style>
 
@@ -97,10 +101,10 @@
     <p>Free Reward System<br>Login with Google to continue</p>
 
     <button id="googleBtn">🌐 Continue with Google</button>
+  </div>
 
-    <div class="footer">
-      © 2025 KSSM ROCK – Free Reward
-    </div>
+  <div class="footer">
+    © 2025 KSSM ROCK – Free Reward
   </div>
 
   <script>
