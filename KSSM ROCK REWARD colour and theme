@@ -1,0 +1,109 @@
+Background Gradient
+
+background: linear-gradient(180deg, #0e5d63, #07404b);
+
+🔹 Card Background
+
+background: white;
+color: black;
+border-radius: 25px;
+
+🔹 Question Box
+
+background: #d9e3e6;
+font-size: 30px;
+font-weight: bold;
+border-radius: 20px;
+
+🔹 Answer Buttons
+
+background: linear-gradient(180deg, #195c63, #0d434a);
+color: white;
+border-radius: 15px;
+font-size: 25px;
+font-weight: bold;
+
+🔹 Coins Box
+
+background: white;
+color: black;
+border-radius: 20px;
+
+🔹 Overlay Screen
+
+background: rgba(0,0,0,0.75);
+color: white;
+font-size: 28px;
+
+
+---
+
+✨ Complete Style Pack (Fully Extracted CSS Ready to Reuse)
+
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(180deg, #0e5d63, #07404b);
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+.card {
+    width: 85%;
+    margin: auto;
+    background: white;
+    border-radius: 25px;
+    padding: 20px;
+    color: black;
+    text-align: center;
+}
+
+.questionBox {
+    background: #d9e3e6;
+    padding: 35px;
+    border-radius: 20px;
+    margin-top: 10px;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.ans {
+    width: 80%;
+    margin: auto;
+    background: linear-gradient(180deg, #195c63, #0d434a);
+    padding: 18px;
+    text-align: center;
+    border-radius: 15px;
+    margin-top: 20px;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+
+.coinBox {
+    background: white;
+    color: black;
+    display: flex;
+    align-items: center;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+#overlayScreen {
+    display: none;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.75);
+    position: fixed;
+    top: 0;
+    left: 0;
+    color: white;
+    text-align: center;
+    padding-top: 200px;
+    font-size: 28px;
+}
+
+
+---
