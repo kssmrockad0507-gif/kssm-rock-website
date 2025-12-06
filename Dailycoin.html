@@ -1,225 +1,415 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Daily Coins</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Daily Claim — KSSM ROCK</title>
+  <style>
+    /* Mobile-first styling (max-width constrained so desktop devtools shows mobile-like) */
     body {
-        margin: 0;
-        padding: 0;
-        background: linear-gradient(180deg, #0e5d63, #07404b);
-        font-family: Arial;
-        color: white;
-        text-align: center;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(180deg,#0e5d63,#07404b);
+      font-family: Arial, sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 92%;
+      max-width: 420px; /* keeps mobile look */
+      margin: 28px 0;
     }
 
     .mainCard {
-        width: 92%;
-        max-width: 450px;
-        margin: 40px auto;
-        background: white;
-        border-radius: 25px;
-        padding: 30px;
-        color: black;
+      background: white;
+      color: black;
+      border-radius: 22px;
+      padding: 26px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      text-align: center;
     }
 
-    .titleText {
-        font-size: 30px;
-        font-weight: bold;
-        margin-bottom: 15px;
+    .title {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 12px;
     }
 
-    .bigBox {
-        background: white;
-        border-radius: 25px;
-        padding: 35px 20px;
-        margin-top: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.25);
-    }
+    .subtitle { color: #1f3b3b; margin-bottom: 14px; font-weight: 700; }
 
     .claimBtn {
-        background: linear-gradient(180deg, #195c63, #0d434a);
-        padding: 20px;
-        color: white;
-        border-radius: 15px;
-        font-size: 26px;
-        font-weight: bold;
-        width: 85%;
-        margin: 20px auto;
-        cursor: pointer;
+      width: 86%;
+      margin: 18px auto 6px auto;
+      padding: 18px;
+      border-radius: 14px;
+      background: linear-gradient(180deg,#195c63,#0d434a);
+      color: white;
+      font-size: 22px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
     }
 
-    #timer {
-        margin-top: 15px;
-        font-size: 20px;
-        font-weight: bold;
-        color: #07404b;
+    .claimBtn[disabled] {
+      opacity: 0.55;
+      cursor: not-allowed;
     }
 
-    /* banner ad */
+    #infoMsg {
+      margin-top: 10px;
+      font-size: 15px;
+      color: #07404b;
+      font-weight: 700;
+    }
+
     .bannerAd {
-        width: 100%;
-        height: 70px;
-        background: #e0e8ea;
-        color: black;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 25px;
-        font-weight: bold;
+      width: 92%;
+      max-width: 420px;
+      height: 70px;
+      margin: 18px auto;
+      border-radius: 12px;
+      background: #e6eef5;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#0e5d63;
+      font-weight:800;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
     }
 
-    /* fullscreen ad */
+    /* Fullscreen overlay for ad */
     #fullScreenAd {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.9);
-        color: white;
-        text-align: center;
-        padding-top: 200px;
-        font-size: 26px;
-        z-index: 999;
+      display:none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      color: white;
+      z-index: 9999;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:18px;
+      padding: 30px;
+      text-align:center;
     }
 
-    #closeAd {
-        margin-top: 35px;
-        padding: 15px 30px;
-        background: #195c63;
-        border-radius: 15px;
-        font-weight: bold;
-        color: white;
-        display: none;
-        font-size: 24px;
+    #closeAdBtn {
+      display:none;
+      padding: 14px 26px;
+      font-size:18px;
+      background: linear-gradient(180deg,#195c63,#0d434a);
+      color:white;
+      border-radius:12px;
+      border:none;
+      font-weight:800;
+      cursor:pointer;
     }
-</style>
+
+    .small {
+      font-size:14px;
+      opacity:0.9;
+    }
+
+    .green {
+      color: #0b8b3a; font-weight:800;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <div class="mainCard">
+      <div class="title">Claim Today's Coins</div>
+      <div class="subtitle">Daily reward — 30 coins</div>
 
-<div class="mainCard">
+      <div id="claimedMsg" style="display:none; font-size:18px; color:green; margin-bottom:6px;">
+        ✔ Already Claimed Today
+      </div>
 
-    <div class="titleText">Claim Today's Coins</div>
+      <button id="claimButton" class="claimBtn">CLAIM 30</button>
 
-    <div class="bigBox">
-
-        <div id="claimedMsg" style="display:none; font-size:24px; color:green;">
-            ✔ Already Claimed Today
-        </div>
-
-        <div class="claimBtn" id="claimButton" onclick="startAd()">CLAIM 30</div>
-
-        <div id="timer"></div>
-
+      <div id="infoMsg" class="small"></div>
     </div>
-</div>
 
-<!-- Banner Ad -->
-<div class="bannerAd">BANNER AD AREA</div>
+    <!-- Banner Ad (outside claim card) -->
+    <div class="bannerAd">BANNER AD SPACE</div>
+  </div>
 
-<!-- Fullscreen Ad -->
-<div id="fullScreenAd">
-    FULLSCREEN AD<br><br>
-    Wait <span id="adSec">10</span> sec...
-    <div id="closeAd" onclick="finishClaim()">Close Ad</div>
-</div>
+  <!-- Fullscreen Ad Overlay -->
+  <div id="fullScreenAd" role="dialog" aria-hidden="true">
+    <div style="font-size:22px; font-weight:800;">FULLSCREEN AD</div>
+    <div style="font-size:18px;">Please wait <span id="adCounter">10</span> sec...</div>
+    <div id="closeAdBtn">CLOSE AD</div>
+    <div class="small">Ad will close after timer — do not refresh.</div>
+  </div>
 
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } 
-from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc } 
-from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+  <!-- Firebase + App Logic -->
+  <script type="module">
+    // Modular Firebase v12 imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+    import {
+      getFirestore, doc, getDoc, updateDoc, runTransaction, increment
+    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-    authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-    projectId: "kssm-rock-tam-ad",
-    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
-    messagingSenderId: "28268633766",
-    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
-};
+    // --- YOUR FIREBASE CONFIG (use existing) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+      authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+      projectId: "kssm-rock-tam-ad",
+      storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+      messagingSenderId: "28268633766",
+      appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+    };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-let uid = "";
-let already = false;
+    // UI refs
+    const claimBtn = document.getElementById("claimButton");
+    const claimedMsg = document.getElementById("claimedMsg");
+    const infoMsg = document.getElementById("infoMsg");
+    const fullScreenAd = document.getElementById("fullScreenAd");
+    const adCounterEl = document.getElementById("adCounter");
+    const closeAdBtn = document.getElementById("closeAdBtn");
 
-onAuthStateChanged(auth, async (user) => {
-    if (!user) {
+    let uid = null;
+    let inProcess = false; // local flag
+    const REWARD_COINS = 30;
+
+    // Helpers
+    function todayISO() {
+      return new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    }
+
+    // Show messages
+    function showInfo(text) { infoMsg.textContent = text; }
+    function clearInfo() { infoMsg.textContent = ""; }
+
+    // Disable UI when claimed / locked
+    function setClaimDisabled() {
+      claimBtn.disabled = true;
+      claimBtn.style.opacity = "0.6";
+    }
+    function setClaimEnabled() {
+      claimBtn.disabled = false;
+      claimBtn.style.opacity = "1";
+    }
+
+    // On auth state
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        // redirect to login if not signed in
         window.location.href = "login.html";
-    } else {
-        uid = user.uid;
-        checkClaim();
-    }
-});
-
-async function checkClaim() {
-    const ref = doc(db, "users", uid);
-    const snap = await getDoc(ref);
-
-    let today = new Date().toISOString().split("T")[0];
-
-    if (snap.exists()) {
-        let last = snap.data().lastClaim;
-
-        if (last === today) {
-            already = true;
-            document.getElementById("claimedMsg").style.display = "block";
-            document.getElementById("claimButton").style.display = "none";
-        }
-    }
-}
-
-// --- Ad start ---
-window.startAd = function() {
-    if (already) return;
-
-    document.getElementById("fullScreenAd").style.display = "block";
-
-    let sec = 10;
-    let adSec = document.getElementById("adSec");
-
-    let x = setInterval(() => {
-        adSec.innerHTML = sec;
-        sec--;
-
-        if (sec < 0) {
-            clearInterval(x);
-            document.getElementById("closeAd").style.display = "block";
-        }
-    }, 1000);
-};
-
-// --- Claim finish ---
-window.finishClaim = async function() {
-    document.getElementById("fullScreenAd").style.display = "none";
-
-    let today = new Date().toISOString().split("T")[0];
-
-    const ref = doc(db, "users", uid);
-
-    await updateDoc(ref, {
-        coins: (await getDoc(ref)).data().coins + 30,
-        lastClaim: today
+        return;
+      }
+      uid = user.uid;
+      await refreshClaimState();
     });
 
-    already = true;
+    // Refresh claim state from Firestore
+    async function refreshClaimState() {
+      try {
+        const userRef = doc(db, "users", uid);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) {
+          // create minimal doc if not exist
+          await updateDoc(userRef, {} ).catch(()=>{ /* ignore if update fails */});
+        }
+        const data = snap.exists() ? snap.data() : {};
+        const last = data.lastClaim || "";
+        const isClaiming = data.isClaiming || false;
+        const today = todayISO();
 
-    document.getElementById("claimButton").style.display = "none";
-    let msg = document.getElementById("claimedMsg");
-    msg.innerHTML = "✔ You received 30 coins!";
-    msg.style.display = "block";
-};
-</script>
+        if (last === today) {
+          // already claimed today
+          claimedMsg.style.display = "block";
+          claimBtn.style.display = "none";
+          showInfo("You already claimed today — come back after 12:00 AM.");
+        } else if (isClaiming) {
+          // someone/process is claiming right now — disable button
+          setClaimDisabled();
+          showInfo("Claim in progress... please wait a moment.");
+        } else {
+          // allowed
+          claimedMsg.style.display = "none";
+          claimBtn.style.display = "inline-block";
+          setClaimEnabled();
+          clearInfo();
+        }
+      } catch (err) {
+        console.error("refreshClaimState error:", err);
+        showInfo("Network error. Try again.");
+      }
+    }
 
+    // STEP 1 — Try to create a short-lived lock (isClaiming:true) atomically
+    // If transaction succeeds, we got the lock and proceed to show Ad
+    async function obtainClaimLock() {
+      const userRef = doc(db, "users", uid);
+      const today = todayISO();
+
+      try {
+        await runTransaction(db, async (tx) => {
+          const snap = await tx.get(userRef);
+          const data = snap.exists() ? snap.data() : {};
+
+          const last = data.lastClaim || "";
+          const isClaiming = data.isClaiming || false;
+
+          if (last === today) {
+            // already claimed today — abort
+            throw new Error("ALREADY_CLAIMED");
+          }
+          if (isClaiming) {
+            // someone else currently claiming — abort
+            throw new Error("LOCKED");
+          }
+
+          // set lock immediately
+          tx.update(userRef, { isClaiming: true });
+        });
+
+        // transaction succeeded — lock obtained
+        return { ok: true };
+      } catch (e) {
+        if (e.message === "ALREADY_CLAIMED") return { ok:false, reason:"ALREADY_CLAIMED" };
+        if (e.message === "LOCKED") return { ok:false, reason:"LOCKED" };
+        // other errors
+        console.error("obtainClaimLock transaction failed:", e);
+        return { ok:false, reason:"ERROR", error:e };
+      }
+    }
+
+    // STEP 2 — After ad finishes, finalize claim atomically:
+    // increment coins, set lastClaim=today, clear isClaiming
+    async function finalizeClaim() {
+      const userRef = doc(db, "users", uid);
+      const today = todayISO();
+
+      try {
+        await runTransaction(db, async (tx) => {
+          const snap = await tx.get(userRef);
+          if (!snap.exists()) {
+            // create doc with initial values
+            tx.set(userRef, { coins: REWARD_COINS, lastClaim: today, isClaiming: false }, { merge: true });
+            return;
+          }
+          const data = snap.data();
+          const last = data.lastClaim || "";
+          // safety: if already claimed in the meantime, do not double award
+          if (last === today) {
+            // clear lock just in case
+            tx.update(userRef, { isClaiming: false });
+            throw new Error("ALREADY_FINALIZED");
+          }
+
+          // increment coins, set lastClaim and clear lock
+          tx.update(userRef, {
+            coins: (typeof data.coins === "number" ? data.coins : 0) + REWARD_COINS,
+            lastClaim: today,
+            isClaiming: false
+          });
+        });
+
+        return { ok:true };
+      } catch (e) {
+        if (e.message === "ALREADY_FINALIZED") return { ok:false, reason:"ALREADY_FINALIZED" };
+        console.error("finalizeClaim transaction failed:", e);
+        return { ok:false, reason:"ERROR", error:e };
+      }
+    }
+
+    // Handler when user presses claim
+    claimBtn.addEventListener("click", async () => {
+      claimBtn.disabled = true;
+      showInfo("Checking eligibility...");
+
+      // attempt to obtain lock
+      const lockRes = await obtainClaimLock();
+      if (!lockRes.ok) {
+        if (lockRes.reason === "ALREADY_CLAIMED") {
+          showInfo("You already claimed today.");
+          claimedMsg.style.display = "block";
+          claimBtn.style.display = "none";
+        } else if (lockRes.reason === "LOCKED") {
+          showInfo("Another claim is in progress. Try again in a few seconds.");
+          setTimeout(refreshClaimState, 2000);
+          claimBtn.disabled = false;
+        } else {
+          showInfo("Network error. Try again.");
+          claimBtn.disabled = false;
+        }
+        return;
+      }
+
+      // lock obtained — show fullscreen ad (placeholder)
+      showFullScreenAd();
+    });
+
+    // Show fullscreen ad UI with countdown; after countdown show close button
+    function showFullScreenAd() {
+      fullScreenAd.style.display = "flex";
+      fullScreenAd.setAttribute("aria-hidden","false");
+      adCounterEl = adCounterEl || adCounterEl;
+      let sec = 10;
+      adCounterEl = adCounterEl || document.getElementById("adCounter");
+      adCounterEl.textContent = sec;
+      closeAdBtn.style.display = "none";
+      showInfo("Ad started. Please wait...");
+
+      const t = setInterval(() => {
+        sec--;
+        adCounterEl.textContent = sec;
+        if (sec <= 0) {
+          clearInterval(t);
+          // allow user to close ad
+          closeAdBtn.style.display = "inline-block";
+          showInfo("Ad finished — tap CLOSE to receive coins.");
+        }
+      }, 1000);
+    }
+
+    // When user presses Close Ad — finalize claim (transaction)
+    closeAdBtn.addEventListener("click", async () => {
+      // disable button to avoid double clicks
+      closeAdBtn.disabled = true;
+      showInfo("Finalizing...");
+
+      const res = await finalizeClaim();
+      fullScreenAd.style.display = "none";
+      fullScreenAd.setAttribute("aria-hidden","true");
+
+      if (res.ok) {
+        // success — update UI
+        claimedMsg.style.display = "block";
+        claimBtn.style.display = "none";
+        showInfo("✔ You received 30 coins!");
+      } else {
+        if (res.reason === "ALREADY_FINALIZED") {
+          claimedMsg.style.display = "block";
+          claimBtn.style.display = "none";
+          showInfo("Already finalized by another process.");
+        } else {
+          // finalization failed — clear lock server-side (best-effort)
+          try {
+            await updateDoc(doc(db,"users",uid), { isClaiming:false });
+          } catch(e){ console.error("clear lock failed",e); }
+          showInfo("Error awarding coins. Try again later.");
+          claimBtn.disabled = false;
+        }
+      }
+      closeAdBtn.disabled = false;
+    });
+
+    // Extra: hide overlay if user navigates away etc. Keep periodic refresh of claim state
+    setInterval(() => {
+      if (uid) refreshClaimState();
+    }, 30_000); // every 30s refresh
+
+  </script>
 </body>
 </html>
