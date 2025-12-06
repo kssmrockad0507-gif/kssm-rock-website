@@ -13,7 +13,6 @@
             color: white;
             text-align: center;
         }
-
         .exitBtn {
             position: fixed;
             top: 15px; left: 15px;
@@ -25,7 +24,6 @@
             cursor: pointer;
             z-index: 1000;
         }
-
         .coinBoxTop {
             position: fixed;
             top: 15px; right: 15px;
@@ -38,12 +36,10 @@
             align-items: center;
             z-index: 1000;
         }
-
         .coinIcon {
             width: 25px;
             margin-right: 8px;
         }
-
         .card {
             width: 90%;
             margin: 120px auto;
@@ -52,7 +48,6 @@
             padding: 20px;
             color: black;
         }
-
         .promoInput {
             width: 95%;
             padding: 15px;
@@ -61,7 +56,6 @@
             border: 2px solid #195c63;
             outline: none;
         }
-
         .applyBtn {
             background: linear-gradient(180deg, #195c63, #0d434a);
             padding: 15px;
@@ -73,7 +67,11 @@
             font-weight: bold;
             cursor: pointer;
         }
-
+        #msg {
+            font-size: 20px;
+            margin-top: 12px;
+            font-weight: bold;
+        }
         .tgBox {
             width: 90%;
             background: white;
@@ -87,16 +85,9 @@
             font-weight: bold;
             cursor: pointer;
         }
-
         .tgLogo {
             width: 30px;
             margin-right: 10px;
-        }
-
-        #msg {
-            font-size: 20px;
-            margin-top: 12px;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -115,7 +106,7 @@
 
         <input id="promoCode" class="promoInput" placeholder="Enter Promo Code">
 
-        <div class="applyBtn" onclick="applyPromo()">APPLY</div>
+        <div class="applyBtn" id="applyBtn">APPLY</div>
 
         <div id="msg"></div>
     </div>
@@ -125,7 +116,6 @@
         For Latest Promo Codes
     </div>
 
-    <!-- FIREBASE -->
     <script type="module">
 
         const firebaseConfig = {
@@ -138,9 +128,9 @@
         };
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc }
+        import { getFirestore, doc, getDoc, updateDoc } 
             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged }
+        import { getAuth, onAuthStateChanged } 
             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const app = initializeApp(firebaseConfig);
@@ -151,25 +141,25 @@
         let userCoins = 0;
         let today = new Date().toISOString().split("T")[0];
 
-        // LOAD USER
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userId = user.uid;
-
                 const ref = doc(db, "users", userId);
                 const snap = await getDoc(ref);
 
                 if (snap.exists()) {
                     userCoins = snap.data().coins || 0;
-                    document.getElementById("userCoins").innerHTML = userCoins;
+                    document.getElementById("userCoins").innerText = userCoins;
+
+                    if (snap.data().lastPromo === today) {
+                        localStorage.setItem("promoUsed", "yes");
+                    }
                 }
             }
         });
 
-        // APPLY PROMO
-        window.applyPromo = async function () {
-
-            const msg = document.getElementById("msg");
+        document.getElementById("applyBtn").addEventListener("click", async () => {
+            let msg = document.getElementById("msg");
             let code = document.getElementById("promoCode").value.trim();
 
             if (!userId) {
@@ -178,17 +168,12 @@
                 return;
             }
 
-            // CHECK IF ALREADY CLAIMED TODAY
-            const claimRef = doc(db, "promoClaims", userId, "daily", today);
-            const claimSnap = await getDoc(claimRef);
-
-            if (claimSnap.exists()) {
+            if (localStorage.getItem("promoUsed") === "yes") {
                 msg.style.color = "red";
-                msg.innerHTML = "✔ You already used today's promo!";
+                msg.innerHTML = "✔ Already used today's promo!";
                 return;
             }
 
-            // TODAY PROMO CODE
             const todayCode = "KSSM100";
 
             if (code !== todayCode) {
@@ -197,26 +182,20 @@
                 return;
             }
 
-            const reward = 20;
-            userCoins += reward;
+            let addCoin = 20;
+            userCoins += addCoin;
 
-            // UPDATE USER COINS
             await updateDoc(doc(db, "users", userId), {
                 coins: userCoins,
                 lastPromo: today
             });
 
-            // SAVE CLAIM RECORD
-            await setDoc(claimRef, {
-                claimedCode: code,
-                reward: reward,
-                claimDate: today
-            });
-
-            document.getElementById("userCoins").innerHTML = userCoins;
+            document.getElementById("userCoins").innerText = userCoins;
             msg.style.color = "green";
-            msg.innerHTML = "🎉 Promo Applied! +" + reward + " coins!";
-        }
+            msg.innerHTML = "🎉 Promo Applied! +" + addCoin + " coins!";
+
+            localStorage.setItem("promoUsed", "yes");
+        });
 
         window.openTG = function () {
             window.location.href = "https://t.me/kssmrockreward";
