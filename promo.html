@@ -1,211 +1,164 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Promo Code</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body {
-            margin: 0; padding: 0;
-            background: linear-gradient(180deg, #0e5d63, #07404b);
-            font-family: Arial, sans-serif;
-            color: white;
-            text-align: center;
-        }
-        .exitBtn {
-            position: fixed;
-            top: 15px; left: 15px;
-            background: white;
-            padding: 9px 16px;
-            color: black;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 1000;
-        }
-        .coinBoxTop {
-            position: fixed;
-            top: 15px; right: 15px;
-            background: white;
-            padding: 8px 18px;
-            color: black;
-            border-radius: 20px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            z-index: 1000;
-        }
-        .coinIcon {
-            width: 25px;
-            margin-right: 8px;
-        }
-        .card {
-            width: 90%;
-            margin: 120px auto;
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            color: black;
-        }
-        .promoInput {
-            width: 95%;
-            padding: 15px;
-            font-size: 20px;
-            border-radius: 15px;
-            border: 2px solid #195c63;
-            outline: none;
-        }
-        .applyBtn {
-            background: linear-gradient(180deg, #195c63, #0d434a);
-            padding: 15px;
-            width: 95%;
-            color: white;
-            border-radius: 15px;
-            font-size: 22px;
-            margin-top: 15px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        #msg {
-            font-size: 20px;
-            margin-top: 12px;
-            font-weight: bold;
-        }
-        .tgBox {
-            width: 90%;
-            background: white;
-            padding: 15px;
-            border-radius: 20px;
-            margin: 25px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .tgLogo {
-            width: 30px;
-            margin-right: 10px;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Promo Code</title>
+  <style>
+    body{
+      margin:0;padding:0;
+      background:linear-gradient(180deg,#0e5d63,#07404b);
+      font-family:Arial;color:white;text-align:center;
+    }
+    .exitBtn{position:fixed;top:15px;left:15px;background:white;padding:9px 16px;color:black;border-radius:10px;font-weight:bold;cursor:pointer;z-index:1000;}
+    .coinBoxTop{position:fixed;top:15px;right:15px;background:white;padding:8px 18px;color:black;border-radius:20px;font-weight:bold;display:flex;align-items:center;z-index:1000;}
+    .coinIcon{width:25px;margin-right:8px;}
+    .card{width:90%;margin:120px auto;background:white;border-radius:20px;padding:20px;color:black;}
+    .promoInput{width:95%;padding:15px;font-size:20px;border-radius:15px;border:2px solid #195c63;outline:none;}
+    .applyBtn{background:linear-gradient(180deg,#195c63,#0d434a);padding:15px;width:95%;color:white;border-radius:15px;font-size:22px;margin-top:15px;font-weight:bold;cursor:pointer;}
+    #msg{font-size:18px;margin-top:12px;font-weight:bold;min-height:28px;}
+    .tgBox{width:90%;background:white;padding:15px;border-radius:20px;margin:25px auto;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;cursor:pointer;}
+    .tgLogo{width:30px;margin-right:10px;}
+  </style>
 </head>
-
 <body>
 
-    <div class="exitBtn" onclick="goHome()">← Back</div>
+  <div class="exitBtn" onclick="goHome()">← Back</div>
 
-    <div class="coinBoxTop">
-        <img class="coinIcon" src="https://cdn-icons-png.flaticon.com/512/138/138292.png">
-        <span id="userCoins">0</span>
-    </div>
+  <div class="coinBoxTop">
+    <img class="coinIcon" src="https://cdn-icons-png.flaticon.com/512/138/138292.png">
+    <span id="userCoins">0</span>
+  </div>
 
-    <div class="card">
-        <h2>Enter Promo Code</h2>
+  <div class="card">
+    <h2>Enter Promo Code</h2>
+    <input id="promoCode" class="promoInput" placeholder="Enter Promo Code">
+    <div class="applyBtn" id="applyBtn">APPLY</div>
+    <div id="msg"></div>
+  </div>
 
-        <input id="promoCode" class="promoInput" placeholder="Enter Promo Code">
+  <div class="tgBox" onclick="openTG()">
+    <img class="tgLogo" src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
+    For Latest Promo Codes
+  </div>
 
-        <div class="applyBtn" id="applyBtn">APPLY</div>
+  <script type="module">
+    // CONFIG - do not change these lines
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+      authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+      projectId: "kssm-rock-tam-ad",
+      storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+      messagingSenderId: "28268633766",
+      appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+    };
 
-        <div id="msg"></div>
-    </div>
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    <div class="tgBox" onclick="openTG()">
-        <img class="tgLogo" src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
-        For Latest Promo Codes
-    </div>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    <script type="module">
+    let userId = null;
+    let userCoins = 0;
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-            authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-            projectId: "kssm-rock-tam-ad",
-            storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
-            messagingSenderId: "28268633766",
-            appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
-        };
+    // Helper: show message
+    function showMsg(text, color='black'){
+      const el = document.getElementById('msg');
+      el.style.color = color;
+      el.innerText = text;
+    }
 
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc } 
-            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } 
-            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    // Load user coins & UI when logged in
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        showMsg('Login required!', 'red');
+        return;
+      }
+      userId = user.uid;
+      try {
+        const uref = doc(db, 'users', userId);
+        const usnap = await getDoc(uref);
+        if (usnap.exists()){
+          userCoins = usnap.data().coins || 0;
+          document.getElementById('userCoins').innerText = userCoins;
+        } else {
+          // create basic user doc if missing
+          await setDoc(uref, { coins: 0, email: user.email || '', uid: userId });
+          userCoins = 0;
+          document.getElementById('userCoins').innerText = userCoins;
+        }
+      } catch(err){
+        console.error(err);
+        showMsg('Error loading user data', 'red');
+      }
+    });
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth();
+    // APPLY button logic (Firestore-only checks)
+    document.getElementById('applyBtn').addEventListener('click', async () => {
+      showMsg('');
+      if (!userId) { showMsg('Login required!', 'red'); return; }
 
-        let userId = null;
-        let userCoins = 0;
-        let today = new Date().toISOString().split("T")[0];
+      const codeInput = document.getElementById('promoCode').value.trim();
+      if (!codeInput) { showMsg('Enter promo code', 'red'); return; }
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                userId = user.uid;
-                const ref = doc(db, "users", userId);
-                const snap = await getDoc(ref);
+      try {
+        // 1) load today's promo code from promoCodes/today
+        const pRef = doc(db, 'promoCodes', 'today');
+        const pSnap = await getDoc(pRef);
+        if (!pSnap.exists()){
+          showMsg('No promo available today', 'red');
+          return;
+        }
+        const todayCode = pSnap.data().code || '';
+        const reward = Number(pSnap.data().reward || 0);
 
-                if (snap.exists()) {
-                    userCoins = snap.data().coins || 0;
-                    document.getElementById("userCoins").innerText = userCoins;
-
-                    if (snap.data().lastPromo === today) {
-                        localStorage.setItem("promoUsed", "yes");
-                    }
-                }
-            }
-        });
-
-        document.getElementById("applyBtn").addEventListener("click", async () => {
-            let msg = document.getElementById("msg");
-            let code = document.getElementById("promoCode").value.trim();
-
-            if (!userId) {
-                msg.style.color = "red";
-                msg.innerHTML = "Login required!";
-                return;
-            }
-
-            if (localStorage.getItem("promoUsed") === "yes") {
-                msg.style.color = "red";
-                msg.innerHTML = "✔ Already used today's promo!";
-                return;
-            }
-
-            const todayCode = "KSSM100";
-
-            if (code !== todayCode) {
-                msg.style.color = "red";
-                msg.innerHTML = "❌ Invalid Promo Code!";
-                return;
-            }
-
-            let addCoin = 20;
-            userCoins += addCoin;
-
-            await updateDoc(doc(db, "users", userId), {
-                coins: userCoins,
-                lastPromo: today
-            });
-
-            document.getElementById("userCoins").innerText = userCoins;
-            msg.style.color = "green";
-            msg.innerHTML = "🎉 Promo Applied! +" + addCoin + " coins!";
-
-            localStorage.setItem("promoUsed", "yes");
-        });
-
-        window.openTG = function () {
-            window.location.href = "https://t.me/kssmrockreward";
+        // 2) check promoClaims doc presence (doc id = `${userId}_${today}`)
+        const claimDocId = `${userId}_${today}`;
+        const claimRef = doc(db, 'promoClaims', claimDocId);
+        const claimSnap = await getDoc(claimRef);
+        if (claimSnap.exists()){
+          showMsg('✔ You already used today\'s promo!', 'red');
+          return;
         }
 
-        window.goHome = function () {
-            window.location.href = "index.html";
+        // 3) compare codes
+        if (codeInput !== todayCode){
+          showMsg('❌ Invalid Promo Code!', 'red');
+          return;
         }
 
-    </script>
+        // 4) all good → add coins and create claim record atomically
+        const userRef = doc(db, 'users', userId);
+        // update user coins
+        const newCoins = (userCoins || 0) + reward;
+        await updateDoc(userRef, { coins: newCoins, lastPromo: today });
 
+        // create promoClaims doc
+        await setDoc(claimRef, {
+          userId: userId,
+          claimedCode: todayCode,
+          reward: reward,
+          claimDate: today
+        });
+
+        // UI update
+        userCoins = newCoins;
+        document.getElementById('userCoins').innerText = userCoins;
+        showMsg('🎉 Promo Applied! +' + reward + ' coins!', 'green');
+
+      } catch (err){
+        console.error(err);
+        showMsg('Error processing promo — try again', 'red');
+      }
+    });
+
+    // Utilities
+    window.openTG = () => { window.location.href = 'https://t.me/kssmrockreward'; }
+    window.goHome = () => { window.location.href = 'index.html'; }
+
+  </script>
 </body>
-</html>
+    </html>
