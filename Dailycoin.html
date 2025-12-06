@@ -1,179 +1,224 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Daily Coin Claim</title>
+<title>Daily Coins</title>
 
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(180deg, #0e5d63, #07404b);
-            font-family: Arial, sans-serif;
-            color: white;
-            text-align: center;
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        .mainCard {
-            width: 85%;
-            margin: 40px auto;
-            background: white;
-            border-radius: 25px;
-            padding: 30px;
-            color: black;
-        }
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(180deg, #0e5d63, #07404b);
+        font-family: Arial;
+        color: white;
+        text-align: center;
+    }
 
-        .titleText {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+    .mainCard {
+        width: 92%;
+        max-width: 450px;
+        margin: 40px auto;
+        background: white;
+        border-radius: 25px;
+        padding: 30px;
+        color: black;
+    }
 
-        .bigBox {
-            background: white;
-            border-radius: 25px;
-            padding: 40px 20px;
-            margin-top: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.25);
-        }
+    .titleText {
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
 
-        .claimBtn {
-            background: linear-gradient(180deg, #195c63, #0d434a);
-            padding: 22px;
-            color: white;
-            border-radius: 15px;
-            font-size: 28px;
-            font-weight: bold;
-            width: 80%;
-            margin: 20px auto;
-            cursor: pointer;
-        }
+    .bigBox {
+        background: white;
+        border-radius: 25px;
+        padding: 35px 20px;
+        margin-top: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.25);
+    }
 
-        #timer {
-            margin-top: 15px;
-            font-size: 22px;
-            font-weight: bold;
-            color: #07404b;
-        }
+    .claimBtn {
+        background: linear-gradient(180deg, #195c63, #0d434a);
+        padding: 20px;
+        color: white;
+        border-radius: 15px;
+        font-size: 26px;
+        font-weight: bold;
+        width: 85%;
+        margin: 20px auto;
+        cursor: pointer;
+    }
 
-        /* Banner Ad */
-        .bannerAd {
-            width: 100%;
-            height: 75px;
-            background: #d9e3e6;
-            border-radius: 15px;
-            margin-top: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            font-weight: bold;
-        }
+    #timer {
+        margin-top: 15px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #07404b;
+    }
 
-        /* Fullscreen Overlay Ad */
-        #fullScreenAd {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.85);
-            color: white;
-            text-align: center;
-            padding-top: 200px;
-            font-size: 28px;
-            z-index: 999;
-        }
+    /* banner ad */
+    .bannerAd {
+        width: 100%;
+        height: 70px;
+        background: #e0e8ea;
+        color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 25px;
+        font-weight: bold;
+    }
 
-        #closeAd {
-            margin-top: 40px;
-            padding: 15px 30px;
-            background: #195c63;
-            border-radius: 15px;
-            font-weight: bold;
-            color: white;
-            display: none;
-            font-size: 26px;
-        }
+    /* fullscreen ad */
+    #fullScreenAd {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        color: white;
+        text-align: center;
+        padding-top: 200px;
+        font-size: 26px;
+        z-index: 999;
+    }
 
-    </style>
+    #closeAd {
+        margin-top: 35px;
+        padding: 15px 30px;
+        background: #195c63;
+        border-radius: 15px;
+        font-weight: bold;
+        color: white;
+        display: none;
+        font-size: 24px;
+    }
+</style>
 </head>
 
 <body>
 
-    <div class="mainCard">
-        <div class="titleText">Claim Today's Coins</div>
+<div class="mainCard">
 
-        <div class="bigBox">
+    <div class="titleText">Claim Today's Coins</div>
 
-            <div id="claimedMsg" style="display:none; font-size:26px; color:green;">
-                ✔ Already Claimed Today
-            </div>
+    <div class="bigBox">
 
-            <div class="claimBtn" id="claimButton" onclick="showFullAd()">CLAIM</div>
-
-            <div id="timer"></div>
-
+        <div id="claimedMsg" style="display:none; font-size:24px; color:green;">
+            ✔ Already Claimed Today
         </div>
+
+        <div class="claimBtn" id="claimButton" onclick="startAd()">CLAIM 30</div>
+
+        <div id="timer"></div>
+
     </div>
+</div>
 
-    <!-- Banner Ad (அது பெட்டிக்கு வெளியே) -->
-    <div class="bannerAd">
-        BANNER AD SPACE
-    </div>
+<!-- Banner Ad -->
+<div class="bannerAd">BANNER AD AREA</div>
 
-    <!-- Fullscreen Ad Overlay -->
-    <div id="fullScreenAd">
-        FULLSCREEN AD RUNNING <br><br>
-        Please wait <span id="adSec">10</span> seconds...
-        <div id="closeAd" onclick="finishClaim()">CLOSE AD</div>
-    </div>
+<!-- Fullscreen Ad -->
+<div id="fullScreenAd">
+    FULLSCREEN AD<br><br>
+    Wait <span id="adSec">10</span> sec...
+    <div id="closeAd" onclick="finishClaim()">Close Ad</div>
+</div>
 
-<script>
-    let alreadyClaimed = false;  // Firestore-லிருந்து வரும் value
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc } 
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-    function showFullAd() {
-        if (alreadyClaimed) {
+const firebaseConfig = {
+    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+    authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+    projectId: "kssm-rock-tam-ad",
+    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+    messagingSenderId: "28268633766",
+    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let uid = "";
+let already = false;
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+    } else {
+        uid = user.uid;
+        checkClaim();
+    }
+});
+
+async function checkClaim() {
+    const ref = doc(db, "users", uid);
+    const snap = await getDoc(ref);
+
+    let today = new Date().toISOString().split("T")[0];
+
+    if (snap.exists()) {
+        let last = snap.data().lastClaim;
+
+        if (last === today) {
+            already = true;
             document.getElementById("claimedMsg").style.display = "block";
             document.getElementById("claimButton").style.display = "none";
-            return;
         }
-
-        document.getElementById("fullScreenAd").style.display = "block";
-
-        let sec = 10;
-        let adSec = document.getElementById("adSec");
-
-        let x = setInterval(() => {
-            adSec.innerHTML = sec;
-            sec--;
-
-            if (sec < 0) {
-                clearInterval(x);
-                document.getElementById("closeAd").style.display = "block";
-            }
-        }, 1000);
     }
+}
 
-    function finishClaim() {
-        document.getElementById("fullScreenAd").style.display = "none";
+// --- Ad start ---
+window.startAd = function() {
+    if (already) return;
 
-        // ------- 30 Coins Add Logic --------
-        // Firestore update எடுத்துக்காட்டு:
-        // db.collection("users").doc(user.uid).update({
-        //     coins: firebase.firestore.FieldValue.increment(30),
-        //     lastClaim: todayDate
-        // })
+    document.getElementById("fullScreenAd").style.display = "block";
 
-        alreadyClaimed = true;
+    let sec = 10;
+    let adSec = document.getElementById("adSec");
 
-        document.getElementById("claimButton").style.display = "none";
-        document.getElementById("timer").style.display = "none";
+    let x = setInterval(() => {
+        adSec.innerHTML = sec;
+        sec--;
 
-        let msg = document.getElementById("claimedMsg");
-        msg.innerHTML = "✔ You received 30 coins!";
-        msg.style.display = "block";
-    }
+        if (sec < 0) {
+            clearInterval(x);
+            document.getElementById("closeAd").style.display = "block";
+        }
+    }, 1000);
+};
+
+// --- Claim finish ---
+window.finishClaim = async function() {
+    document.getElementById("fullScreenAd").style.display = "none";
+
+    let today = new Date().toISOString().split("T")[0];
+
+    const ref = doc(db, "users", uid);
+
+    await updateDoc(ref, {
+        coins: (await getDoc(ref)).data().coins + 30,
+        lastClaim: today
+    });
+
+    already = true;
+
+    document.getElementById("claimButton").style.display = "none";
+    let msg = document.getElementById("claimedMsg");
+    msg.innerHTML = "✔ You received 30 coins!";
+    msg.style.display = "block";
+};
 </script>
 
 </body>
