@@ -103,16 +103,13 @@
 
 <body>
 
-    <!-- Back button -->
     <div class="exitBtn" onclick="goHome()">← Back</div>
 
-    <!-- Coins -->
     <div class="coinBoxTop">
         <img class="coinIcon" src="https://cdn-icons-png.flaticon.com/512/138/138292.png">
         <span id="userCoins">0</span>
     </div>
 
-    <!-- CARD -->
     <div class="card">
         <h2>Enter Promo Code</h2>
 
@@ -123,7 +120,6 @@
         <div id="msg"></div>
     </div>
 
-    <!-- Telegram -->
     <div class="tgBox" onclick="openTG()">
         <img class="tgLogo" src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
         For Latest Promo Codes
@@ -132,21 +128,19 @@
     <!-- FIREBASE -->
     <script type="module">
 
-        // Firebase Config (YOUR ORIGINAL)
         const firebaseConfig = {
-          apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-          authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-          projectId: "kssm-rock-tam-ad",
-          storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
-          messagingSenderId: "28268633766",
-          appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+            apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+            authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+            projectId: "kssm-rock-tam-ad",
+            storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+            messagingSenderId: "28268633766",
+            appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
         };
 
-        // IMPORTS
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc, setDoc } 
+        import { getFirestore, doc, getDoc, setDoc, updateDoc }
             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } 
+        import { getAuth, onAuthStateChanged }
             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const app = initializeApp(firebaseConfig);
@@ -157,7 +151,7 @@
         let userCoins = 0;
         let today = new Date().toISOString().split("T")[0];
 
-        // LOAD USER DATA
+        // LOAD USER
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userId = user.uid;
@@ -168,20 +162,15 @@
                 if (snap.exists()) {
                     userCoins = snap.data().coins || 0;
                     document.getElementById("userCoins").innerHTML = userCoins;
-
-                    // Already used?
-                    if (snap.data().lastPromo === today) {
-                        window.localStorage.setItem("promoUsed", "yes");
-                    }
                 }
             }
         });
 
-        // APPLY PROMO CODE
+        // APPLY PROMO
         window.applyPromo = async function () {
 
+            const msg = document.getElementById("msg");
             let code = document.getElementById("promoCode").value.trim();
-            let msg = document.getElementById("msg");
 
             if (!userId) {
                 msg.style.color = "red";
@@ -189,14 +178,17 @@
                 return;
             }
 
-            // Already used?
-            if (window.localStorage.getItem("promoUsed") === "yes") {
+            // CHECK IF ALREADY CLAIMED TODAY
+            const claimRef = doc(db, "promoClaims", userId, "daily", today);
+            const claimSnap = await getDoc(claimRef);
+
+            if (claimSnap.exists()) {
                 msg.style.color = "red";
-                msg.innerHTML = "✔ Already used today's promo!";
+                msg.innerHTML = "✔ You already used today's promo!";
                 return;
             }
 
-            // Daily Promo Code (You will change daily)
+            // TODAY PROMO CODE
             const todayCode = "KSSM100";
 
             if (code !== todayCode) {
@@ -205,32 +197,31 @@
                 return;
             }
 
-            // ADD COINS
-            let addCoin = 20;
-            userCoins += addCoin;
+            const reward = 20;
+            userCoins += reward;
 
-            // SAVE FIRESTORE
-            const ref = doc(db, "users", userId);
-
-            await updateDoc(ref, {
+            // UPDATE USER COINS
+            await updateDoc(doc(db, "users", userId), {
                 coins: userCoins,
                 lastPromo: today
             });
 
-            // Update UI
+            // SAVE CLAIM RECORD
+            await setDoc(claimRef, {
+                claimedCode: code,
+                reward: reward,
+                claimDate: today
+            });
+
             document.getElementById("userCoins").innerHTML = userCoins;
             msg.style.color = "green";
-            msg.innerHTML = "🎉 Promo Applied! +" + addCoin + " coins!";
-
-            window.localStorage.setItem("promoUsed", "yes");
+            msg.innerHTML = "🎉 Promo Applied! +" + reward + " coins!";
         }
 
-        // Telegram
         window.openTG = function () {
             window.location.href = "https://t.me/kssmrockreward";
         }
 
-        // HOME
         window.goHome = function () {
             window.location.href = "index.html";
         }
