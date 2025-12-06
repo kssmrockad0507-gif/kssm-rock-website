@@ -3,6 +3,8 @@
 <head>
     <title>Promo Code</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         body {
             margin: 0; padding: 0;
@@ -12,197 +14,228 @@
             text-align: center;
         }
 
-        /* MAIN CARD */
-        .card {
-            width: 85%;
-            margin: 35px auto;
+        .exitBtn {
+            position: fixed;
+            top: 15px; left: 15px;
             background: white;
-            border-radius: 25px;
-            padding: 25px;
+            padding: 9px 16px;
+            color: black;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .coinBoxTop {
+            position: fixed;
+            top: 15px; right: 15px;
+            background: white;
+            padding: 8px 18px;
+            color: black;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .coinIcon {
+            width: 25px;
+            margin-right: 8px;
+        }
+
+        .card {
+            width: 90%;
+            margin: 120px auto;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
             color: black;
         }
 
-        .title {
-            font-size: 30px;
-            font-weight: bold;
-            margin-bottom: 25px;
-        }
-
-        /* PROMO INPUT BOX */
         .promoInput {
-            width: 85%;
-            padding: 18px;
-            font-size: 22px;
+            width: 95%;
+            padding: 15px;
+            font-size: 20px;
             border-radius: 15px;
             border: 2px solid #195c63;
             outline: none;
-            margin-bottom: 15px;
         }
 
-        /* APPLY BUTTON */
         .applyBtn {
             background: linear-gradient(180deg, #195c63, #0d434a);
-            padding: 18px;
-            width: 85%;
+            padding: 15px;
+            width: 95%;
             color: white;
             border-radius: 15px;
-            font-size: 25px;
+            font-size: 22px;
+            margin-top: 15px;
             font-weight: bold;
             cursor: pointer;
-            margin: auto;
         }
 
-        /* TELEGRAM BOX */
         .tgBox {
-            width: 85%;
+            width: 90%;
             background: white;
-            padding: 18px;
+            padding: 15px;
             border-radius: 20px;
-            margin: 25px auto 0 auto;
+            margin: 25px auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
             cursor: pointer;
         }
 
         .tgLogo {
             width: 30px;
-            margin-right: 12px;
-        }
-
-        /* EXIT BUTTON */
-        .exitBtn {
-            position: absolute;
-            top: 20px; left: 20px;
-            background: white;
-            padding: 10px 18px;
-            color: black;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 5px rgba(0,0,0,0.4);
-        }
-
-        /* COIN BOX TOP RIGHT */
-        .coinBoxTop {
-            position: absolute;
-            top: 20px; right: 20px;
-            background: white;
-            color: black;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-        }
-
-        .coinIcon {
-            width: 28px;
             margin-right: 10px;
         }
 
         #msg {
-            margin-top: 15px;
             font-size: 20px;
+            margin-top: 12px;
             font-weight: bold;
         }
-
     </style>
 </head>
 
 <body>
 
-    <!-- EXIT -->
+    <!-- Back button -->
     <div class="exitBtn" onclick="goHome()">← Back</div>
 
-    <!-- COINS DISPLAY -->
+    <!-- Coins -->
     <div class="coinBoxTop">
-        <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png" class="coinIcon">
+        <img class="coinIcon" src="https://cdn-icons-png.flaticon.com/512/138/138292.png">
         <span id="userCoins">0</span>
     </div>
 
+    <!-- CARD -->
     <div class="card">
-
-        <div class="title">Enter Promo Code</div>
+        <h2>Enter Promo Code</h2>
 
         <input id="promoCode" class="promoInput" placeholder="Enter Promo Code">
 
         <div class="applyBtn" onclick="applyPromo()">APPLY</div>
 
         <div id="msg"></div>
-
     </div>
 
-    <!-- TELEGRAM BOX -->
+    <!-- Telegram -->
     <div class="tgBox" onclick="openTG()">
         <img class="tgLogo" src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
         For Latest Promo Codes
     </div>
 
+    <!-- FIREBASE -->
+    <script type="module">
 
-<script>
-    let userCoins = 0;   // Firestore இருந்து load பண்ணவேண்டும்
-    let todayPromoUsed = false;   // Firestore-ல் save ஆகும்
+        // Firebase Config (YOUR ORIGINAL)
+        const firebaseConfig = {
+          apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+          authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+          projectId: "kssm-rock-tam-ad",
+          storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+          messagingSenderId: "28268633766",
+          appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+        };
 
-    // HOME PAGEக்கு செல்ல
-    function goHome() {
-        window.location.href = "index.html"; 
-    }
+        // IMPORTS
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc, setDoc } 
+            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } 
+            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    // TELEGRAM
-    function openTG() {
-        window.location.href = "https://t.me/kssmrockreward";
-    }
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth();
 
-    // PROMO CHECK
-    function applyPromo() {
-        let code = document.getElementById("promoCode").value.trim();
-        let msg = document.getElementById("msg");
+        let userId = null;
+        let userCoins = 0;
+        let today = new Date().toISOString().split("T")[0];
 
-        if (todayPromoUsed) {
-            msg.style.color = "red";
-            msg.innerHTML = "✔ Already used today's promo code!";
-            return;
-        }
+        // LOAD USER DATA
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
 
-        if (code === "") {
-            msg.style.color = "red";
-            msg.innerHTML = "Enter a promo code!";
-            return;
-        }
+                const ref = doc(db, "users", userId);
+                const snap = await getDoc(ref);
 
-        // 🔥 DAILY PROMO CODE (You will update daily)
-        const todayCode = "KSSM100";   // இதை நீங்க தினமும் மாற்றிக்கலாம்
+                if (snap.exists()) {
+                    userCoins = snap.data().coins || 0;
+                    document.getElementById("userCoins").innerHTML = userCoins;
 
-        if (code === todayCode) {
+                    // Already used?
+                    if (snap.data().lastPromo === today) {
+                        window.localStorage.setItem("promoUsed", "yes");
+                    }
+                }
+            }
+        });
 
-            // +20 coins add (example)
+        // APPLY PROMO CODE
+        window.applyPromo = async function () {
+
+            let code = document.getElementById("promoCode").value.trim();
+            let msg = document.getElementById("msg");
+
+            if (!userId) {
+                msg.style.color = "red";
+                msg.innerHTML = "Login required!";
+                return;
+            }
+
+            // Already used?
+            if (window.localStorage.getItem("promoUsed") === "yes") {
+                msg.style.color = "red";
+                msg.innerHTML = "✔ Already used today's promo!";
+                return;
+            }
+
+            // Daily Promo Code (You will change daily)
+            const todayCode = "KSSM100";
+
+            if (code !== todayCode) {
+                msg.style.color = "red";
+                msg.innerHTML = "❌ Invalid Promo Code!";
+                return;
+            }
+
+            // ADD COINS
             let addCoin = 20;
-
             userCoins += addCoin;
+
+            // SAVE FIRESTORE
+            const ref = doc(db, "users", userId);
+
+            await updateDoc(ref, {
+                coins: userCoins,
+                lastPromo: today
+            });
+
+            // Update UI
             document.getElementById("userCoins").innerHTML = userCoins;
-
             msg.style.color = "green";
-            msg.innerHTML = "🎉 Promo Applied! +" + addCoin + " coins added!";
+            msg.innerHTML = "🎉 Promo Applied! +" + addCoin + " coins!";
 
-            todayPromoUsed = true;
-
-            // Firestore update example:
-            /*
-            db.collection("users").doc(user.uid).update({
-                coins: firebase.firestore.FieldValue.increment(addCoin),
-                lastPromo: todayDate
-            })
-            */
-
-        } else {
-            msg.style.color = "red";
-            msg.innerHTML = "❌ Invalid Promo Code!";
+            window.localStorage.setItem("promoUsed", "yes");
         }
-    }
-</script>
+
+        // Telegram
+        window.openTG = function () {
+            window.location.href = "https://t.me/kssmrockreward";
+        }
+
+        // HOME
+        window.goHome = function () {
+            window.location.href = "index.html";
+        }
+
+    </script>
 
 </body>
 </html>
