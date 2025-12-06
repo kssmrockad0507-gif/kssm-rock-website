@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daily Coin Claim</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(180deg, #0e5d63, #07404b);
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+        }
+
+        .mainCard {
+            width: 85%;
+            margin: 40px auto;
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            color: black;
+        }
+
+        .titleText {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .bigBox {
+            background: white;
+            border-radius: 25px;
+            padding: 40px 20px;
+            margin-top: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.25);
+        }
+
+        .claimBtn {
+            background: linear-gradient(180deg, #195c63, #0d434a);
+            padding: 22px;
+            color: white;
+            border-radius: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            width: 80%;
+            margin: 20px auto;
+            cursor: pointer;
+        }
+
+        #timer {
+            margin-top: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #07404b;
+        }
+
+        /* Banner Ad */
+        .bannerAd {
+            width: 100%;
+            height: 75px;
+            background: #d9e3e6;
+            border-radius: 15px;
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Fullscreen Overlay Ad */
+        #fullScreenAd {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            text-align: center;
+            padding-top: 200px;
+            font-size: 28px;
+            z-index: 999;
+        }
+
+        #closeAd {
+            margin-top: 40px;
+            padding: 15px 30px;
+            background: #195c63;
+            border-radius: 15px;
+            font-weight: bold;
+            color: white;
+            display: none;
+            font-size: 26px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="mainCard">
+        <div class="titleText">Claim Today's Coins</div>
+
+        <div class="bigBox">
+
+            <div id="claimedMsg" style="display:none; font-size:26px; color:green;">
+                ✔ Already Claimed Today
+            </div>
+
+            <div class="claimBtn" id="claimButton" onclick="showFullAd()">CLAIM</div>
+
+            <div id="timer"></div>
+
+        </div>
+    </div>
+
+    <!-- Banner Ad (அது பெட்டிக்கு வெளியே) -->
+    <div class="bannerAd">
+        BANNER AD SPACE
+    </div>
+
+    <!-- Fullscreen Ad Overlay -->
+    <div id="fullScreenAd">
+        FULLSCREEN AD RUNNING <br><br>
+        Please wait <span id="adSec">10</span> seconds...
+        <div id="closeAd" onclick="finishClaim()">CLOSE AD</div>
+    </div>
+
+<script>
+    let alreadyClaimed = false;  // Firestore-லிருந்து வரும் value
+
+    function showFullAd() {
+        if (alreadyClaimed) {
+            document.getElementById("claimedMsg").style.display = "block";
+            document.getElementById("claimButton").style.display = "none";
+            return;
+        }
+
+        document.getElementById("fullScreenAd").style.display = "block";
+
+        let sec = 10;
+        let adSec = document.getElementById("adSec");
+
+        let x = setInterval(() => {
+            adSec.innerHTML = sec;
+            sec--;
+
+            if (sec < 0) {
+                clearInterval(x);
+                document.getElementById("closeAd").style.display = "block";
+            }
+        }, 1000);
+    }
+
+    function finishClaim() {
+        document.getElementById("fullScreenAd").style.display = "none";
+
+        // ------- 30 Coins Add Logic --------
+        // Firestore update எடுத்துக்காட்டு:
+        // db.collection("users").doc(user.uid).update({
+        //     coins: firebase.firestore.FieldValue.increment(30),
+        //     lastClaim: todayDate
+        // })
+
+        alreadyClaimed = true;
+
+        document.getElementById("claimButton").style.display = "none";
+        document.getElementById("timer").style.display = "none";
+
+        let msg = document.getElementById("claimedMsg");
+        msg.innerHTML = "✔ You received 30 coins!";
+        msg.style.display = "block";
+    }
+</script>
+
+</body>
+</html>
