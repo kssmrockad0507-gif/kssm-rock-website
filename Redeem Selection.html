@@ -80,6 +80,7 @@
     <!-- BACK BUTTON -->
     <div id="backBtn" onclick="goBack()">←</div>
 
+    <!-- LIVE COINS -->
     <div class="coinBox">Your Coins: <span id="coinCount">0</span></div>
 
     <div class="card">
@@ -93,27 +94,32 @@
 
     <div id="overlayScreen"></div>
 
-    <!-- FIREBASE MODULE SCRIPT -->
+    <!-- FIREBASE MODULE -->
     <script type="module">
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import {
             getFirestore, doc, getDoc, updateDoc, onSnapshot,
             collection, query, where, limit, getDocs, addDoc
         } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+        // ⭐ YOUR FIREBASE CONFIG
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID"
+            apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+            authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+            projectId: "kssm-rock-tam-ad",
+            storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+            messagingSenderId: "28268633766",
+            appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Global access
+        // Make firebase globally available
         window.db = db;
-        window.getDoc = getDoc;
         window.doc = doc;
+        window.getDoc = getDoc;
         window.updateDoc = updateDoc;
         window.collection = collection;
         window.query = query;
@@ -121,10 +127,9 @@
         window.limit = limit;
         window.getDocs = getDocs;
         window.addDoc = addDoc;
-        window.onSnapshot = onSnapshot;
 
-        // Fetch live coin updates
-        const userId = "user123"; 
+        // ⭐ LIVE COINS UPDATE
+        const userId = "user123";
         const userRef = doc(db, "users", userId);
 
         onSnapshot(userRef, (snap) => {
@@ -132,9 +137,10 @@
                 document.getElementById("coinCount").innerHTML = snap.data().balance;
             }
         });
+
     </script>
 
-    <!-- NON-MODULE SCRIPT FOR HTML onclick -->
+    <!-- NORMAL SCRIPT ACCESSIBLE FOR HTML onclick -->
     <script>
         async function redeemNow(cat) {
             const overlay = document.getElementById("overlayScreen");
@@ -188,8 +194,9 @@
             overlay.innerHTML = "Redeem Successful!<br><br><b>" + code + "</b>";
         }
 
+        // ⭐ BACK GOES TO index.html
         function goBack() {
-            window.location.href = "home.html";
+            window.location.href = "index.html";
         }
     </script>
 
