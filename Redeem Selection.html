@@ -2,10 +2,13 @@
 <html>
 <head>
     <title>Redeem</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
+        /* Force mobile look even in desktop mode */
         body {
-            margin: 0;
-            padding: 0;
+            max-width: 480px;
+            margin: auto;
             background: linear-gradient(180deg, #0e5d63, #07404b);
             font-family: Arial, sans-serif;
             color: white;
@@ -46,7 +49,7 @@
             font-weight: bold;
             width: fit-content;
             margin: auto;
-            margin-bottom: 10px;
+            margin-top: 20px;
         }
 
         #overlayScreen {
@@ -83,9 +86,9 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { 
-            getFirestore, doc, getDoc, updateDoc, 
-            collection, query, where, limit, getDocs, addDoc 
+        import {
+            getFirestore, doc, getDoc, updateDoc,
+            collection, query, where, limit, getDocs, addDoc
         } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -97,34 +100,38 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const userId = "user123"; //  👉 உன் app ல login user id போடு
+        const userId = "user123";   // Login user ID
 
+        // Load Coins
         async function loadCoins() {
             const u = await getDoc(doc(db, "users", userId));
             document.getElementById("coinCount").innerHTML = u.data().balance;
         }
         loadCoins();
 
+        // Redeem System
         async function redeemNow(cat) {
-            document.getElementById("overlayScreen").style.display = "block";
-            document.getElementById("overlayScreen").innerHTML = "Processing...";
 
-            // 1. Get user balance
+            const overlay = document.getElementById("overlayScreen");
+            overlay.style.display = "block";
+            overlay.innerHTML = "Processing...";
+
+            // 1. User balance
             const userRef = doc(db, "users", userId);
             const userSnap = await getDoc(userRef);
             const balance = userSnap.data().balance;
 
-            // 2. Get price from redeemCategories
+            // 2. Category coin cost
             const catSnap = await getDoc(doc(db, "redeemCategories", cat));
             const coinCost = catSnap.data().coinCost;
 
             if (balance < coinCost) {
-                document.getElementById("overlayScreen").innerHTML = "Not Enough Coins!";
-                setTimeout(() => { document.getElementById("overlayScreen").style.display = "none"; }, 2000);
+                overlay.innerHTML = "Not Enough Coins!";
+                setTimeout(() => overlay.style.display = "none", 2000);
                 return;
             }
 
-            // 3. Get first unused code
+            // 3. Fetch FIRST unused code from subcollection
             const q = query(
                 collection(db, "redeemCodes", cat),
                 where("isUsed", "==", false),
@@ -133,15 +140,15 @@
             const codeSnap = await getDocs(q);
 
             if (codeSnap.empty) {
-                document.getElementById("overlayScreen").innerHTML = "No Stock Available Now!";
-                setTimeout(() => { document.getElementById("overlayScreen").style.display = "none"; }, 2000);
+                overlay.innerHTML = "No Stock Available Now!";
+                setTimeout(() => overlay.style.display = "none", 2000);
                 return;
             }
 
             const codeDoc = codeSnap.docs[0];
             const code = codeDoc.data().code;
 
-            // 4. Mark code as used
+            // 4. Mark code as USED
             await updateDoc(doc(db, "redeemCodes", cat, codeDoc.id), {
                 isUsed: true
             });
@@ -158,8 +165,8 @@
                 date: new Date()
             });
 
-            // 7. Show final popup
-            document.getElementById("overlayScreen").innerHTML =
+            // 7. Final Success Popup
+            overlay.innerHTML =
                 "Redeem Successful!<br><br>Your Code:<br><b>" + code + "</b>";
 
             loadCoins();
@@ -167,4 +174,4 @@
     </script>
 
 </body>
-  </html>
+</html>
