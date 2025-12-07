@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KSSM ROCK FREE REWARD</title>
-
-<style>
+<title>KSSM ROCK FREE REWARD</title><style>
     body {
         margin: 0;
         padding: 0;
@@ -125,47 +122,31 @@
         cursor: pointer;
     }
 
-</style>
-</head>
-
-<body>
-
-<!-- TOP BAR -->
-<div class="topbar">
+</style></head><body><!-- TOP BAR --><div class="topbar">
     <div class="menu-btn" onclick="openMenu()">三</div>
     <div class="title">KSSM ROCK FREE REWARD</div>
     <div class="coins">
         <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png" alt="coin">
         <span id="coinValue">0</span>
     </div>
-</div>
-
-<!-- TASK BOXES -->
-<div class="box-container">
+</div><!-- TASK BOXES --><div class="box-container">
     <!-- Changed to open Dailycoin.html -->
-    <div class="big-box" onclick="window.location.href='Dailycoin.html'">Daily Coin</div>
+    <div class="big-box" onclick="window.location.href='Dailycoin.html'">Daily Coin</div><!-- TASK 1 (Math Quiz) -->
+<div class="big-box" onclick="window.location.href='task.html'">Maths Quiz</div>
 
-    <!-- TASK 1 (Math Quiz) -->
-    <div class="big-box" onclick="window.location.href='task.html'">Maths Quiz</div>
+<!-- TASK 2 (Alphabet Identifier) -->
+<div class="big-box" onclick="window.location.href='task2.html'">Alphabet Identifier</div>
 
-    <!-- TASK 2 (Alphabet Identifier) -->
-    <div class="big-box" onclick="window.location.href='task2.html'">Alphabet Identifier</div>
+<div class="big-box" onclick="goPromo()">Promo Code</div>
 
-    <div class="big-box" onclick="goPromo()">Promo Code</div>
-</div>
-
-<!-- MENU PAGE -->
-<div id="menuPage" class="menu-screen">
+</div><!-- MENU PAGE --><div id="menuPage" class="menu-screen">
     <div class="menu-box">
-        <div>Redeem History</div>
-        <div>Redeem Selection</div>
+        <div onclick="window.location.href='redeem-history.html'">Redeem History</div>
+        <div onclick="window.location.href='Redeem Selection.html'">Redeem Selection</div>
         <div onclick="logoutUser()">Logout</div>
         <button class="close-btn" onclick="closeMenu()">Close</button>
     </div>
-</div>
-
-<!-- FIREBASE -->
-<script type="module">
+</div><!-- FIREBASE --><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
@@ -209,17 +190,12 @@ function logoutUser() {
 }
 
 window.logoutUser = logoutUser;
-</script>
-
-<!-- MENU + NAV -->
-<script>
+</script><!-- MENU + NAV --><script>
 function openMenu() { document.getElementById("menuPage").style.display = "flex"; }
 function closeMenu() { document.getElementById("menuPage").style.display = "none"; }
 
 function goPromo() { window.location.href = "promo.html"; }
 function goDaily() { window.location.href = "Dailycoin.html"; }
 function goTask() { window.location.href = "task.html"; }
-</script>
-
-</body>
+</script></body>
 </html>
