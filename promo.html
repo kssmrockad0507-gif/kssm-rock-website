@@ -1,164 +1,356 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Promo Code</title>
-  <style>
-    body{
-      margin:0;padding:0;
-      background:linear-gradient(180deg,#0e5d63,#07404b);
-      font-family:Arial;color:white;text-align:center;
-    }
-    .exitBtn{position:fixed;top:15px;left:15px;background:white;padding:9px 16px;color:black;border-radius:10px;font-weight:bold;cursor:pointer;z-index:1000;}
-    .coinBoxTop{position:fixed;top:15px;right:15px;background:white;padding:8px 18px;color:black;border-radius:20px;font-weight:bold;display:flex;align-items:center;z-index:1000;}
-    .coinIcon{width:25px;margin-right:8px;}
-    .card{width:90%;margin:120px auto;background:white;border-radius:20px;padding:20px;color:black;}
-    .promoInput{width:95%;padding:15px;font-size:20px;border-radius:15px;border:2px solid #195c63;outline:none;}
-    .applyBtn{background:linear-gradient(180deg,#195c63,#0d434a);padding:15px;width:95%;color:white;border-radius:15px;font-size:22px;margin-top:15px;font-weight:bold;cursor:pointer;}
-    #msg{font-size:18px;margin-top:12px;font-weight:bold;min-height:28px;}
-    .tgBox{width:90%;background:white;padding:15px;border-radius:20px;margin:25px auto;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;cursor:pointer;}
-    .tgLogo{width:30px;margin-right:10px;}
-  </style>
-</head>
-<body>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>KSSM ROCK – Promo Code</title><style>
+/* Theme pack (as requested) */
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(180deg, #0e5d63, #07404b);
+  font-family: Arial, sans-serif;
+  color: white;
+  -webkit-font-smoothing:antialiased;
+}
 
-  <div class="exitBtn" onclick="goHome()">← Back</div>
+.header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 18px;
+}
 
+.backBtn {
+  background: white;
+  color: black;
+  padding:8px 12px;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.coinBoxTop {
+  background: white;
+  color: black;
+  padding:8px 14px;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:bold;
+}
+
+/* Main card */
+.container {
+  max-width:720px;
+  margin: 42px auto;
+  padding: 0 18px;
+}
+
+.card {
+  width:100%;
+  background: white;
+  color: black;
+  border-radius: 25px;
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+/* inner white box for promo input */
+.promoInput {
+  width: 92%;
+  padding: 16px;
+  font-size: 20px;
+  border-radius: 15px;
+  border: 2px solid #195c63;
+  margin: 10px auto;
+  display:block;
+  outline: none;
+}
+
+.applyBtn {
+  width: 92%;
+  margin: 12px auto 0;
+  padding: 14px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #195c63, #0d434a);
+  color: white;
+  font-size: 20px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+}
+
+/* small white box for telegram link */
+.tgBox {
+  width:100%;
+  background: white;
+  color: black;
+  padding: 12px;
+  border-radius: 15px;
+  margin-top: 16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  cursor:pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  font-weight:bold;
+}
+
+/* banner ad area (outside the white card) */
+.banner {
+  width:90%;
+  max-width:720px;
+  margin: 18px auto;
+  background:#d9e3e6;
+  color:#333;
+  height:80px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+/* message text */
+.msg {
+  margin-top:10px;
+  font-size:16px;
+  font-weight:700;
+  min-height:22px;
+}
+
+/* small note */
+.small {
+  margin-top:8px;
+  font-size:13px;
+  color:#333;
+}
+
+/* overlay for success / error (uses theme overlay style) */
+#overlayScreen {
+  display:none;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.75);
+  position: fixed;
+  top:0;
+  left:0;
+  color:white;
+  text-align:center;
+  padding-top:160px;
+  font-size:28px;
+  z-index:9999;
+}
+
+@media (max-width:520px){
+  .promoInput { font-size:18px; padding:12px; }
+  .applyBtn { font-size:18px; padding:12px; }
+  .banner { height:60px; }
+}
+</style></head>
+<body><!-- Header: back + coin --><div class="header">
+  <div class="backBtn" onclick="goHome()">← Back</div>
   <div class="coinBoxTop">
-    <img class="coinIcon" src="https://cdn-icons-png.flaticon.com/512/138/138292.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png" alt="coin" style="width:22px;height:22px;">
     <span id="userCoins">0</span>
   </div>
-
+</div><div class="container">
+  <!-- Main white card -->
   <div class="card">
-    <h2>Enter Promo Code</h2>
-    <input id="promoCode" class="promoInput" placeholder="Enter Promo Code">
-    <div class="applyBtn" id="applyBtn">APPLY</div>
-    <div id="msg"></div>
-  </div>
+    <h2 style="margin:6px 0 6px;font-size:22px;">Enter Promo Code</h2><!-- promo input inside white card -->
+<input id="promoCodeInput" placeholder="Enter Promo Code" class="promoInput" autocomplete="off" />
 
-  <div class="tgBox" onclick="openTG()">
-    <img class="tgLogo" src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
-    For Latest Promo Codes
-  </div>
+<button id="applyBtn" class="applyBtn">APPLY</button>
 
-  <script type="module">
-    // CONFIG - do not change these lines
-    const firebaseConfig = {
-      apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-      authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-      projectId: "kssm-rock-tam-ad",
-      storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
-      messagingSenderId: "28268633766",
-      appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
-    };
+<div id="msg" class="msg"></div>
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<div class="small">Enter the promo code provided in our Telegram channel. One use per user per day.</div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+<!-- Telegram small white box inside card -->
+<div class="tgBox" onclick="openTelegram()">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" style="width:26px;height:26px;">
+  For latest promo codes — Join Telegram
+</div>
 
-    let userId = null;
-    let userCoins = 0;
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  </div>  <!-- Banner ad (outside the white card) -->  <div class="banner">BANNER AD SPACE</div>
+</div><!-- Overlay (for messages if needed) --><div id="overlayScreen"></div><!-- Firebase + Logic (modular imports) --><script type="module">
+  // Firebase config (provided)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+    authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+    projectId: "kssm-rock-tam-ad",
+    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+    messagingSenderId: "28268633766",
+    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+  };
 
-    // Helper: show message
-    function showMsg(text, color='black'){
-      const el = document.getElementById('msg');
-      el.style.color = color;
-      el.innerText = text;
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, updateDoc, setDoc, addDoc, collection, serverTimestamp, increment
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // UI elements
+  const userCoinsEl = document.getElementById('userCoins');
+  const promoInput = document.getElementById('promoCodeInput');
+  const applyBtn = document.getElementById('applyBtn');
+  const msgEl = document.getElementById('msg');
+
+  let currentUser = null;
+  let userCoins = 0;
+
+  // Today's date string (YYYY-MM-DD)
+  function todayISO() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  // On auth state
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      // not logged in -> go to login
+      window.location.href = 'login.html';
+      return;
+    }
+    currentUser = user;
+    await loadUser();
+  });
+
+  // Load user coins + lastPromo check
+  async function loadUser() {
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+      const snap = await getDoc(userRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        userCoins = data.coins ?? 0;
+        userCoinsEl.innerText = userCoins;
+      } else {
+        // create user doc if not exists
+        await setDoc(userRef, { coins: 0 });
+        userCoins = 0;
+        userCoinsEl.innerText = 0;
+      }
+    } catch (err) {
+      console.error('loadUser err', err);
+      showMsg('Error loading user data', 'red');
+    }
+  }
+
+  // Show message helper
+  function showMsg(text, color='black') {
+    msgEl.style.color = color;
+    msgEl.innerText = text;
+  }
+
+  // Apply promo logic
+  applyBtn.addEventListener('click', async () => {
+    const codeTyped = (promoInput.value || '').trim();
+    if (!codeTyped) {
+      showMsg('Enter a promo code', 'red');
+      return;
+    }
+    if (!currentUser) {
+      showMsg('Login required', 'red');
+      return;
     }
 
-    // Load user coins & UI when logged in
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        showMsg('Login required!', 'red');
+    showMsg('Checking...', 'black');
+    applyBtn.disabled = true;
+
+    try {
+      // Read promoCodes/today
+      const promoDocRef = doc(db, 'promoCodes', 'today');
+      const promoSnap = await getDoc(promoDocRef);
+      if (!promoSnap.exists()) {
+        showMsg('No active promo today', 'red');
+        applyBtn.disabled = false;
         return;
       }
-      userId = user.uid;
-      try {
-        const uref = doc(db, 'users', userId);
-        const usnap = await getDoc(uref);
-        if (usnap.exists()){
-          userCoins = usnap.data().coins || 0;
-          document.getElementById('userCoins').innerText = userCoins;
-        } else {
-          // create basic user doc if missing
-          await setDoc(uref, { coins: 0, email: user.email || '', uid: userId });
-          userCoins = 0;
-          document.getElementById('userCoins').innerText = userCoins;
-        }
-      } catch(err){
-        console.error(err);
-        showMsg('Error loading user data', 'red');
+      const promo = promoSnap.data();
+      const expectedCode = (promo.code || '').toString().trim();
+
+      if (!promo.isActive === undefined) {
+        // harmless - promo structure may not have isActive; we rely on code matching
       }
-    });
 
-    // APPLY button logic (Firestore-only checks)
-    document.getElementById('applyBtn').addEventListener('click', async () => {
-      showMsg('');
-      if (!userId) { showMsg('Login required!', 'red'); return; }
-
-      const codeInput = document.getElementById('promoCode').value.trim();
-      if (!codeInput) { showMsg('Enter promo code', 'red'); return; }
-
-      try {
-        // 1) load today's promo code from promoCodes/today
-        const pRef = doc(db, 'promoCodes', 'today');
-        const pSnap = await getDoc(pRef);
-        if (!pSnap.exists()){
-          showMsg('No promo available today', 'red');
-          return;
-        }
-        const todayCode = pSnap.data().code || '';
-        const reward = Number(pSnap.data().reward || 0);
-
-        // 2) check promoClaims doc presence (doc id = `${userId}_${today}`)
-        const claimDocId = `${userId}_${today}`;
-        const claimRef = doc(db, 'promoClaims', claimDocId);
-        const claimSnap = await getDoc(claimRef);
-        if (claimSnap.exists()){
-          showMsg('✔ You already used today\'s promo!', 'red');
-          return;
-        }
-
-        // 3) compare codes
-        if (codeInput !== todayCode){
-          showMsg('❌ Invalid Promo Code!', 'red');
-          return;
-        }
-
-        // 4) all good → add coins and create claim record atomically
-        const userRef = doc(db, 'users', userId);
-        // update user coins
-        const newCoins = (userCoins || 0) + reward;
-        await updateDoc(userRef, { coins: newCoins, lastPromo: today });
-
-        // create promoClaims doc
-        await setDoc(claimRef, {
-          userId: userId,
-          claimedCode: todayCode,
-          reward: reward,
-          claimDate: today
-        });
-
-        // UI update
-        userCoins = newCoins;
-        document.getElementById('userCoins').innerText = userCoins;
-        showMsg('🎉 Promo Applied! +' + reward + ' coins!', 'green');
-
-      } catch (err){
-        console.error(err);
-        showMsg('Error processing promo — try again', 'red');
+      // check code match
+      if (codeTyped !== expectedCode) {
+        showMsg('Invalid promo code', 'red');
+        applyBtn.disabled = false;
+        return;
       }
-    });
 
-    // Utilities
-    window.openTG = () => { window.location.href = 'https://t.me/kssmrockreward'; }
-    window.goHome = () => { window.location.href = 'index.html'; }
+      // check user's lastPromo
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      const userData = userSnap.exists() ? userSnap.data() : {};
+      const lastPromo = userData.lastPromo ?? '';
+      const today = todayISO();
 
-  </script>
-</body>
-    </html>
+      if (lastPromo === today) {
+        showMsg('✔ Already used today', 'red');
+        applyBtn.disabled = false;
+        return;
+      }
+
+      // All good -> apply reward
+      const reward = Number(promo.reward) || 0;
+
+      // 1) update users coins atomically
+      await updateDoc(userRef, {
+        coins: increment(reward),
+        lastPromo: today
+      });
+
+      // 2) add promoClaims auto-id document
+      await addDoc(collection(db, 'promoClaims'), {
+        userUID: currentUser.uid,
+        claimedCode: expectedCode,
+        claimDate: serverTimestamp(),
+        reward: reward
+      });
+
+      // 3) optionally increment claimedCount in promoCodes (if exists)
+      try {
+        if (typeof promo.claimedCount === 'number') {
+          await updateDoc(promoDocRef, { claimedCount: increment(1) });
+        }
+      } catch (e) {
+        // ignore if field not present or rules block it
+      }
+
+      // update UI
+      userCoins += reward;
+      userCoinsEl.innerText = userCoins;
+      showMsg('🎉 Promo applied! +' + reward + ' coins', 'green');
+      promoInput.value = '';
+    } catch (err) {
+      console.error('apply err', err);
+      showMsg('Error processing promo — try again', 'red');
+    } finally {
+      applyBtn.disabled = false;
+    }
+  });
+
+  // Helper: open telegram
+  function openTelegram() {
+    window.location.href = 'https://t.me/kssmrockreward';
+  }
+
+  // go home
+  function goHome() {
+    window.location.href = 'index.html';
+  }
+
+  // Expose helpers for inline onclicks
+  window.openTelegram = openTelegram;
+  window.goHome = goHome;
+</script></body>
+</html>
