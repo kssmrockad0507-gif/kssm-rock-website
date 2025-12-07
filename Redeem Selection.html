@@ -93,7 +93,7 @@
 
     <div id="overlayScreen"></div>
 
-    <!-- FIREBASE -->
+    <!-- FIREBASE MODULE SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import {
@@ -103,27 +103,45 @@
 
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const userId = "user123";
+        // Global access
+        window.db = db;
+        window.getDoc = getDoc;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.collection = collection;
+        window.query = query;
+        window.where = where;
+        window.limit = limit;
+        window.getDocs = getDocs;
+        window.addDoc = addDoc;
+        window.onSnapshot = onSnapshot;
 
-        // 🔥 LIVE REALTIME COIN UPDATE
-        onSnapshot(doc(db, "users", userId), (docSnap) => {
-            document.getElementById("coinCount").innerHTML = docSnap.data().balance;
+        // Fetch live coin updates
+        const userId = "user123"; 
+        const userRef = doc(db, "users", userId);
+
+        onSnapshot(userRef, (snap) => {
+            if (snap.exists()) {
+                document.getElementById("coinCount").innerHTML = snap.data().balance;
+            }
         });
+    </script>
 
-        // ⭐ Redeem Function
+    <!-- NON-MODULE SCRIPT FOR HTML onclick -->
+    <script>
         async function redeemNow(cat) {
             const overlay = document.getElementById("overlayScreen");
             overlay.style.display = "block";
             overlay.innerHTML = "Processing...";
 
-            const userRef = doc(db, "users", userId);
+            const userRef = doc(db, "users", "user123");
             const userSnap = await getDoc(userRef);
             const balance = userSnap.data().balance;
 
@@ -141,6 +159,7 @@
                 where("isUsed", "==", false),
                 limit(1)
             );
+
             const codeSnap = await getDocs(q);
 
             if (codeSnap.empty) {
@@ -160,7 +179,7 @@
                 balance: balance - coinCost
             });
 
-            await addDoc(collection(db, "users", userId, "history"), {
+            await addDoc(collection(db, "users", "user123", "history"), {
                 code: code,
                 amount: cat,
                 date: new Date()
@@ -169,9 +188,8 @@
             overlay.innerHTML = "Redeem Successful!<br><br><b>" + code + "</b>";
         }
 
-        // BACK BUTTON REDIRECT
         function goBack() {
-            window.location.href = "home.html";  // உன் ஹோம் பேஜ் file பெயர் போடு
+            window.location.href = "home.html";
         }
     </script>
 
