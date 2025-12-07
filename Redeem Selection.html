@@ -5,13 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        /* Force mobile look even in desktop mode */
         body {
             max-width: 480px;
             margin: auto;
             background: linear-gradient(180deg, #0e5d63, #07404b);
             font-family: Arial, sans-serif;
             color: white;
+        }
+
+        /* Back Button */
+        #backBtn {
+            font-size: 30px;
+            padding: 10px 15px;
+            cursor: pointer;
+            width: fit-content;
+        }
+
+        .coinBox {
+            background: white;
+            color: black;
+            display: flex;
+            align-items: center;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            width: fit-content;
+            margin: auto;
+            margin-top: 10px;
         }
 
         .card {
@@ -39,19 +59,6 @@
             color: white;
         }
 
-        .coinBox {
-            background: white;
-            color: black;
-            display: flex;
-            align-items: center;
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            width: fit-content;
-            margin: auto;
-            margin-top: 20px;
-        }
-
         #overlayScreen {
             display: none;
             width: 100%;
@@ -70,6 +77,9 @@
 
 <body>
 
+    <!-- BACK BUTTON -->
+    <div id="backBtn" onclick="goBack()">←</div>
+
     <div class="coinBox">Your Coins: <span id="coinCount">0</span></div>
 
     <div class="card">
@@ -83,11 +93,11 @@
 
     <div id="overlayScreen"></div>
 
-    <!-- Firebase SDK -->
+    <!-- FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import {
-            getFirestore, doc, getDoc, updateDoc,
+            getFirestore, doc, getDoc, updateDoc, onSnapshot,
             collection, query, where, limit, getDocs, addDoc
         } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -100,28 +110,23 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const userId = "user123";   // Login user ID
+        const userId = "user123";
 
-        // Load Coins
-        async function loadCoins() {
-            const u = await getDoc(doc(db, "users", userId));
-            document.getElementById("coinCount").innerHTML = u.data().balance;
-        }
-        loadCoins();
+        // 🔥 LIVE REALTIME COIN UPDATE
+        onSnapshot(doc(db, "users", userId), (docSnap) => {
+            document.getElementById("coinCount").innerHTML = docSnap.data().balance;
+        });
 
-        // Redeem System
+        // ⭐ Redeem Function
         async function redeemNow(cat) {
-
             const overlay = document.getElementById("overlayScreen");
             overlay.style.display = "block";
             overlay.innerHTML = "Processing...";
 
-            // 1. User balance
             const userRef = doc(db, "users", userId);
             const userSnap = await getDoc(userRef);
             const balance = userSnap.data().balance;
 
-            // 2. Category coin cost
             const catSnap = await getDoc(doc(db, "redeemCategories", cat));
             const coinCost = catSnap.data().coinCost;
 
@@ -131,7 +136,6 @@
                 return;
             }
 
-            // 3. Fetch FIRST unused code from subcollection
             const q = query(
                 collection(db, "redeemCodes", cat),
                 where("isUsed", "==", false),
@@ -140,7 +144,7 @@
             const codeSnap = await getDocs(q);
 
             if (codeSnap.empty) {
-                overlay.innerHTML = "No Stock Available Now!";
+                overlay.innerHTML = "No Stock Available!";
                 setTimeout(() => overlay.style.display = "none", 2000);
                 return;
             }
@@ -148,28 +152,26 @@
             const codeDoc = codeSnap.docs[0];
             const code = codeDoc.data().code;
 
-            // 4. Mark code as USED
             await updateDoc(doc(db, "redeemCodes", cat, codeDoc.id), {
                 isUsed: true
             });
 
-            // 5. Deduct coins
             await updateDoc(userRef, {
                 balance: balance - coinCost
             });
 
-            // 6. Save history
             await addDoc(collection(db, "users", userId, "history"), {
                 code: code,
                 amount: cat,
                 date: new Date()
             });
 
-            // 7. Final Success Popup
-            overlay.innerHTML =
-                "Redeem Successful!<br><br>Your Code:<br><b>" + code + "</b>";
+            overlay.innerHTML = "Redeem Successful!<br><br><b>" + code + "</b>";
+        }
 
-            loadCoins();
+        // BACK BUTTON REDIRECT
+        function goBack() {
+            window.location.href = "home.html";  // உன் ஹோம் பேஜ் file பெயர் போடு
         }
     </script>
 
