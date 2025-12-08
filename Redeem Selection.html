@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Redeem</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redeem Selection</title>
 
+    <!-- CSS Theme -->
     <style>
         body {
-            max-width: 480px;
-            margin: auto;
+            margin: 0;
+            padding: 0;
             background: linear-gradient(180deg, #0e5d63, #07404b);
             font-family: Arial, sans-serif;
             color: white;
         }
 
-        /* Back Button */
-        #backBtn {
+        .topBar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .backBtn {
             font-size: 30px;
-            padding: 10px 15px;
             cursor: pointer;
-            width: fit-content;
         }
 
         .coinBox {
@@ -29,27 +34,25 @@
             padding: 6px 15px;
             border-radius: 20px;
             font-weight: bold;
-            width: fit-content;
-            margin: auto;
-            margin-top: 10px;
+            font-size: 22px;
         }
 
         .card {
-            width: 90%;
+            width: 85%;
             margin: auto;
-            margin-top: 30px;
             background: white;
             border-radius: 25px;
             padding: 20px;
             color: black;
             text-align: center;
+            margin-top: 20px;
         }
 
         .redeemBtn {
             width: 80%;
             margin: auto;
             background: linear-gradient(180deg, #195c63, #0d434a);
-            padding: 20px;
+            padding: 18px;
             text-align: center;
             border-radius: 15px;
             margin-top: 20px;
@@ -73,37 +76,41 @@
             font-size: 28px;
         }
     </style>
+
 </head>
 
 <body>
 
-    <!-- BACK BUTTON -->
-    <div id="backBtn" onclick="goBack()">←</div>
+    <div class="topBar">
+        <div class="backBtn" onclick="history.back()">←</div>
 
-    <!-- LIVE COINS -->
-    <div class="coinBox">Your Coins: <span id="coinCount">0</span></div>
+        <div class="coinBox">
+            <span id="coinValue">0</span> Coins
+        </div>
+    </div>
 
     <div class="card">
-        <h2>Select Redeem Code</h2>
+        <h2>Redeem Options</h2>
 
-        <div class="redeemBtn" onclick="redeemNow('10rs')">Redeem ₹10</div>
-        <div class="redeemBtn" onclick="redeemNow('20rs')">Redeem ₹20</div>
-        <div class="redeemBtn" onclick="redeemNow('50rs')">Redeem ₹50</div>
-        <div class="redeemBtn" onclick="redeemNow('100rs')">Redeem ₹100</div>
+        <div class="redeemBtn" onclick="openRedeemList('10rs',1000)">
+            ₹10 Redeem = 1000 Coins
+        </div>
+
+        <div class="redeemBtn" onclick="openRedeemList('20rs',2000)">
+            ₹20 Redeem = 2000 Coins
+        </div>
+
+        <div class="redeemBtn" onclick="openRedeemList('50rs',5000)">
+            ₹50 Redeem = 5000 Coins
+        </div>
     </div>
 
     <div id="overlayScreen"></div>
 
-    <!-- FIREBASE MODULE -->
+    <!-- Firebase -->
     <script type="module">
 
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import {
-            getFirestore, doc, getDoc, updateDoc, onSnapshot,
-            collection, query, where, limit, getDocs, addDoc
-        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-        // ⭐ YOUR FIREBASE CONFIG
+        // Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
             authDomain: "kssm-rock-tam-ad.firebaseapp.com",
@@ -113,91 +120,108 @@
             appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
         };
 
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, addDoc } 
+        from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } 
+        from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth();
 
-        // Make firebase globally available
-        window.db = db;
-        window.doc = doc;
-        window.getDoc = getDoc;
-        window.updateDoc = updateDoc;
-        window.collection = collection;
-        window.query = query;
-        window.where = where;
-        window.limit = limit;
-        window.getDocs = getDocs;
-        window.addDoc = addDoc;
+        let currentUID = null;
 
-        // ⭐ LIVE COINS UPDATE
-        const userId = "user123";
-        const userRef = doc(db, "users", userId);
-
-        onSnapshot(userRef, (snap) => {
-            if (snap.exists()) {
-                document.getElementById("coinCount").innerHTML = snap.data().balance;
+        //-----------------------------
+        // LIVE COIN SHOW
+        //-----------------------------
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUID = user.uid;
+                const userRef = doc(db, "users", currentUID);
+                const snap = await getDoc(userRef);
+                if (snap.exists()) {
+                    document.getElementById("coinValue").innerText = snap.data().coins;
+                }
             }
         });
 
-    </script>
+        //-----------------------------
+        // REDEEM OPTION CLICKED
+        //-----------------------------
+        async function openRedeemList(category, cost) {
 
-    <!-- NORMAL SCRIPT ACCESSIBLE FOR HTML onclick -->
-    <script>
-        async function redeemNow(cat) {
-            const overlay = document.getElementById("overlayScreen");
+            const userRef = doc(db, "users", currentUID);
+            const userData = await getDoc(userRef);
+
+            if (userData.data().coins < cost) {
+                alert("Not enough coins!");
+                return;
+            }
+
+            // Check database for available code
+            const codeRef = collection(db, "redeemCategories", category, "codes");
+            const codeSnap = await getDocs(codeRef);
+
+            let foundCode = null;
+            codeSnap.forEach(docu => {
+                if (docu.data().isUsed === false && foundCode === null) {
+                    foundCode = { id: docu.id, data: docu.data() };
+                }
+            });
+
+            if (foundCode === null) {
+                alert("No Code Available!");
+                return;
+            }
+
+            // Show ad simulation
+            let overlay = document.getElementById("overlayScreen");
             overlay.style.display = "block";
-            overlay.innerHTML = "Processing...";
+            overlay.innerHTML = "Loading Ad... 10 sec";
 
-            const userRef = doc(db, "users", "user123");
+            let sec = 10;
+            let x = setInterval(() => {
+                sec--;
+                overlay.innerHTML = "Loading Ad... " + sec + " sec";
+                if (sec <= 0) {
+                    clearInterval(x);
+                    overlay.style.display = "none";
+                    confirmRedeem(foundCode, cost, category);
+                }
+            }, 1000);
+        }
+
+        //-----------------------------
+        // CONFIRM REDEEM AND SAVE TO HISTORY
+        //-----------------------------
+        async function confirmRedeem(codeObj, cost, category) {
+
+            // Subtract coins
+            const userRef = doc(db, "users", currentUID);
             const userSnap = await getDoc(userRef);
-            const balance = userSnap.data().balance;
+            let newCoins = userSnap.data().coins - cost;
 
-            const catSnap = await getDoc(doc(db, "redeemCategories", cat));
-            const coinCost = catSnap.data().coinCost;
+            await updateDoc(userRef, { coins: newCoins });
+            document.getElementById("coinValue").innerText = newCoins;
 
-            if (balance < coinCost) {
-                overlay.innerHTML = "Not Enough Coins!";
-                setTimeout(() => overlay.style.display = "none", 2000);
-                return;
-            }
+            // Mark code used
+            const usedRef = doc(db, "redeemCategories", category, "codes", codeObj.id);
+            await updateDoc(usedRef, { isUsed: true });
 
-            const q = query(
-                collection(db, "redeemCodes", cat),
-                where("isUsed", "==", false),
-                limit(1)
-            );
-
-            const codeSnap = await getDocs(q);
-
-            if (codeSnap.empty) {
-                overlay.innerHTML = "No Stock Available!";
-                setTimeout(() => overlay.style.display = "none", 2000);
-                return;
-            }
-
-            const codeDoc = codeSnap.docs[0];
-            const code = codeDoc.data().code;
-
-            await updateDoc(doc(db, "redeemCodes", cat, codeDoc.id), {
-                isUsed: true
+            // Save in redeemCodes (user history)
+            await addDoc(collection(db, "redeemCodes"), {
+                uid: currentUID,
+                code: codeObj.data.code,
+                category: category,
+                time: Date.now()
             });
 
-            await updateDoc(userRef, {
-                balance: balance - coinCost
-            });
-
-            await addDoc(collection(db, "users", "user123", "history"), {
-                code: code,
-                amount: cat,
-                date: new Date()
-            });
-
-            overlay.innerHTML = "Redeem Successful!<br><br><b>" + code + "</b>";
+            // Redirect to history page
+            window.location.href = "redeem-history.html";
         }
 
-        // ⭐ BACK GOES TO index.html
-        function goBack() {
-            window.location.href = "index.html";
-        }
+        window.openRedeemList = openRedeemList;
     </script>
 
 </body>
