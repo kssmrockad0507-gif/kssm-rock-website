@@ -1,176 +1,201 @@
-<!doctype html>
-
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Redeem History - KSSM ROCK</title>  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KSSM ROCK FREE REWARD</title><style>
     body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(180deg, #0e5d63, #07404b);
-      font-family: Arial, sans-serif;
-      color: white;
+        margin: 0;
+        padding: 0;
+        font-family: Arial;
+        background: linear-gradient(180deg, #0e5d63, #07404b);
+        background-size: cover;
     }
 
-    .topBar {
-      width: 100%;
-      padding: 14px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .topbar {
+        width: 100%;
+        padding: 14px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        background: rgba(255,255,255,0.12);
+        backdrop-filter: blur(10px);
+        box-shadow: 0px 4px 20px rgba(0,0,0,0.25);
     }
 
-    .backBtn {
-      font-size: 28px;
-      cursor: pointer;
+    .menu-btn {
+        font-size: 30px;
+        cursor: pointer;
+        user-select: none;
+        flex: 1;
     }
 
-    .coinBox {
-      background: white;
-      color: black;
-      padding: 6px 12px;
-      border-radius: 18px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .title {
+        flex: 2;
+        text-align: center;
+        font-size: 23px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-shadow: 0px 0px 8px rgba(255,255,255,0.6);
     }
 
-    .container {
-      width: 92%;
-      max-width: 720px;
-      margin: 18px auto;
-      background: white;
-      color: black;
-      border-radius: 20px;
-      padding: 18px;
+    .coins {
+        flex: 1;
+        display: flex;
+        justify-content: right;
+        align-items: center;
+        font-size: 20px;
+        background: rgba(255,255,255,0.25);
+        padding: 8px 14px;
+        border-radius: 12px;
+        backdrop-filter: blur(6px);
+        box-shadow: 0px 3px 12px rgba(0,0,0,0.2);
     }
 
-    h2 { text-align:center; margin: 2px 0 12px 0; }
-
-    .historyList { margin-top: 8px; }
-
-    .historyItem {
-      background: #d9e3e6;
-      padding: 12px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      font-weight: 700;
+    .coins img {
+        width: 24px;
+        height: 24px;
+        margin-right: 7px;
     }
 
-    .small { font-weight:600; font-size:13px; color:#073d3a; }
-
-    .noData {
-      text-align:center;
-      padding: 22px;
-      font-size:18px;
-      color:#fff;
-      background:transparent;
+    .box-container {
+        padding: 20px;
     }
 
-    @media (max-width:520px){
-      .container{ width:94%; padding:16px; }
-      .historyItem{ font-size:16px; }
+    /* WHITE TASK BUTTONS */
+    .big-box {
+        background: white;
+        color: #0e5d63;
+        margin-top: 18px;
+        padding: 22px;
+        border-radius: 18px;
+        font-size: 22px;
+        font-weight: bold;
+        backdrop-filter: blur(6px);
+        box-shadow: 0px 6px 20px rgba(0,0,0,0.25);
+        cursor: pointer;
+        transition: 0.3s;
+        text-align: center;
     }
-  </style></head>
-<body>  <div class="topBar">
-    <div class="backBtn" onclick="goHome()">←</div>
-    <div class="coinBox">
-      <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png" width="20" alt="coin">
-      <span id="liveCoins">0</span>
+
+    .big-box:hover {
+        transform: scale(1.03);
+        background: #eef5f5;
+    }
+
+    .menu-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.75);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .menu-box {
+        width: 80%;
+        background: rgba(255,255,255,0.95);
+        padding: 25px;
+        border-radius: 18px;
+        text-align: center;
+        box-shadow: 0px 6px 20px rgba(0,0,0,0.35);
+    }
+
+    .menu-box div {
+        font-size: 22px;
+        padding: 14px;
+        border-bottom: 1px solid #ccc;
+        color: #0e5d63;
+    }
+
+    .close-btn {
+        margin-top: 15px;
+        padding: 10px 18px;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        background: #0e5d63;
+        color: white;
+        cursor: pointer;
+    }
+
+</style></head><body><!-- TOP BAR --><div class="topbar">
+    <div class="menu-btn" onclick="openMenu()">三</div>
+    <div class="title">KSSM ROCK FREE REWARD</div>
+    <div class="coins">
+        <img src="https://cdn-icons-png.flaticon.com/512/138/138292.png" alt="coin">
+        <span id="coinValue">0</span>
     </div>
-  </div>  <div class="container">
-    <h2>Redeem History</h2>
-    <div id="historyList" class="historyList">
-      <div class="noData">Loading...</div>
+</div><!-- TASK BOXES --><div class="box-container">
+    <!-- Changed to open Dailycoin.html -->
+    <div class="big-box" onclick="window.location.href='Dailycoin.html'">Daily Coin</div><!-- TASK 1 (Math Quiz) -->
+<div class="big-box" onclick="window.location.href='task.html'">Maths Quiz</div>
+
+<!-- TASK 2 (Alphabet Identifier) -->
+<div class="big-box" onclick="window.location.href='task2.html'">Alphabet Identifier</div>
+
+<div class="big-box" onclick="goPromo()">Promo Code</div>
+
+</div><!-- MENU PAGE --><div id="menuPage" class="menu-screen">
+    <div class="menu-box">
+        <div onclick="window.location.href='redeem-history.html'">Redeem History</div>
+        <div onclick="window.location.href='Redeem Selection.html'">Redeem Selection</div>
+        <div onclick="logoutUser()">Logout</div>
+        <button class="close-btn" onclick="closeMenu()">Close</button>
     </div>
-  </div>  <!-- Firebase -->  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-    import {
-      getFirestore, doc, onSnapshot, collection, query, orderBy, getDocs
-    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+</div><!-- FIREBASE --><script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore, doc, getDoc }
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-      authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-      projectId: "kssm-rock-tam-ad",
-      storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
-      messagingSenderId: "28268633766",
-      appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
-    };
+const firebaseConfig = {
+    apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+    authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+    projectId: "kssm-rock-tam-ad",
+    storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+    messagingSenderId: "28268633766",
+    appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    // Navigate back to main (index.html)
-    window.goHome = function() {
-      window.location.href = "index.html";
-    };
+async function loadCoins(uid) {
+    const ref = doc(db, "users", uid);
+    const snap = await getDoc(ref);
 
-    // Render history items
-    function renderHistory(list) {
-      const container = document.getElementById('historyList');
-      container.innerHTML = '';
-      if (!list || list.length === 0) {
-        container.innerHTML = '<div class="noData">No Redeem History Available</div>';
-        return;
-      }
-      list.forEach(item=>{
-        // time might be Firestore timestamp or ISO string
-        let timeText = '';
-        if (item.time && item.time.toDate) {
-          timeText = new Date(item.time.toDate()).toLocaleString();
-        } else if (item.time && item.time.seconds) {
-          timeText = new Date(item.time.seconds * 1000).toLocaleString();
-        } else {
-          timeText = item.time ? new Date(item.time).toLocaleString() : '';
-        }
-        container.innerHTML += `
-          <div class="historyItem">
-            <div><strong>Code:</strong> ${item.code ?? '—'}</div>
-            <div class="small"><strong>Value:</strong> ${item.value ?? item.amount ?? '—'} </div>
-            <div class="small"><strong>Time:</strong> ${timeText}</div>
-          </div>
-        `;
-      });
+    if (snap.exists()) {
+        document.getElementById("coinValue").innerText = snap.data().coins;
     }
+}
 
-    // Load live coins and history for signed-in user
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        alert("Please login to view Redeem History.");
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
         window.location.href = "login.html";
-        return;
-      }
+    } else {
+        loadCoins(user.uid);
+    }
+});
 
-      const userDocRef = doc(db, "users", user.uid);
-
-      // LIVE coins update
-      onSnapshot(userDocRef, (snap) => {
-        if (snap.exists()) {
-          // adjust field name if you use 'coins' or 'balance'
-          const coins = snap.data().coins ?? snap.data().balance ?? 0;
-          document.getElementById('liveCoins').innerText = coins;
-        } else {
-          document.getElementById('liveCoins').innerText = 0;
-        }
-      });
-
-      // Load history once (ordered desc by time)
-      try {
-        const historyCol = collection(db, "users", user.uid, "redeemHistory");
-        const q = query(historyCol, orderBy("time", "desc"));
-        const snap = await getDocs(q);
-        const items = [];
-        snap.forEach(d => items.push(d.data()));
-        renderHistory(items);
-      } catch (err) {
-        console.error("Load history error:", err);
-        document.getElementById('historyList').innerHTML = '<div class="noData">Error loading history</div>';
-      }
+function logoutUser() {
+    signOut(auth).then(() => {
+        window.location.href = "login.html";
     });
-  </script></body>
-</html>
+}
+
+window.logoutUser = logoutUser;
+</script><!-- MENU + NAV --><script>
+function openMenu() { document.getElementById("menuPage").style.display = "flex"; }
+function closeMenu() { document.getElementById("menuPage").style.display = "none"; }
+
+function goPromo() { window.location.href = "promo.html"; }
+function goDaily() { window.location.href = "Dailycoin.html"; }
+function goTask() { window.location.href = "task.html"; }
+</script></body>
+  </html>
