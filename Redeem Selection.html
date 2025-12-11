@@ -1,232 +1,262 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Redeem Selection</title>
-
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(180deg, #0e5d63, #07404b);
-            font-family: Arial, sans-serif;
-            color: white;
-        }
-
-        .topBar {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-        }
-
-        .backBtn {
-            font-size: 30px;
-            cursor: pointer;
-        }
-
-        .coinBox {
-            background: white;
-            color: black;
-            display: flex;
-            align-items: center;
-            padding: 5px 14px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        .card {
-            width: 90%;
-            margin: auto;
-            background: white;
-            border-radius: 18px;
-            padding: 18px;
-            color: black;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .redeemBtn {
-            width: 90%;
-            margin: auto;
-            background: linear-gradient(180deg, #195c63, #0d434a);
-            padding: 16px;
-            text-align: center;
-            border-radius: 14px;
-            margin-top: 18px;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-            color: white;
-        }
-
-        #overlayScreen {
-            display: none;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.75);
-            position: fixed;
-            top: 0;
-            left: 0;
-            color: white;
-            text-align: center;
-            padding-top: 200px;
-            font-size: 28px;
-        }
-
-        @media (min-width: 800px) {
-            body {
-                width: 450px;
-                margin: auto;
-                border-radius: 15px;
-            }
-        }
-    </style>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Redeem Selection</title>
+<style>
+  /* Mobile-first style (looks mobile; on desktop it will center narrow) */
+  body{
+    margin:0;padding:0;
+    font-family:Arial, sans-serif;
+    background: linear-gradient(180deg,#0e5d63,#07404b);
+    color:white;
+    -webkit-font-smoothing:antialiased;
+  }
+  .container{
+    max-width:480px;
+    margin:0 auto;
+    padding:12px;
+  }
+  .topBar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px;
+  }
+  .backBtn{ font-size:28px; cursor:pointer; }
+  .coinBox{
+    background:white;color:black;
+    padding:6px 12px;border-radius:20px;font-weight:bold;
+    display:flex;align-items:center;font-size:16px;
+  }
+  .card{
+    width:92%; margin:18px auto;
+    background:white;color:black;border-radius:18px;padding:16px;text-align:center;
+    box-shadow:0 6px 18px rgba(0,0,0,0.15);
+  }
+  h2{ margin:6px 0 12px; font-size:20px; }
+  .redeemBtn{
+    width:90%; margin:12px auto;
+    background:linear-gradient(180deg,#195c63,#0d434a);
+    color:white;padding:14px;border-radius:14px;font-size:18px;font-weight:700;
+    cursor:pointer; box-shadow:0 6px 16px rgba(0,0,0,0.18);
+  }
+  #overlayScreen{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75);
+    z-index:9999; color:white; text-align:center; padding-top:180px; font-size:20px;
+  }
+  @media(min-width:800px){
+    body{ display:flex; justify-content:center; align-items:flex-start; padding-top:30px; }
+    .container{ box-shadow:0 10px 30px rgba(0,0,0,0.25); border-radius:12px; background:transparent; }
+  }
+</style>
 </head>
-
 <body>
-
+  <div class="container">
     <div class="topBar">
-        <div class="backBtn" onclick="history.back()">←</div>
-
-        <div class="coinBox">
-            <span id="coinValue">0</span> Coins
-        </div>
+      <div class="backBtn" onclick="goBack()">←</div>
+      <div class="coinBox"><span id="coinValue">0</span> Coins</div>
     </div>
 
     <div class="card">
-        <h2>Redeem Options</h2>
+      <h2>Redeem Options</h2>
 
-        <div class="redeemBtn" onclick="openRedeemList('10rs',1000)">
-            ₹10 Redeem = 1000 Coins
-        </div>
-
-        <div class="redeemBtn" onclick="openRedeemList('20rs',2000)">
-            ₹20 Redeem = 2000 Coins
-        </div>
-
-        <div class="redeemBtn" onclick="openRedeemList('50rs',5000)">
-            ₹50 Redeem = 5000 Coins
-        </div>
+      <div class="redeemBtn" onclick="startRedeem('10rs', 1000)">₹10 Redeem = 1000 Coins</div>
+      <div class="redeemBtn" onclick="startRedeem('20rs', 2000)">₹20 Redeem = 2000 Coins</div>
+      <div class="redeemBtn" onclick="startRedeem('50rs', 5000)">₹50 Redeem = 5000 Coins</div>
+      <div style="margin-top:8px;font-size:13px;color:#444">(An ad will show for 10s, then redeem completes)</div>
     </div>
+  </div>
 
-    <div id="overlayScreen"></div>
+  <div id="overlayScreen">Processing... <div id="overlayDetail"></div></div>
 
-    <!-- Firebase -->
-    <script type="module">
+  <!-- Firebase module -->
+  <script type="module">
+    // ------- YOUR FIREBASE CONFIG -------
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+      authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+      projectId: "kssm-rock-tam-ad",
+      storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+      messagingSenderId: "28268633766",
+      appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+    };
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-            authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-            projectId: "kssm-rock-tam-ad",
-            storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
-            messagingSenderId: "28268633766",
-            appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
-        };
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore, doc, runTransaction, getDoc, collection, query, where, limit, getDocs, addDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
-        import {
-            getFirestore, doc, getDoc,
-            collection, getDocs, updateDoc, addDoc
-        } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged }
-            from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth();
+    // current user id
+    let currentUID = null;
 
-        let currentUID = null;
+    // show live coins (onAuth)
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        // not logged in -> redirect to login or show 0
+        document.getElementById('coinValue').innerText = "0";
+        currentUID = null;
+        return;
+      }
+      currentUID = user.uid;
+      await refreshCoinsUI();
+    });
 
-        // ---------------- LIVE COINS ----------------
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUID = user.uid;
-                const uRef = doc(db, "users", currentUID);
-                const snap = await getDoc(uRef);
-                if (snap.exists()) {
-                    document.getElementById("coinValue").innerText = snap.data().coins;
-                }
-            }
+    async function refreshCoinsUI(){
+      if (!currentUID) return;
+      try {
+        const uref = doc(db, "users", currentUID);
+        const usnap = await getDoc(uref);
+        if (usnap.exists()){
+          const coins = usnap.data().coins ?? 0;
+          document.getElementById('coinValue').innerText = coins;
+        } else {
+          document.getElementById('coinValue').innerText = "0";
+        }
+      } catch(e){
+        console.error("refreshCoinsUI error:", e);
+      }
+    }
+
+    // simulate ad: returns Promise resolved after 10s
+    function showFakeAd(){
+      return new Promise(resolve=>{
+        const overlay = document.getElementById('overlayScreen');
+        const detail = document.getElementById('overlayDetail');
+        overlay.style.display = "block";
+        let sec = 10;
+        detail.innerText = sec + " sec";
+        const t = setInterval(()=>{
+          sec--;
+          detail.innerText = sec + " sec";
+          if (sec <= 0){
+            clearInterval(t);
+            overlay.style.display = "none";
+            resolve();
+          }
+        },1000);
+      });
+    }
+
+    // main flow
+    async function startRedeem(category, costInCoins){
+      if (!currentUID){
+        alert("Login required to redeem.");
+        return;
+      }
+
+      // Check user's coins quick client-side
+      const uref = doc(db, "users", currentUID);
+      const usnap = await getDoc(uref);
+      const userCoins = (usnap.exists() && usnap.data().coins) ? usnap.data().coins : 0;
+      if (userCoins < costInCoins){
+        alert("Not enough coins!");
+        return;
+      }
+
+      // show ad then continue
+      await showFakeAd();
+
+      // After ad, perform transaction to atomically:
+      // 1) fetch first unused code doc from redeemCategories/{category}/codes
+      // 2) check user coins is still enough
+      // 3) mark code as used (set isUsed:true, usedBy, usedAt)
+      // 4) decrement user.coins by costInCoins
+      // 5) add an entry in user's history subcollection (client create allowed)
+      // 6) add a global audit doc in redeemCodes collection (optional)
+
+      const codesColRef = collection(db, "redeemCategories", category, "codes");
+
+      // fetch an unused code doc id (non-transactional read first - for simplicity)
+      // NOTE: we will re-check inside transaction to be safe
+      const q = query(codesColRef, where("isUsed","==",false), limit(1));
+      const qSnap = await getDocs(q);
+      if (qSnap.empty){
+        alert("No Code Available!");
+        return;
+      }
+      const codeDoc = qSnap.docs[0]; // candidate
+
+      // Run transaction to reserve + update user
+      try {
+        await runTransaction(db, async (tx) => {
+          // reload user inside tx
+          const userRef = doc(db, "users", currentUID);
+          const userDoc = await tx.get(userRef);
+          if (!userDoc.exists()) throw new Error("User not found");
+
+          const currentCoins = userDoc.data().coins ?? 0;
+          if (currentCoins < costInCoins) throw new Error("Not enough coins (after check)");
+
+          // reload code doc inside tx
+          const codeRef = doc(db, "redeemCategories", category, "codes", codeDoc.id);
+          const codeDocTx = await tx.get(codeRef);
+          if (!codeDocTx.exists()) throw new Error("Code vanished");
+          if (codeDocTx.data().isUsed === true) throw new Error("Code already used (race)");
+
+          // mark code used
+          tx.update(codeRef, {
+            isUsed: true,
+            usedBy: currentUID,
+            usedAt: Date.now()
+          });
+
+          // decrement user coins
+          tx.update(userRef, {
+            coins: currentCoins - costInCoins
+          });
+
+          // add user history (can't add in tx with addDoc easily; so we'll queue outside)
+          // instead, create an audit doc in global collection inside tx:
+          const auditRef = doc(db, "redeemClaims", /* auto-id by addDoc not available in tx */ );
+          // Firestore runTransaction doesn't support addDoc-style auto-id easily.
+          // Workaround: do audit write outside tx after tx success.
+          return { codeValue: codeDocTx.data().code, codeId: codeDoc.id };
         });
 
-        // ---------------- OPEN REDEEM LIST ----------------
-        async function openRedeemList(category, cost) {
+        // Transaction success: now add history and global audit (outside tx)
+        // fetch code value again (non-transactional) for message
+        const finalCodeSnap = await getDoc(doc(db, "redeemCategories", category, "codes", codeDoc.id));
+        const finalCodeValue = finalCodeSnap.exists() ? finalCodeSnap.data().code : "";
 
-            const userRef = doc(db, "users", currentUID);
-            const userSnap = await getDoc(userRef);
+        // add history under user
+        await addDoc(collection(db, "users", currentUID, "history"), {
+          code: finalCodeValue,
+          category: category,
+          amountCoins: costInCoins,
+          time: Date.now()
+        });
 
-            if (userSnap.data().coins < cost) {
-                alert("Not enough coins!");
-                return;
-            }
+        // add global audit
+        await addDoc(collection(db, "redeemCodes"), {
+          uid: currentUID,
+          code: finalCodeValue,
+          category: category,
+          time: Date.now()
+        });
 
-            // FIX: CODE FETCH CORRECT PATH
-            const codesRef = collection(db, "redeemCategories", category, "codes");
-            const codesSnap = await getDocs(codesRef);
+        // refresh UI coins
+        await refreshCoinsUI();
 
-            let foundCode = null;
+        // redirect to history page (user will see redeemed code there)
+        window.location.href = "Redeem History.html";
+      } catch (err) {
+        console.error("Transaction failed:", err);
+        alert("Redeem failed: " + (err.message || err));
+      }
+    }
 
-            codesSnap.forEach(d => {
-                if (d.data().isUsed === false && foundCode === null) {
-                    foundCode = { id: d.id, data: d.data() };
-                }
-            });
+    // helper
+    function goBack(){ window.history.back(); }
 
-            if (foundCode === null) {
-                alert("No Code Available!");
-                return;
-            }
-
-            // Fake ad
-            let overlay = document.getElementById("overlayScreen");
-            overlay.style.display = "block";
-            overlay.innerHTML = "Loading Ad... 10 sec";
-
-            let sec = 10;
-            let x = setInterval(() => {
-                sec--;
-                overlay.innerHTML = "Loading Ad... " + sec + " sec";
-                if (sec <= 0) {
-                    clearInterval(x);
-                    overlay.style.display = "none";
-                    confirmRedeem(foundCode, cost, category);
-                }
-            }, 1000);
-        }
-
-        // ---------------- CONFIRM REDEEM ----------------
-        async function confirmRedeem(codeObj, cost, category) {
-
-            // Deduct coins
-            const userRef = doc(db, "users", currentUID);
-            const userSnap = await getDoc(userRef);
-            let newCoins = userSnap.data().coins - cost;
-
-            await updateDoc(userRef, { coins: newCoins });
-            document.getElementById("coinValue").innerText = newCoins;
-
-            // Mark code used
-            const usedRef = doc(db, "redeemCategories", category, "codes", codeObj.id);
-            await updateDoc(usedRef, { isUsed: true });
-
-            // Save in redeem history
-            await addDoc(collection(db, "redeemCodes"), {
-                uid: currentUID,
-                code: codeObj.data.code,
-                category: category,
-                time: Date.now()
-            });
-
-            // Redirect to history page
-            window.location.href = "Redeem History.html";
-        }
-
-        window.openRedeemList = openRedeemList;
-
-    </script>
-
+    // expose for debug
+    window.startRedeem = startRedeem;
+  </script>
 </body>
 </html>
