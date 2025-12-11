@@ -85,7 +85,8 @@
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
-      getFirestore, doc, runTransaction, getDoc, collection, query, where, limit, getDocs, addDoc
+      getFirestore, doc, runTransaction, getDoc, collection,
+      query, where, limit, getDocs, addDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -99,7 +100,7 @@
     // show live coins (onAuth)
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        // not logged in -> redirect to login or show 0
+        // not logged in -> show 0
         document.getElementById('coinValue').innerText = "0";
         currentUID = null;
         return;
@@ -151,7 +152,7 @@
         return;
       }
 
-      // Check user's coins quick client-side
+      // Quick check user coins client-side
       const uref = doc(db, "users", currentUID);
       const usnap = await getDoc(uref);
       const userCoins = (usnap.exists() && usnap.data().coins) ? usnap.data().coins : 0;
@@ -163,29 +164,21 @@
       // show ad then continue
       await showFakeAd();
 
-      // After ad, perform transaction to atomically:
-      // 1) fetch first unused code doc from redeemCategories/{category}/codes
-      // 2) check user coins is still enough
-      // 3) mark code as used (set isUsed:true, usedBy, usedAt)
-      // 4) decrement user.coins by costInCoins
-      // 5) add an entry in user's history subcollection (client create allowed)
-      // 6) add a global audit doc in redeemCodes collection (optional)
+      // Path to codes collection
+      const codesColPath = collection(db, "redeemCategories", category, "codes");
 
-      const codesColRef = collection(db, "redeemCategories", category, "codes");
-
-      // fetch an unused code doc id (non-transactional read first - for simplicity)
-      // NOTE: we will re-check inside transaction to be safe
-      const q = query(codesColRef, where("isUsed","==",false), limit(1));
+      // fetch one unused code (candidate)
+      const q = query(codesColPath, where("isUsed","==",false), limit(1));
       const qSnap = await getDocs(q);
       if (qSnap.empty){
         alert("No Code Available!");
         return;
       }
-      const codeDoc = qSnap.docs[0]; // candidate
+      const codeDoc = qSnap.docs[0];
 
-      // Run transaction to reserve + update user
+      // Run transaction to atomically reserve code and deduct coins
       try {
-        await runTransaction(db, async (tx) => {
+        const txResult = await runTransaction(db, async (tx) => {
           // reload user inside tx
           const userRef = doc(db, "users", currentUID);
           const userDoc = await tx.get(userRef);
@@ -212,20 +205,14 @@
             coins: currentCoins - costInCoins
           });
 
-          // add user history (can't add in tx with addDoc easily; so we'll queue outside)
-          // instead, create an audit doc in global collection inside tx:
-          const auditRef = doc(db, "redeemClaims", /* auto-id by addDoc not available in tx */ );
-          // Firestore runTransaction doesn't support addDoc-style auto-id easily.
-          // Workaround: do audit write outside tx after tx success.
-          return { codeValue: codeDocTx.data().code, codeId: codeDoc.id };
+          // return info for outside use
+          return { codeValue: codeDocTx.data().code ?? "", codeId: codeDoc.id };
         });
 
-        // Transaction success: now add history and global audit (outside tx)
-        // fetch code value again (non-transactional) for message
-        const finalCodeSnap = await getDoc(doc(db, "redeemCategories", category, "codes", codeDoc.id));
-        const finalCodeValue = finalCodeSnap.exists() ? finalCodeSnap.data().code : "";
+        // tx success: add history & global audit outside tx
+        const finalCodeValue = txResult.codeValue || "";
 
-        // add history under user
+        // add user history
         await addDoc(collection(db, "users", currentUID, "history"), {
           code: finalCodeValue,
           category: category,
@@ -233,7 +220,7 @@
           time: Date.now()
         });
 
-        // add global audit
+        // add global audit (redeemCodes collection holds redeemed records)
         await addDoc(collection(db, "redeemCodes"), {
           uid: currentUID,
           code: finalCodeValue,
@@ -259,4 +246,4 @@
     window.startRedeem = startRedeem;
   </script>
 </body>
-</html>
+  </html>
