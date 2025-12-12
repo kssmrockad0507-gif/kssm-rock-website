@@ -1,465 +1,97 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ta">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Panel — KSSM ROCK</title>
+  <title>KSSM Admin Panel (Google Login)</title>
   <style>
-    :root{
-      --bg1:#0e5d63; --bg2:#07404b;
-      --card:#ffffff; --accent1:#195c63; --accent2:#0d434a;
-    }
-    body{
-      margin:0; font-family:Arial, sans-serif;
-      background:linear-gradient(180deg,var(--bg1),var(--bg2));
-      color:#fff; min-height:100vh;
-    }
-    .wrap{max-width:980px;margin:18px auto;padding:12px;}
-    .top{
-      display:flex;align-items:center;justify-content:space-between;
-      gap:12px;
-    }
-    .title{font-weight:700;font-size:20px}
-    .loginBtn, .logoutBtn{
-      background:linear-gradient(180deg,var(--accent1),var(--accent2));
-      padding:10px 14px;border-radius:10px;color:#fff;border:none;cursor:pointer;
-      font-weight:700;
-    }
-    .card{
-      background:var(--card); color:#000; border-radius:16px; padding:14px;
-      margin-top:16px; box-shadow:0 8px 30px rgba(0,0,0,0.2);
-    }
-    .grid{display:grid;grid-template-columns:1fr 370px; gap:14px}
-    .panelTitle{font-weight:700;margin-bottom:8px}
-    label{display:block;margin-top:8px;font-size:13px}
-    input[type="text"], input[type="number"], textarea, select{
-      width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;
-    }
-    button.btn{
-      background:linear-gradient(180deg,var(--accent1),var(--accent2));
-      color:#fff;border:none;padding:10px 12px;border-radius:10px;cursor:pointer;margin-top:10px;
-    }
-    .list{max-height:420px;overflow:auto;padding:6px;border-radius:8px;border:1px dashed #ddd}
-    .item{background:#f2f7f7;padding:8px;border-radius:8px;margin-bottom:8px}
-    .muted{color:#666;font-size:13px}
-    .small{font-size:13px}
-    .actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-    .danger{background:#ff5a5a;color:#fff;border:none;padding:6px 8px;border-radius:8px;cursor:pointer}
-    .success{background:#29a07e;color:#fff;border:none;padding:6px 8px;border-radius:8px;cursor:pointer}
-    .note{font-size:13px;color:#333;margin-top:6px}
-    @media(max-width:900px){ .grid{grid-template-columns:1fr; } .wrap{padding:8px} }
+    body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(180deg,#0e5d63,#07404b);color:#fff;}
+    .wrap{max-width:960px;margin:auto;padding:16px;}
+    .card{background:#fff;color:#000;padding:16px;border-radius:12px;margin-bottom:16px;}
+    .btn{cursor:pointer;background:linear-gradient(180deg,#195c63,#0d434a);color:#fff;border:none;padding:10px 12px;border-radius:8px;font-weight:700;}
+    .danger{background:#d9534f;}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top">
-      <div>
-        <div class="title">KSSM ROCK — Admin Panel (Google Sign-In)</div>
-        <div class="muted small">Manage redeem codes, users, coins and redeem history</div>
-      </div>
-      <div>
-        <button id="btnSignIn" class="loginBtn">Login with Google</button>
-        <button id="btnSignOut" class="logoutBtn" style="display:none">Sign out</button>
-      </div>
-    </div>
-
-    <div id="adminArea" style="display:none">
-      <div style="margin-top:12px; color:#fff;" id="adminInfo">Signed in as: <b id="adminEmail"></b></div>
-
-      <div class="card">
-        <div class="grid">
-          <!-- LEFT: Main tools -->
-          <div>
-            <!-- Add Redeem Codes -->
-            <div>
-              <div class="panelTitle">1) Bulk add Redeem Codes to category</div>
-              <div class="note">Choose category (10rs/20rs/50rs/100rs etc). Paste codes (one per line). Click Add.</div>
-              <label>Category ID</label>
-              <input id="addCategory" placeholder="e.g. 10rs" type="text" value="10rs" />
-              <label>Codes (one per line)</label>
-              <textarea id="codesTextarea" rows="6" placeholder="ABCD-1234-EFGH-5678&#10;NEXT-CODE-...."></textarea>
-              <div class="actions">
-                <button id="btnAddCodes" class="btn">Add Codes</button>
-                <button id="btnClearCodes" class="btn" style="background:#777">Clear</button>
-              </div>
-            </div>
-
-            <hr style="margin:16px 0" />
-
-            <!-- View & manage codes in category -->
-            <div>
-              <div class="panelTitle">2) View / Manage codes in a category</div>
-              <label>Category to inspect</label>
-              <input id="inspectCategory" placeholder="10rs" type="text" value="10rs" />
-              <div class="actions">
-                <button id="btnLoadCodes" class="btn">Load Codes</button>
-              </div>
-              <div style="margin-top:8px" class="list" id="codesList">No codes loaded</div>
-            </div>
-
-            <hr style="margin:16px 0" />
-
-            <!-- Users list & coins edit -->
-            <div>
-              <div class="panelTitle">3) Users — view & edit coins / isAdmin</div>
-              <div class="actions">
-                <button id="btnLoadUsers" class="btn">Load Users</button>
-                <button id="btnRefresh" class="btn" style="background:#777">Refresh</button>
-              </div>
-              <div class="list" id="usersList">No users loaded</div>
-            </div>
-
-            <hr style="margin:16px 0" />
-
-            <!-- Global redeem history -->
-            <div>
-              <div class="panelTitle">4) Global Redeem History</div>
-              <div class="actions">
-                <button id="btnLoadHistory" class="btn">Load Redeem History</button>
-              </div>
-              <div class="list" id="historyList">No history loaded</div>
-            </div>
-          </div>
-
-          <!-- RIGHT: quick admin tools -->
-          <div>
-            <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
-              <div class="panelTitle">Quick admin tools</div>
-            </div>
-
-            <div style="margin-top:8px">
-              <label>User UID (for coin ops)</label>
-              <input id="targetUid" placeholder="user uid" type="text" />
-              <label>Coins amount</label>
-              <input id="coinAmount" placeholder="1000" type="number" />
-              <div class="actions">
-                <button id="btnAddCoins" class="success">Add coins</button>
-                <button id="btnRemoveCoins" class="danger">Remove coins</button>
-              </div>
-              <div class="note">After operation, click Load Users to refresh list.</div>
-            </div>
-
-            <hr style="margin:12px 0" />
-
-            <div>
-              <div class="panelTitle">Maintenance & announcements</div>
-              <label>Maintenance mode (toggle)</label>
-              <div class="actions">
-                <button id="btnToggleMaint" class="btn">Toggle Maintenance</button>
-              </div>
-              <label>Announcement message</label>
-              <input id="announceText" type="text" placeholder="Write announcement..." />
-              <div class="actions">
-                <button id="btnSetAnn" class="btn">Set Announcement</button>
-                <button id="btnClearAnn" class="btn" style="background:#777">Clear</button>
-              </div>
-            </div>
-
-            <div style="margin-top:14px" class="note">Important: Firestore rules must allow these admin writes only for verified admin users (isAdmin field).</div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <div id="statusMsg" style="margin-top:12px;color:#fff"></div>
-
-    <div style="height:40px"></div>
+<div class="wrap">
+  <div class="card" id="authCard">
+    <h2>KSSM Admin Login</h2>
+    <button id="googleSignIn" class="btn">Continue with Google</button>
+    <button id="signOutBtn" class="btn danger" style="display:none;">Sign Out</button>
+    <div id="adminInfo" style="margin-top:10px;display:none;">Signed in as <b id="adminEmail"></b></div>
   </div>
 
-  <!-- Firebase + Admin JS -->
-  <script type="module">
-    // ---------- Firebase config (use your project config) ----------
-    const firebaseConfig = {
-      apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-      authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-      projectId: "kssm-rock-tam-ad",
-      storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
-      messagingSenderId: "28268633766",
-      appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
-    };
+  <div class="card" id="adminPanel" style="display:none;">
+    <h2>Welcome Admin</h2>
+    <p>All admin controls (Users, Coins, Redeem, etc.) appear here once you’re logged in.</p>
+  </div>
+</div>
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, updateDoc, addDoc,
-      collection, query, where, limit, getDocs, orderBy, deleteDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
+/* 🔥 Firebase Config */
+const firebaseConfig = {
+  apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+  authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+  projectId: "kssm-rock-tam-ad",
+  storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+  messagingSenderId: "28268633766",
+  appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+};
 
-    // UI refs
-    const btnSignIn = document.getElementById('btnSignIn');
-    const btnSignOut = document.getElementById('btnSignOut');
-    const adminArea = document.getElementById('adminArea');
-    const adminEmail = document.getElementById('adminEmail');
-    const statusMsg = document.getElementById('statusMsg');
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
 
-    // sign in
-    btnSignIn.addEventListener('click', async ()=>{
-      try {
-        await signInWithPopup(auth, provider);
-      } catch(e){
-        alert("Sign-in failed: " + e.message);
-        console.error(e);
-      }
-    });
-    btnSignOut.addEventListener('click', ()=> signOut(auth));
+/* Elements */
+const signInBtn = document.getElementById("googleSignIn");
+const signOutBtn = document.getElementById("signOutBtn");
+const adminPanel = document.getElementById("adminPanel");
+const adminInfo = document.getElementById("adminInfo");
+const adminEmail = document.getElementById("adminEmail");
 
-    // on auth change: verify isAdmin field in users collection
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        adminArea.style.display = 'none';
-        btnSignIn.style.display = 'inline-block';
-        btnSignOut.style.display = 'none';
-        adminEmail.innerText = '';
-        statusMsg.innerText = 'Not signed in';
-        return;
-      }
+/* Google Sign-In */
+signInBtn.addEventListener("click", async () => {
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (e) {
+    alert("Google Sign-in Failed: " + e.message);
+  }
+});
 
-      adminEmail.innerText = user.email || user.uid;
-      btnSignIn.style.display = 'none';
-      btnSignOut.style.display = 'inline-block';
-      statusMsg.innerText = 'Checking admin permission...';
+/* Sign-Out */
+signOutBtn.addEventListener("click", async () => {
+  await signOut(auth);
+});
 
-      // Check users/{uid}.isAdmin
-      try {
-        const uRef = doc(db, 'users', user.uid);
-        const uSnap = await getDoc(uRef);
-        const isAdmin = uSnap.exists() && uSnap.data().isAdmin === true;
+/* Auth State */
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const uid = user.uid;
+    const docRef = doc(db, "users", uid);
+    const docSnap = await getDoc(docRef);
 
-        if (!isAdmin) {
-          // optional: allow super-admin by uid hardcode (ONLY for testing)
-          const superAdminUIDs = []; // put developer testing UID here if needed
-          if (!superAdminUIDs.includes(user.uid)) {
-            alert("This Google account is not an admin. Contact project owner.");
-            await signOut(auth);
-            return;
-          }
-        }
-
-        // show admin UI
-        adminArea.style.display = 'block';
-        statusMsg.innerText = 'Welcome admin: ' + (user.email || user.uid);
-      } catch(e){
-        console.error(e);
-        alert("Error verifying admin: " + e.message);
-        await signOut(auth);
-      }
-    });
-
-    // ---------- Helpers ----------
-    function setStatus(msg){ statusMsg.innerText = msg; }
-
-    // Bulk add codes
-    document.getElementById('btnAddCodes').addEventListener('click', async ()=>{
-      const cat = document.getElementById('addCategory').value.trim();
-      const textarea = document.getElementById('codesTextarea').value.trim();
-      if (!cat || !textarea) { alert('Enter category and codes'); return; }
-      const lines = textarea.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-      if (!lines.length) { alert('No codes found'); return; }
-
-      setStatus('Adding ' + lines.length + ' codes...');
-      try {
-        // add each as doc under: redeemCategories/{cat}/codes/{auto-id} with fields {code,isUsed:false}
-        for (const code of lines) {
-          await addDoc(collection(db, 'redeemCategories', cat, 'codes'), {
-            code: code,
-            isUsed: false,
-            createdAt: Date.now()
-          });
-        }
-        setStatus('Added ' + lines.length + ' codes to ' + cat);
-        document.getElementById('codesTextarea').value = '';
-      } catch(e){
-        console.error(e); alert('Add codes failed: '+ e.message);
-        setStatus('Error adding codes');
-      }
-    });
-    document.getElementById('btnClearCodes').addEventListener('click', ()=> {
-      document.getElementById('codesTextarea').value = '';
-    });
-
-    // Load codes for category
-    document.getElementById('btnLoadCodes').addEventListener('click', loadCodes);
-    async function loadCodes(){
-      const cat = document.getElementById('inspectCategory').value.trim();
-      const out = document.getElementById('codesList');
-      out.innerHTML = 'Loading...';
-      if (!cat) { out.innerHTML='Enter category'; return; }
-      try {
-        const q = query(collection(db, 'redeemCategories', cat, 'codes'), orderBy('createdAt','desc'));
-        const snap = await getDocs(q);
-        if (snap.empty) { out.innerHTML = '<div class="muted small">No codes</div>'; return; }
-        out.innerHTML = '';
-        snap.forEach(docu=>{
-          const d = docu.data();
-          const el = document.createElement('div'); el.className='item';
-          el.innerHTML = `
-            <div><b>${d.code||'(no-code)'}</b></div>
-            <div class="muted small">used: ${d.isUsed ? 'yes' : 'no'} ${d.usedBy?'<br/>by:'+d.usedBy:''}</div>
-            <div class="actions">
-              <button class="btn markUsed">${d.isUsed ? 'Mark unused' : 'Mark used'}</button>
-              <button class="btn deleteCode" style="background:#ff5a5a">Delete</button>
-            </div>
-          `;
-          // attach handlers
-          el.querySelector('.markUsed').addEventListener('click', async ()=>{
-            try {
-              await updateDoc(doc(db,'redeemCategories',cat,'codes',docu.id), {
-                isUsed: d.isUsed ? false : true,
-                usedBy: d.isUsed ? null : (auth.currentUser ? auth.currentUser.uid : null),
-                usedAt: d.isUsed ? null : Date.now()
-              });
-              loadCodes();
-            } catch(e){ alert('Update failed: '+e.message); console.error(e); }
-          });
-          el.querySelector('.deleteCode').addEventListener('click', async ()=>{
-            if (!confirm('Delete this code?')) return;
-            try {
-              await deleteDoc(doc(db,'redeemCategories',cat,'codes',docu.id));
-              loadCodes();
-            } catch(e){ alert('Delete failed: '+e.message); console.error(e); }
-          });
-
-          out.appendChild(el);
-        });
-      } catch(e){
-        console.error(e); out.innerHTML='Error: '+ e.message;
-      }
+    if (docSnap.exists() && docSnap.data().isAdmin === true) {
+      signInBtn.style.display = "none";
+      signOutBtn.style.display = "inline-block";
+      adminInfo.style.display = "block";
+      adminPanel.style.display = "block";
+      adminEmail.innerText = user.email;
+    } else {
+      alert("You are not authorized as Admin!");
+      await signOut(auth);
     }
-
-    // Load users (from users collection in Firestore)
-    document.getElementById('btnLoadUsers').addEventListener('click', loadUsers);
-    async function loadUsers(){
-      const out = document.getElementById('usersList');
-      out.innerHTML = 'Loading users...';
-      try {
-        // Note: this lists documents under 'users' collection. Ensure rules allow admin read.
-        const q = query(collection(db, 'users'), orderBy('email','asc'));
-        const snap = await getDocs(q);
-        if (snap.empty) { out.innerHTML = '<div class="muted small">No users</div>'; return; }
-        out.innerHTML = '';
-        snap.forEach(docu=>{
-          const d = docu.data();
-          const el = document.createElement('div'); el.className='item';
-          el.innerHTML = `
-            <div><b>${d.email || docu.id}</b></div>
-            <div class="muted small">uid: ${docu.id}</div>
-            <div class="muted small">coins: <span class="coinsVal">${d.coins||0}</span> | isAdmin: <span class="adminFlag">${d.isAdmin? 'true':'false'}</span></div>
-            <div class="actions">
-              <button class="btn grantAdmin">Toggle Admin</button>
-              <button class="btn addCoins">+100</button>
-              <button class="danger rmCoins">-100</button>
-            </div>
-          `;
-          el.querySelector('.grantAdmin').addEventListener('click', async ()=>{
-            try {
-              await updateDoc(doc(db,'users',docu.id), { isAdmin: !(d.isAdmin===true) });
-              loadUsers();
-            } catch(e){ alert('Toggle failed: '+e.message); console.error(e); }
-          });
-          el.querySelector('.addCoins').addEventListener('click', async ()=>{
-            try {
-              const amt = 100;
-              await updateDoc(doc(db,'users',docu.id), { coins: (d.coins||0) + amt });
-              loadUsers();
-            } catch(e){ alert('Add coins failed: '+ e.message); console.error(e); }
-          });
-          el.querySelector('.rmCoins').addEventListener('click', async ()=>{
-            try {
-              const amt = 100;
-              await updateDoc(doc(db,'users',docu.id), { coins: Math.max(0,(d.coins||0) - amt) });
-              loadUsers();
-            } catch(e){ alert('Remove coins failed: '+ e.message); console.error(e); }
-          });
-
-          out.appendChild(el);
-        });
-      } catch(e){
-        console.error(e); out.innerHTML = 'Error: '+ e.message;
-      }
-    }
-
-    // Quick add / remove coins by UID input
-    document.getElementById('btnAddCoins').addEventListener('click', async ()=>{
-      const uid = document.getElementById('targetUid').value.trim();
-      const amt = Number(document.getElementById('coinAmount').value) || 0;
-      if (!uid || !amt) { alert('Enter uid and amount'); return; }
-      try {
-        const uRef = doc(db,'users',uid);
-        const snap = await getDoc(uRef);
-        if (!snap.exists()) {
-          // create user doc fallback
-          await setDoc(uRef, { coins: amt, isAdmin: false, email: '' }, { merge:true });
-        } else {
-          await updateDoc(uRef, { coins: (snap.data().coins||0) + amt });
-        }
-        alert('Added coins');
-        loadUsers();
-      } catch(e){ alert('Error: '+ e.message); console.error(e); }
-    });
-
-    document.getElementById('btnRemoveCoins').addEventListener('click', async ()=>{
-      const uid = document.getElementById('targetUid').value.trim();
-      const amt = Number(document.getElementById('coinAmount').value) || 0;
-      if (!uid || !amt) { alert('Enter uid and amount'); return; }
-      try {
-        const uRef = doc(db,'users',uid);
-        const snap = await getDoc(uRef);
-        if (!snap.exists()) { alert('User not found'); return; }
-        const newCoins = Math.max(0,(snap.data().coins||0) - amt);
-        await updateDoc(uRef, { coins: newCoins });
-        alert('Removed coins');
-        loadUsers();
-      } catch(e){ alert('Error: '+ e.message); console.error(e); }
-    });
-
-    // Load global redeem history collection (redeemCodes or redeemClaims — adjust to your schema)
-    document.getElementById('btnLoadHistory').addEventListener('click', async ()=>{
-      const out = document.getElementById('historyList');
-      out.innerHTML = 'Loading...';
-      try {
-        // try redeemCodes collection (audited redeemed records)
-        const q = query(collection(db,'redeemCodes'), orderBy('time','desc'), limit(200));
-        const snap = await getDocs(q);
-        if (snap.empty) { out.innerHTML = '<div class="muted small">No history</div>'; return; }
-        out.innerHTML = '';
-        snap.forEach(docu=>{
-          const d = docu.data();
-          const el = document.createElement('div'); el.className='item';
-          el.innerHTML = `<div><b>Code:</b> ${d.code||''}</div>
-                          <div class="muted small">uid: ${d.uid||''} | category: ${d.category||''}</div>
-                          <div class="muted small">time: ${d.time ? new Date(d.time).toLocaleString() : ''}</div>`;
-          out.appendChild(el);
-        });
-      } catch(e){
-        console.error(e); out.innerHTML = 'Error: '+ e.message;
-      }
-    });
-
-    // Maintenance & announcement
-    document.getElementById('btnToggleMaint').addEventListener('click', async ()=>{
-      try {
-        const gRef = doc(db,'admin','settings');
-        const snap = await getDoc(gRef);
-        const cur = snap.exists() && snap.data().maintenance === true;
-        await setDoc(gRef, { maintenance: !cur }, { merge:true });
-        alert('Maintenance set to ' + (!cur));
-      } catch(e){ alert('Error: '+ e.message); console.error(e); }
-    });
-    document.getElementById('btnSetAnn').addEventListener('click', async ()=>{
-      const txt = document.getElementById('announceText').value || '';
-      try {
-        await setDoc(doc(db,'admin','settings'), { announcement: txt }, { merge:true });
-        alert('Announcement saved');
-      } catch(e){ alert('Error: '+ e.message); console.error(e); }
-    });
-    document.getElementById('btnClearAnn').addEventListener('click', async ()=>{
-      try {
-        await 
+  } else {
+    signInBtn.style.display = "inline-block";
+    signOutBtn.style.display = "none";
+    adminInfo.style.display = "none";
+    adminPanel.style.display = "none";
+  }
+});
+</script>
+</body>
+</html>
