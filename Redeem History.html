@@ -9,7 +9,7 @@
         margin: 0;
         padding: 0;
         background: linear-gradient(180deg, #0e5d63, #07404b);
-        font-family: Arial;
+        font-family: Arial, sans-serif;
         color: white;
     }
 
@@ -35,7 +35,7 @@
         font-weight: bold;
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 8px;
     }
 
     .card {
@@ -53,13 +53,19 @@
         padding: 15px;
         border-radius: 10px;
         margin-top: 15px;
+        word-break: break-word;
     }
 
     .noData {
         text-align: center;
         padding: 20px;
-        font-size: 22px;
+        font-size: 18px;
         color: white;
+    }
+
+    .small {
+        font-size: 13px;
+        color: #555;
     }
 </style>
 </head>
@@ -83,9 +89,12 @@
 
 <!-- Firebase -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc,
+  collection, getDocs, query, where, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* 🔥 Firebase Config */
 const firebaseConfig = {
@@ -101,52 +110,145 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore(app);
 
-/* 📌 Back Button */
+/* Back Button: go to index (main) */
 function goBack() {
-    window.location.href = "Home.html";  // your home page file
+    window.location.href = "index.html";
 }
 
-/* 📌 Load Coins & History */
+/* Helper: normalise time value to JS Date */
+function toDate(value){
+  if (!value) return new Date();
+  // Firestore Timestamp object
+  if (typeof value.toDate === 'function') return value.toDate();
+  // number (ms)
+  if (typeof value === 'number') return new Date(value);
+  // string
+  const n = Number(value);
+  if (!isNaN(n)) return new Date(n);
+  return new Date(value);
+}
+
+/* Build a friendly label for coin/price field */
+function getValueLabel(d){
+  // try common fields used across your codebases
+  if (d.amountCoins) return d.amountCoins + " coins";
+  if (d.value) return d.value + " coins";
+  if (d.amount) return d.amount + " coins";
+  if (d.reward) return (d.reward !== undefined ? d.reward + " coins" : "");
+  if (d.price) return d.price + " value";
+  return "";
+}
+
+/* Load and render history from multiple possible places:
+   - users/{uid}/history
+   - users/{uid}/redeemHistory
+   - global redeemCodes collection (where uid == current user)
+   This makes the page robust if different code paths wrote to different names.
+*/
+async function loadHistoryForUser(uid){
+  const listEl = document.getElementById("historyList");
+  listEl.innerHTML = "";
+
+  const collected = []; // will hold {code, label, time, source}
+
+  // try users/{uid}/history
+  try {
+    const histCol1 = collection(db, "users", uid, "history");
+    const snap1 = await getDocs(query(histCol1, orderBy("time", "desc")));
+    snap1.forEach(s=>{
+      const d = s.data();
+      collected.push({
+        code: d.code || d.claimedCode || "",
+        label: getValueLabel(d),
+        time: toDate(d.time || d.usedAt || d.claimDate || d.date),
+        source: "history"
+      });
+    });
+  } catch(e){
+    console.warn("history subcollection read error:", e);
+  }
+
+  // try users/{uid}/redeemHistory
+  try {
+    const histCol2 = collection(db, "users", uid, "redeemHistory");
+    const snap2 = await getDocs(query(histCol2, orderBy("time", "desc")));
+    snap2.forEach(s=>{
+      const d = s.data();
+      collected.push({
+        code: d.code || d.claimedCode || "",
+        label: getValueLabel(d),
+        time: toDate(d.time || d.usedAt || d.claimDate || d.date),
+        source: "redeemHistory"
+      });
+    });
+  } catch(e){
+    console.warn("redeemHistory subcollection read error:", e);
+  }
+
+  // try global redeemed records in root "redeemCodes" where uid == user
+  try {
+    const globalQ = query(collection(db, "redeemCodes"), where("uid", "==", uid));
+    const snap3 = await getDocs(globalQ);
+    snap3.forEach(s=>{
+      const d = s.data();
+      collected.push({
+        code: d.code || "",
+        label: getValueLabel(d),
+        time: toDate(d.time || d.usedAt || d.claimDate || d.date),
+        source: "redeemCodes"
+      });
+    });
+  } catch(e){
+    console.warn("global redeemCodes read error:", e);
+  }
+
+  if (collected.length === 0){
+    listEl.innerHTML = `<div class='noData'>No Redeem History Available</div>`;
+    return;
+  }
+
+  // sort by time desc
+  collected.sort((a,b) => b.time - a.time);
+
+  // render
+  for (const item of collected){
+    const timeStr = item.time ? item.time.toLocaleString() : "";
+    const label = item.label ? `<div class="small"><b>Value:</b> ${item.label}</div>` : "";
+    listEl.innerHTML += `
+      <div class="historyItem">
+        <div><b>Code:</b> ${item.code || "(no code)"}</div>
+        ${label}
+        <div class="small"><b>Time:</b> ${timeStr}</div>
+        <div class="small"><b>Source:</b> ${item.source}</div>
+      </div>
+    `;
+  }
+}
+
+/* Load live coins and history when auth ready */
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
-        alert("Please login!");
-        window.location.href = "login.html";
+        // not logged in
+        document.getElementById("coinValue").innerText = "0";
+        document.getElementById("historyList").innerHTML = `<div class='noData'>Please login to see history</div>`;
         return;
     }
 
-    const userRef = doc(db, "users", user.uid);
-
-    // Load Coins
-    const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-        document.getElementById("coinValue").innerText = userSnap.data().coins || 0;
+    // live coins display (read once; if you want realtime use onSnapshot)
+    try {
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+          document.getElementById("coinValue").innerText = userSnap.data().coins || 0;
+      } else {
+          document.getElementById("coinValue").innerText = "0";
+      }
+    } catch(e){
+      console.error("user coins read error:", e);
     }
 
-    // Load Redeem History
-    const hList = document.getElementById("historyList");
-    hList.innerHTML = "";
-
-    const historyRef = collection(db, "users", user.uid, "redeemHistory");
-    const q = query(historyRef, orderBy("time", "desc"));
-
-    const snap = await getDocs(q);
-
-    if (snap.empty) {
-        hList.innerHTML = `<div class='noData'>No Redeem History Available</div>`;
-        return;
-    }
-
-    snap.forEach(docu => {
-        let data = docu.data();
-
-        hList.innerHTML += `
-            <div class="historyItem">
-                <b>Code: </b> ${data.code} <br>
-                <b>Value: </b> ${data.value} coins <br>
-                <b>Time: </b> ${new Date(data.time).toLocaleString()}
-            </div>
-        `;
-    });
+    // load user's history from available places
+    await loadHistoryForUser(user.uid);
 });
 </script>
 
