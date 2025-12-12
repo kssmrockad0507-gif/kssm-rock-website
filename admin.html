@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KSSM - Admin Panel</title>
+  <style>
+    /* Simple mobile-first admin style (matches your theme) */
+    body{ margin:0; font-family:Arial, sans-serif; background:linear-gradient(180deg,#0e5d63,#07404b); color:#fff; }
+    .wrap{ max-width:960px; margin:12px auto; padding:12px; }
+    .card{ background:#fff; color:#000; padding:12px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.2); margin-bottom:12px; }
+    h1,h2{ margin:6px 0; }
+    label{ font-weight:700; display:block; margin:8px 0 4px; }
+    input,select,textarea,button{ padding:10px; font-size:16px; border-radius:8px; border:1px solid #ccc; width:100%; box-sizing:border-box; }
+    .row{ display:flex; gap:12px; }
+    .col{ flex:1; }
+    .small{ width:auto; display:inline-block; }
+    .list{ max-height:360px; overflow:auto; margin-top:8px; }
+    .item{ padding:10px; background:#f0f6f6; margin-bottom:8px; border-radius:8px; }
+    .btn{ cursor:pointer; background:linear-gradient(180deg,#195c63,#0d434a); color:#fff; border:none; padding:10px 12px; border-radius:8px; font-weight:700; }
+    .danger{ background:#d9534f; }
+    .muted{ color:#666; font-size:14px;}
+    pre{ white-space:pre-wrap; word-break:break-word; background:#111; color:#0f0; padding:8px; border-radius:8px; font-size:12px;}
+    @media(min-width:900px){ .row{ flex-wrap:nowrap; } .card{ padding:18px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="card" id="authCard">
+      <h1>KSSM Admin</h1>
+      <div id="authUI">
+        <label>Admin Email</label>
+        <input id="adminEmail" placeholder="admin@example.com" />
+        <label>Password</label>
+        <input id="adminPassword" type="password" placeholder="password" />
+        <div style="margin-top:8px;" class="row">
+          <button class="btn col" id="btnSignIn">Sign in</button>
+          <button class="btn col" id="btnSignOut" style="display:none;background:#aaa;color:#000;">Sign out</button>
+        </div>
+        <p class="muted">Admin must have users/{uid}.isAdmin = true in Firestore.</p>
+      </div>
+      <div id="adminInfo" style="display:none; margin-top:10px;">
+        <div class="muted">Signed in as <span id="adminEmailLabel"></span></div>
+        <div style="margin-top:6px;">
+          <button class="btn small" id="btnRefresh">Refresh Data</button>
+          <button class="btn small" id="btnOpenConsole" style="background:#0d6efd;margin-left:6px;">Open Firestore Console</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="card" id="settingsCard" style="display:none;">
+      <h2>Global Settings</h2>
+      <label>Maintenance Mode</label>
+      <div class="row">
+        <button class="btn col" id="toggleMaintenance">Toggle</button>
+        <div class="col"><div id="maintenanceState" class="muted">loading...</div></div>
+      </div>
+
+      <label style="margin-top:8px">Announcement</label>
+      <textarea id="announcementText" rows="2" placeholder="Write announcement"></textarea>
+      <div style="margin-top:8px;" class="row">
+        <button class="btn col" id="saveAnnouncement">Save Announcement</button>
+        <button class="btn col" id="clearAnnouncement" style="background:#d9534f">Clear</button>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <div class="card" id="usersCard" style="display:none;">
+      <h2>Users</h2>
+      <label>Search by email or uid</label>
+      <input id="searchUser" placeholder="email or uid" />
+      <div style="margin-top:8px;" class="row">
+        <button class="btn col" id="btnSearch">Search</button>
+        <button class="btn col" id="btnListAll">List top 50</button>
+      </div>
+
+      <div class="list" id="usersList"></div>
+    </div>
+
+    <!-- Redeem Codes -->
+    <div class="card" id="codesCard" style="display:none;">
+      <h2>Redeem Codes (redeemCategories → {category} → codes)</h2>
+      <label>Category (e.g. 10rs,20rs,50rs,100rs)</label>
+      <input id="codeCategory" placeholder="10rs" />
+      <div class="row" style="margin-top:8px;">
+        <input id="newCodeValue" placeholder="CODE-XXXX-YYYY" />
+        <button class="btn small" id="btnAddCode">Add Code</button>
+      </div>
+
+      <div style="margin-top:10px;" class="row">
+        <button class="btn col" id="btnListCodes">List codes</button>
+        <button class="btn col" id="btnDeleteUnused" style="background:#d9534f">Delete all unused</button>
+      </div>
+
+      <div class="list" id="codesList" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- Redeem History / Global -->
+    <div class="card" id="historyCard" style="display:none;">
+      <h2>Global Redeem Records</h2>
+      <div class="row">
+        <button class="btn col" id="btnListRedeems">List recent 50</button>
+        <button class="btn col" id="btnExport" style="background:#0d6efd">Download JSON</button>
+      </div>
+      <div id="redeemList" class="list" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- Admin Logs -->
+    <div class="card" id="logsCard" style="display:none;">
+      <h2>Admin Audit Logs</h2>
+      <div class="row">
+        <button class="btn col" id="btnListLogs">List 50</button>
+        <button class="btn col" id="btnClearLogs" style="background:#d9534f">Clear Logs</button>
+      </div>
+      <div id="logsList" class="list" style="margin-top:10px;"></div>
+    </div>
+
+    <div id="debug" style="display:none"><pre id="debugPre"></pre></div>
+  </div>
+
+<script type="module">
+/* -------------------------
+   Admin single-file logic
+   ------------------------- */
+
+/* FIREBASE CONFIG: use your provided config */
+const firebaseConfig = {
+  apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+  authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+  projectId: "kssm-rock-tam-ad",
+  storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+  messagingSenderId: "28268633766",
+  appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+};
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+  collection, query, where, getDocs, limit, orderBy, addDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* UI refs */
+const adminEmailIn = document.getElementById('adminEmail');
+const adminPassIn = document.getElementById('adminPassword');
+const btnSignIn = document.getElementById('btnSignIn');
+const btnSignOut = document.getElementById('btnSignOut');
+const adminInfo = document.getElementById('adminInfo');
+const adminEmailLabel = document.getElementById('adminEmailLabel');
+const settingsCard = document.getElementById('settingsCard');
+const usersCard = document.getElementById('usersCard');
+const codesCard = document.getElementById('codesCard');
+const historyCard = document.getElementById('historyCard');
+const logsCard = document.getElementById('logsCard');
+
+const maintenanceState = document.getElementById('maintenanceState');
+const toggleMaintenance = document.getElementById('toggleMaintenance');
+const announcementText = document.getElementById('announcementText');
+const saveAnnouncement = document.getElementById('saveAnnouncement');
+const clearAnnouncement = document.getElementById('clearAnnouncement');
+
+const btnRefresh = document.getElementById('btnRefresh');
+const btnOpenConsole = document.getElementById('btnOpenConsole');
+
+const searchUser = document.getElementById('searchUser');
+const btnSearch = document.getElementById('btnSearch');
+const btnListAll = document.getElementById('btnListAll');
+const usersList = document.getElementById('usersList');
+
+const codeCategory = document.getElementById('codeCategory');
+const newCodeValue = document.getElementById('newCodeValue');
+const btnAddCode = document.getElementById('btnAddCode');
+const btnListCodes = document.getElementById('btnListCodes');
+const btnDeleteUnused = document.getElementById('btnDeleteUnused');
+const codesList = document.getElementById('codesList');
+
+const btnListRedeems = document.getElementById('btnListRedeems');
+const btnExport = document.getElementById('btnExport');
+const redeemList = document.getElementById('redeemList');
+
+const btnListLogs = document.getElementById('btnListLogs');
+const btnClearLogs = document.getElementById('btnClearLogs');
+const logsList = document.getElementById('logsList');
+
+const debugPre = document.getElementById('debugPre');
+
+/* Helper: show admin UI after sign-in+isAdmin */
+let currentAdminUID = null;
+function showAllAdminUI(show){
+  settingsCard.style.display = show ? 'block' : 'none';
+  usersCard.style.display = show ? 'block' : 'none';
+  codesCard.style.display = show ? 'block' : 'none';
+  historyCard.style.display = show ? 'block' : 'none';
+  logsCard.style.display = show ? 'block' : 'none';
+  document.getElementById('authUI').style.display = show ? 'none' : 'block';
+  document.getElementById('adminInfo').style.display = show ? 'block' : 'none';
+  btnSignOut.style.display = show ? 'inline-block' : 'none';
+}
+
+/* Sign-in */
+btnSignIn.addEventListener('click', async ()=>{
+  try{
+    const email = adminEmailIn.value.trim();
+    const pw = adminPassIn.value || '';
+    if(!email || !pw){ alert('Enter admin email & password'); return; }
+    const res = await signInWithEmailAndPassword(auth, email, pw);
+    console.log('signed in', res.user.uid);
+  }catch(err){
+    alert('Sign in error: '+err.message);
+    console.error(err);
+  }
+});
+
+btnSignOut.addEventListener('click', async ()=>{
+  await signOut(auth);
+});
+
+/* Open console */
+btnOpenConsole.addEventListener('click', ()=>{
+  window.open('https://console.firebase.google.com/project/' + firebaseConfig.projectId + '/firestore/data', '_blank');
+});
+
+/* onAuth -> check isAdmin */
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    currentAdminUID = null;
+    adminEmailLabel.innerText = '';
+    showAllAdminUI(false);
+    btnSignIn.style.display = 'inline-block';
+    return;
+  }
+  currentAdminUID = user.uid;
+  adminEmailLabel.innerText = user.email;
+  // verify users/{uid}.isAdmin
+  try{
+    const uref = doc(db, 'users', currentAdminUID);
+    const udoc = await getDoc(uref);
+    if(!udoc.exists() || udoc.data().isAdmin !== true){
+      alert('This account is not marked admin in Firestore (users/{uid}.isAdmin = true). Sign out.');
+      await signOut(auth);
+      return;
+    }
+    // ok admin
+    btnSignIn.style.display = 'none';
+    showAllAdminUI(true);
+    refreshAll();
+  }catch(e){
+    console.error(e);
+    alert('Auth check error');
+  }
+});
+
+/* ---------- SETTINGS ---------- */
+async function refreshSettings(){
+  try{
+    const sref = doc(db, 'adminSettings', 'global');
+    const snap = await getDoc(sref);
+    if(!snap.exists()){
+      maintenanceState.innerText = 'off';
+      announcementText.value = '';
+      return;
+    }
+    maintenanceState.innerText = snap.data().maintenance ? 'ON' : 'OFF';
+    announcementText.value = snap.data().announcement || '';
+  }catch(e){ console.error(e); }
+}
+
+toggleMaintenance.addEventListener('click', async ()=>{
+  if(!currentAdminUID) return alert('Sign in admin first');
+  const sref = doc(db, 'adminSettings', 'global');
+  const snap = await getDoc(sref);
+  const current = snap.exists() && snap.data().maintenance === true;
+  await setDoc(sref, { maintenance: !current, updatedBy: currentAdminUID, updatedAt: Date.now() }, { merge:true });
+  logAction('toggleMaintenance', {value: !current});
+  await refreshSettings();
+});
+
+saveAnnouncement.addEventListener('click', async ()=>{
+  if(!currentAdminUID) return alert('Sign in admin first');
+  const txt = announcementText.value || '';
+  const sref = doc(db, 'adminSettings', 'global');
+  await setDoc(sref, { announcement: txt, updatedBy: currentAdminUID, updatedAt: Date.now() }, { merge:true });
+  logAction('saveAnnouncement', {textPreview: txt.slice(0,80)});
+  alert('Saved');
+  refreshSettings();
+});
+
+clearAnnouncement.addEventListener('click', async ()=>{
+  if(!currentAdminUID) return alert('Sign in admin first');
+  const sref = doc(db, 'adminSettings', 'global');
+  await updateDoc(sref, { announcement: '' });
+  logAction('clearAnnouncement', {});
+  announcementText.value = '';
+  alert('Cleared');
+});
+
+/* ---------- USERS ---------- */
+btnSearch.addEventListener('click', listUsersBySearch);
+btnListAll.addEventListener('click', listTopUsers);
+
+async function listTopUsers(){
+  usersList.innerHTML = 'Loading...';
+  const q = query(collection(db,'users'), orderBy('coins','desc'), limit(50));
+  const snap = await getDocs(q);
+  renderUsers(snap);
+}
+
+async function listUsersBySearch(){
+  const term = searchUser.value.trim();
+  if(!term){ listTopUsers(); return; }
+  usersList.innerHTML = 'Searching...';
+  // search by email (where email == term) or uid
+  let results = [];
+  // try uid direct
+  const idRef = doc(db,'users',term);
+  const idSnap = await getDoc(idRef);
+  if(idSnap.exists()) results.push({id:idSnap.id, data:idSnap.data()});
+  // search email equality (firestore requires index)
+  const q = query(collection(db,'users'), where('email','==',term), limit(50));
+  const snap = await getDocs(q);
+  snap.forEach(d=> results.push({id:d.id, data:d.data()}));
+  renderUsersFromArray(results);
+}
+
+function renderUsers(snap){
+  let html = '';
+  snap.forEach(d=>{
+    const data = d.data();
+    html += userItemHTML(d.id, data);
+  });
+  usersList.innerHTML = html || '<div class="muted">No users</div>';
+  attachUserControls();
+}
+
+function renderUsersFromArray(arr){
+  let html = '';
+  arr.forEach(d=>{
+    html += userItemHTML(d.id, d.data);
+  });
+  usersList.innerHTML = html || '<div class="muted">No users</div>';
+  attachUserControls();
+}
+
+function userItemHTML(uid, data){
+  return `
+    <div class="item" data-uid="${uid}">
+      <b>${data.email||'(no email)'} </b> <span class="muted">[${uid}]</span><br>
+      Coins: <b>${data.coins||0}</b> &nbsp; isAdmin: <b>${data.isAdmin? 'yes':'no'}</b><br>
+      <div style="margin-top:8px" class="row">
+        <input class="col setCoins" placeholder="Set coins (number)" />
+        <button class="btn small btnSet">Set</button>
+        <input class="col addCoins" placeholder="Add coins (number)" />
+        <button class="btn small btnAdd">Add</button>
+        <button class="btn small danger btnDelete">Delete user</button>
+      </div>
+    </div>
+  `;
+}
+
+function attachUserControls(){
+  document.querySelectorAll('.item').forEach(el=>{
+    const uid = el.getAttribute('data-uid');
+    el.querySelector('.btnSet').onclick = async ()=>{
+      const val = Number(el.querySelector('.setCoins').value||0);
+      if(isNaN(val)) return alert('Enter number');
+      await updateDoc(doc(db,'users',uid), { coins: val });
+      logAction('setCoins',{uid,coins:val});
+      alert('Updated');
+      listTopUsers();
+    };
+    el.querySelector('.btnAdd').onclick = async ()=>{
+      const val = Number(el.querySelector('.addCoins').value||0);
+      if(isNaN(val)) return alert('Enter number');
+      // safe increment read -> update (not transaction for simplicity)
+      const uref = doc(db,'users',uid);
+      const usnap = await getDoc(uref);
+      const cur = (usnap.exists() && usnap.data().coins) ? usnap.data().coins : 0;
+      await updateDoc(uref, { coins: cur + val });
+      logAction('addCoins',{uid,add:val});
+      alert('Added');
+      listTopUsers();
+    };
+    el.querySelector('.btnDelete').onclick = async ()=>{
+      if(!confirm('Delete user doc permanently?')) return;
+      await deleteDoc(doc(db,'users',uid));
+      logAction('deleteUser',{uid});
+      alert('Deleted');
+      listTopUsers();
+    };
+  });
+}
+
+/* ---------- CODES ---------- */
+btnAddCode.addEventListener('click', async ()=>{
+  if(!currentAdminUID) return alert('Sign in admin');
+  const cat = (codeCategory.value||'').trim();
+  const codeVal = (newCodeValue.value||'').trim();
+  if(!cat || !codeVal) return alert('Enter category and code');
+  // create doc under redeemCategories/{cat}/codes with auto-id
+  const colRef = collection(db, 'redeemCategories', cat, 'codes');
+  await addDoc(colRef, { code: codeVal, isUsed:false });
+  logAction('addCode',{category:cat,code:codeVal});
+  alert('Added');
+  newCodeValue.value = '';
+  listCodes();
+});
+
+btnListCodes.addEventListener('click', listCodes);
+
+async function listCodes(){
+  codesList.innerHTML = 'Loading...';
+  const cat = (codeCategory.value||'').trim();
+  if(!cat) return codesList.innerHTML = '<div class="muted">Enter category</div>';
+  const colRef = collection(db, 'redeemCategories', cat, 'codes');
+  const snap = await getDocs(colRef);
+  let html = '';
+  snap.forEach(d=>{
+    const dd = d.data();
+    html += `
+      <div class="item" data-id="${d.id}" data-cat="${cat}">
+        <b>${dd.code}</b> &nbsp; used: ${dd.isUsed? 'yes':'no'} <br>
+        <div style="margin-top:8px" class="row">
+          <button class="btn small btnMark" ${dd.isUsed? 'disabled':''}>Mark used</button>
+          <button class="btn small btnDeleteCode danger">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+  codesList.innerHTML = html || '<div class="muted">No codes in this category</div>';
+  attachCodeControls();
+}
+
+function attachCodeControls(){
+  codesList.querySelectorAll('.item').forEach(el=>{
+    const id = el.getAttribute('data-id'), cat = el.getAttribute('data-cat');
+    el.querySelector('.btnDeleteCode').onclick = async ()=>{
+      if(!confirm('Delete this code doc?')) return;
+      await deleteDoc(doc(db, 'redeemCategories', cat, 'codes', id));
+      logAction('deleteCode',{category:cat,id});
+      alert('Deleted');
+      listCodes();
+    };
+    const btnMark = el.querySelector('.btnMark');
+    if(btnMark) btnMark.onclick = async ()=>{
+      await updateDoc(doc(db,'redeemCategories',cat,'codes',id), { isUsed:true, usedBy: currentAdminUID, usedAt: Date.now() });
+      logAction('markUsedCode',{category:cat,id});
+      alert('Marked used');
+      listCodes();
+    };
+  });
+}
+
+btnDeleteUnused.addEventListener('click', async ()=>{
+  const cat = (codeCategory.value||'').trim();
+  if(!cat) return alert('enter category');
+  if(!confirm('Delete all unused codes in '+cat+'?')) return;
+  // delete each unused
+  const colRef = collection(db, 'redeemCategories', cat, 'codes');
+  const q = query(colRef, where('isUsed','==', false));
+  const snap = await getDocs(q);
+  for(const d of snap.docs) {
+    await deleteDoc(doc(db, 'redeemCategories', cat, 'codes', d.id));
+  }
+  logAction('deleteUnused',{category:cat,deletedCount: snap.size});
+  alert('Deleted '+snap.size);
+  listCodes();
+});
+
+/* ---------- REDEEM GLOBAL ---------- */
+btnListRedeems.addEventListener('click', listRedeems);
+btnExport.addEventListener('click', exportRedeems);
+
+async function listRedeems(){
+  redeemList.innerHTML = 'Loading...';
+  const q = query(collection(db,'redeemCodes'), orderBy('time','desc'), limit(50));
+  const snap = await getDocs(q);
+  let html = '';
+  snap.forEach(d=>{
+    const dd = d.data();
+    html += `<div class="item"><b>${dd.code}</b><br>uid: ${dd.uid}<br>cat:${dd.category} time:${new Date(dd.time).toLocaleString()}</div>`;
+  });
+  redeemList.innerHTML = html || '<div class="muted">No redeems</div>';
+}
+
+async function exportRedeems(){
+  const q = query(collection(db,'redeemCodes'), orderBy('time','desc'), limit(500));
+  const snap = await getDocs(q);
+  const arr = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  const blob = new Blob([JSON.stringify(arr, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'redeemCodes_export.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- LOGS ---------- */
+btnListLogs.addEventListener('click', listLogs);
+btnClearLogs.addEventListener('click', clearLogs);
+
+async function
