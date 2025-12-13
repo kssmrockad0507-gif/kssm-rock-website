@@ -1,295 +1,466 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>KSSM Admin Panel</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-:root{
-  --bg1:#0e5d63;
-  --bg2:#07404b;
-  --card:#ffffff;
-  --accent:#195c63;
-  --danger:#d9534f;
-  --success:#28a745;
-}
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:linear-gradient(180deg,var(--bg1),var(--bg2));
-  min-height:100vh;
-  color:#fff;
-}
-.container{
-  max-width:1100px;
-  margin:auto;
-  padding:16px;
-}
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.brand{font-size:22px;font-weight:bold;}
-.btn{
-  border:none;
-  border-radius:8px;
-  padding:8px 14px;
-  cursor:pointer;
-}
-.btn-main{background:var(--accent);color:#fff;}
-.btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);}
-.btn-danger{background:var(--danger);color:#fff;}
-.btn-success{background:var(--success);color:#fff;}
-
-.card{
-  background:var(--card);
-  color:#000;
-  border-radius:14px;
-  padding:16px;
-  margin-top:16px;
-}
-
-.tabs{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-  flex-wrap:wrap;
-}
-.tabs button{
-  border:none;
-  padding:8px 12px;
-  border-radius:10px;
-  cursor:pointer;
-  background:#eee;
-}
-.tabs button.active{
-  background:var(--accent);
-  color:#fff;
-}
-
-.field{
-  width:100%;
-  padding:8px;
-  margin-top:8px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-.list{
-  max-height:300px;
-  overflow:auto;
-  margin-top:10px;
-}
-.notice{
-  background:#f4f4f4;
-  padding:10px;
-  border-radius:8px;
-  margin-bottom:8px;
-}
-.hidden{display:none;}
-.small{font-size:13px;color:#555;}
-.chip{
-  padding:6px 12px;
-  border-radius:20px;
-  background:#fff;
-  color:#000;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KSSM Admin Panel</title>
+  <style>
+    :root{--bg:#07404b;--bg2:#0e5d63;--card:#fff;--accent:#195c63;--danger:#d9534f;}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,var(--bg2),var(--bg));color:#fff;min-height:100vh}
+    .wrap{max-width:1000px;margin:18px auto;padding:18px}
+    .top{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .brand{font-size:20px;font-weight:700}
+    .btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:8px 12px;border-radius:8px}
+    .card{background:#fff;color:#000;border-radius:14px;padding:16px;margin-top:14px}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .col{flex:1;min-width:240px}
+    .small{font-size:13px;color:#555}
+    .field{width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-top:8px}
+    .list{max-height:320px;overflow:auto;margin-top:10px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid #eee;font-size:14px}
+    .danger{background:var(--danger);color:#fff;padding:6px 8px;border-radius:6px;border:0;cursor:pointer}
+    .success{background:#28a745;color:#fff;padding:6px 8px;border-radius:6px;border:0;cursor:pointer}
+    nav.tabs{display:flex;gap:8px;margin-top:12px}
+    nav.tabs button{padding:8px 10px;border-radius:10px;border:0;background:rgba(0,0,0,0.06);cursor:pointer}
+    nav.tabs button.active{background:var(--accent);color:#fff}
+    .notice{background:#f7f7f7;padding:10px;border-radius:8px;color:#222}
+    .top-info{display:flex;gap:10px;align-items:center}
+    .chip{background:#fff;color:#000;padding:6px 10px;border-radius:20px}
+    .inline{display:inline-block;margin-right:8px}
+    /* mobile friendly */
+    @media(max-width:700px){ .row{flex-direction:column} .col{min-width:unset} }
+  </style>
 </head>
-
 <body>
-<div class="container">
-
-<!-- HEADER -->
-<div class="header">
-  <div class="brand">KSSM Admin Panel</div>
-  <div>
-    <span id="signedAs" class="small">Not signed</span>
-    <button id="loginBtn" class="btn btn-main">Sign in with Google</button>
-    <button id="logoutBtn" class="btn btn-ghost hidden">Sign Out</button>
-  </div>
-</div>
-
-<!-- ADMIN AREA -->
-<div id="adminArea" class="hidden">
-
-<div class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <div>
-      <h2>Welcome Admin</h2>
-      <div class="small">Full control panel</div>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">KSSM Admin Panel</div>
+      <div class="top-info">
+        <div id="signedAs" class="small">Not signed</div>
+        <button id="btnSign" class="btn">Sign in with Google</button>
+        <button id="btnSignOut" class="btn-ghost" style="display:none">Sign Out</button>
+      </div>
     </div>
-    <div id="maintenanceChip" class="chip">Maintenance : OFF</div>
-  </div>
 
-  <!-- TABS -->
-  <div class="tabs">
-    <button class="active" data-tab="dashboard">Dashboard</button>
-    <button data-tab="users">Users</button>
-    <button data-tab="coins">Coins</button>
-    <button data-tab="codes">Redeem Codes</button>
-    <button data-tab="history">History</button>
-    <button data-tab="settings">Settings</button>
-  </div>
+    <div id="adminArea" style="display:none">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h2 style="margin:0">Welcome Admin</h2>
+            <div class="small">Use tabs below to manage users, coins, redeem codes and history.</div>
+          </div>
+          <div>
+            <div class="chip" id="maintenanceChip">Maintenance: OFF</div>
+          </div>
+        </div>
 
-  <!-- DASHBOARD -->
-  <div id="dashboard" class="tab">
-    <div class="card">
-      <h3>Statistics</h3>
-      <div id="statUsers">Users: —</div>
-      <div id="statCodes">Codes: —</div>
-      <div id="statRedeemed">Redeemed: —</div>
+        <nav class="tabs" id="tabs">
+          <button data-tab="dashboard" class="active">Dashboard</button>
+          <button data-tab="users">Users</button>
+          <button data-tab="coins">Coins</button>
+          <button data-tab="codes">Redeem Codes</button>
+          <button data-tab="history">Global History</button>
+          <button data-tab="settings">Settings</button>
+          <button data-tab="announce">Announcements</button>
+        </nav>
+
+        <div id="tabContent" style="margin-top:14px">
+          <!-- DASHBOARD -->
+          <div data-panel="dashboard">
+            <div class="row">
+              <div class="col card">
+                <h3>Quick stats</h3>
+                <div id="statUsers">Users: —</div>
+                <div id="statCodes">Total Codes: —</div>
+                <div id="statRedeemed">Redeemed: —</div>
+              </div>
+
+              <div class="col card">
+                <h3>Add quick code (admin) — category</h3>
+                <select id="quickCat" class="field">
+                  <option value="10rs">10rs</option>
+                  <option value="20rs">20rs</option>
+                  <option value="50rs">50rs</option>
+                  <option value="100rs">100rs</option>
+                </select>
+                <input id="quickCodeVal" class="field" placeholder="CODE (e.g. ABCD-1234-EFGH)">
+                <div style="margin-top:8px">
+                  <button id="btnAddQuick" class="success">Add Code</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- USERS -->
+          <div data-panel="users" style="display:none">
+            <div class="card">
+              <h3>All Users</h3>
+              <div class="small">Search by email or uid</div>
+              <input id="searchUser" class="field" placeholder="email or uid">
+              <div style="margin-top:8px">
+                <button id="btnLoadUsers" class="btn">Load Users</button>
+              </div>
+
+              <div class="list" id="usersList"></div>
+            </div>
+          </div>
+
+          <!-- COINS -->
+          <div data-panel="coins" style="display:none">
+            <div class="card">
+              <h3>Modify User Coins</h3>
+              <input id="coinUserId" class="field" placeholder="User UID">
+              <input id="coinAmount" class="field" placeholder="Amount (positive to add, negative to remove)">
+              <div style="margin-top:8px">
+                <button id="btnUpdateCoin" class="btn">Update Coins (transaction)</button>
+              </div>
+              <div class="small" style="margin-top:12px">Transactional update used to avoid race conditions.</div>
+            </div>
+          </div>
+
+          <!-- CODES -->
+          <div data-panel="codes" style="display:none">
+            <div class="card">
+              <h3>Redeem Codes (view/add/delete)</h3>
+              <div style="display:flex;gap:8px">
+                <select id="catSelect" class="field" style="max-width:220px">
+                  <option value="10rs">10rs</option>
+                  <option value="20rs">20rs</option>
+                  <option value="50rs">50rs</option>
+                  <option value="100rs">100rs</option>
+                </select>
+                <button id="btnLoadCodes" class="btn">Load Codes</button>
+              </div>
+
+              <div style="margin-top:10px">
+                <input id="newCodeVal" class="field" placeholder="New code string">
+                <button id="btnAddCode" class="success" style="margin-top:8px">Add New Code</button>
+              </div>
+
+              <div class="list" id="codesList"></div>
+            </div>
+          </div>
+
+          <!-- HISTORY -->
+          <div data-panel="history" style="display:none">
+            <div class="card">
+              <h3>Global Redeem History</h3>
+              <div style="display:flex;gap:8px">
+                <button id="btnLoadGlobal" class="btn">Load Global History</button>
+                <button id="btnClearGlobal" class="danger" style="margin-left:8px">Delete Old (not recommended)</button>
+              </div>
+              <div class="list" id="globalHistory"></div>
+            </div>
+          </div>
+
+          <!-- SETTINGS -->
+          <div data-panel="settings" style="display:none">
+            <div class="card">
+              <h3>Settings</h3>
+              <div class="small">Maintenance mode toggles (writes by client can be blocked by your app code)</div>
+              <div style="margin-top:10px">
+                <button id="btnToggleMaint" class="btn">Toggle Maintenance</button>
+                <button id="btnRefreshStats" class="btn-ghost">Refresh Stats</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ANNOUNCE -->
+          <div data-panel="announce" style="display:none">
+            <div class="card">
+              <h3>Announcements</h3>
+              <input id="announceText" class="field" placeholder="Announcement message">
+              <div style="margin-top:10px">
+                <button id="btnPostAnn" class="btn">Post Announcement</button>
+                <button id="btnClearAnn" class="btn-ghost">Clear Announcement</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
-  </div>
 
-  <!-- USERS -->
-  <div id="users" class="tab hidden">
-    <div class="card">
-      <h3>All Users</h3>
-      <button onclick="loadUsers()" class="btn btn-main">Load Users</button>
-      <div id="usersList" class="list"></div>
+    <div id="notAdmin" style="display:none" class="card">
+      <h3>Access denied</h3>
+      <div class="small">You are signed in but not an admin. Make sure your user doc has <code>isAdmin: true</code>.</div>
     </div>
+
+    <div style="height:40px"></div>
   </div>
 
-  <!-- COINS -->
-  <div id="coins" class="tab hidden">
-    <div class="card">
-      <h3>Modify Coins</h3>
-      <input id="coinUid" class="field" placeholder="User UID">
-      <input id="coinAmount" class="field" placeholder="Amount (+ / -)">
-      <button onclick="updateCoins()" class="btn btn-main" style="margin-top:10px;">Update</button>
-    </div>
-  </div>
+  <!-- Firebase -->
+  <script type="module">
+    // ===== FIREBASE CONFIG (use your provided config) =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
+      authDomain: "kssm-rock-tam-ad.firebaseapp.com",
+      projectId: "kssm-rock-tam-ad",
+      storageBucket: "kssm-rock-tam-ad.firebasestorage.app",
+      messagingSenderId: "28268633766",
+      appId: "1:28268633766:web:f6ee57eaf56f7cbd37de67"
+    };
 
-  <!-- CODES -->
-  <div id="codes" class="tab hidden">
-    <div class="card">
-      <h3>Redeem Codes</h3>
-      <select id="codeCategory" class="field">
-        <option value="10rs">10rs</option>
-        <option value="20rs">20rs</option>
-        <option value="50rs">50rs</option>
-        <option value="100rs">100rs</option>
-      </select>
-      <button onclick="loadCodes()" class="btn btn-main" style="margin-top:10px;">Load</button>
-      <div id="codesList" class="list"></div>
-    </div>
-  </div>
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc,
+      getDocs, query, where, orderBy, limit, runTransaction, deleteDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <!-- HISTORY -->
-  <div id="history" class="tab hidden">
-    <div class="card">
-      <h3>Redeem History</h3>
-      <button onclick="loadHistory()" class="btn btn-main">Load</button>
-      <div id="historyList" class="list"></div>
-    </div>
-  </div>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
 
-  <!-- SETTINGS -->
-  <div id="settings" class="tab hidden">
-    <div class="card">
-      <h3>Settings</h3>
-      <button onclick="toggleMaintenance()" class="btn btn-main">Toggle Maintenance</button>
-    </div>
-  </div>
+    // UI elements
+    const btnSign = document.getElementById('btnSign');
+    const btnSignOut = document.getElementById('btnSignOut');
+    const signedAs = document.getElementById('signedAs');
+    const adminArea = document.getElementById('adminArea');
+    const notAdmin = document.getElementById('notAdmin');
+    const maintenanceChip = document.getElementById('maintenanceChip');
 
-</div>
-</div>
+    // Tab handling
+    document.querySelectorAll('#tabs button').forEach(btn=>{
+      btn.addEventListener('click',()=> {
+        document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.getAttribute('data-tab');
+        document.querySelectorAll('[data-panel]').forEach(p=>{
+          p.style.display = (p.getAttribute('data-panel')===tab) ? '' : 'none';
+        });
+      });
+    });
 
-<div id="notAdmin" class="card hidden">
-  <h3>Access Denied</h3>
-  <p>You are not an admin.</p>
-</div>
+    // Auth handlers
+    btnSign.addEventListener('click', async ()=> {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch(e){ alert('Sign-in failed: '+ e.message); console.error(e); }
+    });
 
-</div>
+    btnSignOut.addEventListener('click', async ()=>{
+      await signOut(auth);
+    });
 
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    onAuthStateChanged(auth, async (user)=> {
+      if (!user) {
+        signedAs.innerText = 'Not signed';
+        adminArea.style.display = 'none';
+        notAdmin.style.display = 'none';
+        btnSign.style.display = '';
+        btnSignOut.style.display = 'none';
+        return;
+      }
+      signedAs.innerText = `Signed in as ${user.email}`;
+      btnSign.style.display = 'none';
+      btnSignOut.style.display = '';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCBgBWfpUbtlPbvCfDr6N1_L2svtJglfhM",
-  authDomain: "kssm-rock-tam-ad.firebaseapp.com",
-  projectId: "kssm-rock-tam-ad",
-};
+      // Check isAdmin in users/{uid}
+      const uref = doc(db, 'users', user.uid);
+      const usnap = await getDoc(uref);
+      if (usnap.exists() && usnap.data().isAdmin === true) {
+        adminArea.style.display = '';
+        notAdmin.style.display = 'none';
+        loadStats();
+        loadMaintenance();
+      } else {
+        adminArea.style.display = 'none';
+        notAdmin.style.display = '';
+      }
+    });
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
+    // ----- Dashboard quick add code -----
+    document.getElementById('btnAddQuick').addEventListener('click', async ()=>{
+      const cat = document.getElementById('quickCat').value;
+      const code = document.getElementById('quickCodeVal').value.trim();
+      if (!code) return alert('Enter code value');
+      try {
+        const col = collection(db, 'redeemCategories', cat, 'codes');
+        await addDoc(col, { code, isUsed: false });
+        alert('Code added');
+        document.getElementById('quickCodeVal').value='';
+        loadStats();
+      } catch(e){ alert('Add code error: '+e.message); console.error(e); }
+    });
 
-/* AUTH */
-loginBtn.onclick = ()=>signInWithPopup(auth,provider);
-logoutBtn.onclick = ()=>signOut(auth);
+    // ----- Users -----
+    document.getElementById('btnLoadUsers').addEventListener('click', loadUsers);
+    async function loadUsers(){
+      const qval = document.getElementById('searchUser').value.trim();
+      let q;
+      if (qval) {
+        // search: try email exact match or uid contains
+        q = query(collection(db, 'users'), where('email','==', qval), limit(50));
+      } else {
+        q = query(collection(db, 'users'), orderBy('email'), limit(200));
+      }
+      const snap = await getDocs(q);
+      const list = document.getElementById('usersList'); list.innerHTML='';
+      snap.forEach(docu=>{
+        const d = docu.data();
+        const row = document.createElement('div');
+        row.className='notice';
+        row.innerHTML = `
+          <b>${d.email||'(no email)'} </b><br>
+          UID: ${docu.id}<br>
+          Coins: ${d.coins||0} &nbsp; isAdmin: ${d.isAdmin? 'yes':'no'}
+          <div style="margin-top:8px">
+            <button class="btn-ghost" onclick="showUserEdit('${docu.id}')">Edit</button>
+            <button class="btn" onclick="impersonate('${docu.id}')">Impersonate (open)</button>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
 
-onAuthStateChanged(auth, async user=>{
-  if(!user) return;
-  signedAs.innerText = user.email;
-  loginBtn.classList.add("hidden");
-  logoutBtn.classList.remove("hidden");
+    // show user edit prompt
+    window.showUserEdit = async function(uid){
+      const uref = doc(db,'users',uid);
+      const usnap = await getDoc(uref);
+      const data = usnap.exists() ? usnap.data() : {};
+      const newCoins = prompt('Set coins for user', data.coins||0);
+      if (newCoins===null) return;
+      try {
+        await updateDoc(uref, { coins: Number(newCoins) });
+        alert('Coins updated');
+        loadUsers();
+      } catch(e){ alert('update error: '+e.message); console.error(e); }
+    };
 
-  const u = await getDoc(doc(db,"users",user.uid));
-  if(u.exists() && u.data().isAdmin){
-    adminArea.classList.remove("hidden");
+    // impersonate = just open user profile link (for dev) - here we alert
+    window.impersonate = function(uid){
+      alert('Impersonate not implemented — use client app with this UID for testing.');
+    };
+
+    // ----- Coins transaction -----
+    document.getElementById('btnUpdateCoin').addEventListener('click', async ()=>{
+      const uid = document.getElementById('coinUserId').value.trim();
+      const amt = Number(document.getElementById('coinAmount').value);
+      if (!uid || isNaN(amt)) return alert('Enter uid and numeric amount');
+      try {
+        const userRef = doc(db,'users',uid);
+        await runTransaction(db, async (tx) => {
+          const udoc = await tx.get(userRef);
+          if (!udoc.exists()) throw new Error('User not found');
+          const cur = udoc.data().coins || 0;
+          tx.update(userRef, { coins: cur + amt });
+        });
+        alert('Transaction success');
+      } catch(e){ alert('Transaction failed: '+e.message); console.error(e); }
+    });
+
+    // ----- Codes view/add/delete -----
+    document.getElementById('btnLoadCodes').addEventListener('click', loadCodes);
+    async function loadCodes(){
+      const cat = document.getElementById('catSelect').value;
+      const col = collection(db, 'redeemCategories', cat, 'codes');
+      const snap = await getDocs(col);
+      const out = document.getElementById('codesList'); out.innerHTML='';
+      snap.forEach(docu=>{
+        const d = docu.data();
+        const div = document.createElement('div');
+        div.className='notice';
+        div.innerHTML = `<b>${d.code}</b><br>used: ${d.isUsed ? 'yes' : 'no'}<br>
+          <button class="btn-ghost" onclick="delCode('${cat}','${docu.id}')">Delete</button>
+        `;
+        out.appendChild(div);
+      });
+    }
+
+    document.getElementById('btnAddCode').addEventListener('click', async ()=>{
+      const cat = document.getElementById('catSelect').value;
+      const codeVal = document.getElementById('newCodeVal').value.trim();
+      if (!codeVal) return alert('Enter code');
+      try {
+        await addDoc(collection(db, 'redeemCategories', cat, 'codes'), { code: codeVal, isUsed:false });
+        alert('Code added');
+        document.getElementById('newCodeVal').value='';
+        loadCodes();
+        loadStats();
+      } catch(e){ alert('Add code error: '+e.message); console.error(e); }
+    });
+
+    window.delCode = async function(cat, id){
+      if (!confirm('Delete this code?')) return;
+      try {
+        await deleteDoc(doc(db, 'redeemCategories', cat, 'codes', id));
+        alert('Deleted');
+        loadCodes();
+        loadStats();
+      } catch(e){ alert('Delete error: '+e.message); console.error(e); }
+    };
+
+    // ----- Global history -----
+    document.getElementById('btnLoadGlobal').addEventListener('click', loadGlobalHistory);
+    async function loadGlobalHistory(){
+      const snap = await getDocs(query(collection(db,'redeemCodes'), orderBy('time','desc'), limit(200)));
+      const out = document.getElementById('globalHistory'); out.innerHTML='';
+      snap.forEach(docu=>{
+        const d = docu.data();
+        const el = document.createElement('div'); el.className='notice';
+        el.innerHTML = `<b>Code:</b> ${d.code} <br><b>UID:</b> ${d.uid} <br><b>Category:</b> ${d.category} <br>${new Date(d.time).toLocaleString()}`;
+        out.appendChild(el);
+      });
+    }
+    document.getElementById('btnClearGlobal').addEventListener('click', async ()=>{
+      if (!confirm('Delete all global history? This is irreversible.')) return;
+      alert('Please delete manually in console if needed. (Bulk delete not implemented)');
+    });
+
+    // ----- Maintenance -----
+    document.getElementById('btnToggleMaint').addEventListener('click', async ()=>{
+      const settingsRef = doc(db, 'adminSettings', 'global');
+      const snap = await getDoc(settingsRef);
+      const now = snap.exists() ? !snap.data().maintenance : true;
+      await setDoc(settingsRef, { maintenance: now }, { merge:true });
+      loadMaintenance();
+    });
+
+    async function loadMaintenance(){
+      const docref = doc(db, 'adminSettings','global');
+      const snap = await getDoc(docref);
+      const on = snap.exists() && snap.data().maintenance === true;
+      maintenanceChip.innerText = 'Maintenance: ' + (on ? 'ON' : 'OFF');
+      maintenanceChip.style.background = on ? '#f6c23e' : '#fff';
+    }
+
+    // ----- Announcements -----
+    document.getElementById('btnPostAnn').addEventListener('click', async ()=>{
+      const txt = document.getElementById('announceText').value.trim();
+      if (!txt) return alert('Enter announcement text');
+      await setDoc(doc(db, 'adminSettings', 'announcement'), { text: txt, time: Date.now() }, { merge:true });
+      alert('Announcement posted');
+    });
+    document.getElementById('btnClearAnn').addEventListener('click', async ()=>{
+      await setDoc(doc(db,'adminSettings','announcement'), { text: '' }, { merge:true });
+      alert('Cleared');
+    });
+
+    // ----- Stats -----
+    async function loadStats(){
+      // users
+      const uSnap = await getDocs(collection(db, 'users'));
+      document.getElementById('statUsers').innerText = 'Users: ' + uSnap.size;
+      // codes total & redeemed
+      let total=0, redeemed=0;
+      const cats = ['10rs','20rs','50rs','100rs'];
+      for (const c of cats){
+        const s = await getDocs(collection(db,'redeemCategories',c,'codes'));
+        total += s.size;
+        s.forEach(d => { if (d.data().isUsed) redeemed++; });
+      }
+      document.getElementById('statCodes').innerText = 'Total Codes: ' + total;
+      document.getElementById('statRedeemed').innerText = 'Redeemed: ' + redeemed;
+    }
+
+    // initial
     loadStats();
-  }else{
-    notAdmin.classList.remove("hidden");
-  }
-});
-
-/* TABS */
-document.querySelectorAll(".tabs button").forEach(b=>{
-  b.onclick=()=>{
-    document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active");
-    document.querySelectorAll(".tab").forEach(t=>t.classList.add("hidden"));
-    document.getElementById(b.dataset.tab).classList.remove("hidden");
-  };
-});
-
-/* FUNCTIONS */
-async function loadStats(){
-  const u=await getDocs(collection(db,"users"));
-  statUsers.innerText="Users: "+u.size;
-}
-async function loadUsers(){
-  usersList.innerHTML="";
-  const snap=await getDocs(collection(db,"users"));
-  snap.forEach(d=>{
-    usersList.innerHTML+=`<div class="notice">${d.data().email||"no email"}</div>`;
-  });
-}
-async function updateCoins(){
-  const uid=coinUid.value;
-  const amt=Number(coinAmount.value);
-  await runTransaction(db,async tx=>{
-    const ref=doc(db,"users",uid);
-    const s=await tx.get(ref);
-    tx.update(ref,{coins:(s.data().coins||0)+amt});
-  });
-  alert("Coins updated");
-}
-async function loadCodes(){
-  codesList.innerHTML="";
-  const cat=codeCategory.value;
-  const snap=await getDocs(collection(db,"redeemCategories",cat,"codes"));
-  snap.forEach(d=>{
-    codesList.innerHTML+=`<div class="notice">${d.data().code}</div>`;
-  });
-}
-async function loadHistory(){
-  historyList.innerHTML="";
-  const snap=await getDocs(collection(db,"redeemCodes"));
-  snap.forEach(d=>{
-    historyList.innerHTML+=`<div class="notice">${d.data().code}</div>`;
-  });
-}
-async function toggleMaintenance(){
-  alert("Maintenance toggle logic here");
-}
-</script>
+  </script>
 </body>
-  </html>
+</html>
