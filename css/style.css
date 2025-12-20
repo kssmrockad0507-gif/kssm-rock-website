@@ -1,76 +1,42 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  background: #000;
+  margin: 0;
   overflow: hidden;
-  touch-action: none;
-  font-family: sans-serif;
+  background: #1e5c1e;
 }
 
-#game {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+canvas {
+  display: block;
 }
 
-/* WORLD (camera illusion) */
-#world {
-  position: absolute;
-  width: 3000px;
-  height: 3000px;
-  background: linear-gradient(#2e7d32, #1b5e20);
-}
-
-/* PLAYER */
-#player {
-  position: absolute;
-  width: 60px;
-  height: 80px;
-  background: url("../assets/images/player.png") no-repeat center/contain;
-  left: 50%;
-  bottom: 120px;
-  transform: translateX(-50%);
-}
-
-/* JOYSTICK - LEFT */
 #joystick {
   position: fixed;
-  left: 20px;
-  bottom: 20px;
+  bottom: 40px;
+  left: 40px;
   width: 120px;
   height: 120px;
+  background: rgba(255,255,255,0.2);
   border-radius: 50%;
-  background: rgba(255,255,255,0.15);
 }
 
 #stick {
-  position: absolute;
   width: 50px;
   height: 50px;
-  left: 35px;
-  top: 35px;
+  background: lime;
   border-radius: 50%;
-  background: #00ff00;
+  position: absolute;
+  top: 35px;
+  left: 35px;
 }
 
-/* SHOOT BUTTON - RIGHT */
-#shoot {
+#shootBtn {
   position: fixed;
-  right: 30px;
-  bottom: 40px;
-  width: 80px;
-  height: 80px;
+  bottom: 60px;
+  right: 40px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: red;
   color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  opacity: 0.8;
+  font-size: 18px;
+  border: none;
 }
