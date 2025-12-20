@@ -1,19 +1,74 @@
 <!DOCTYPE html>
 <html lang="ta">
 <head>
-  <meta charset="UTF-8">
-  <title>Battle Royale Test</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Battle Royale Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/style.css">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    overflow: hidden;
+    background: #111;
+  }
+
+  canvas {
+    display: block;
+  }
+</style>
 </head>
 <body>
 
-  <!-- Game Canvas -->
-  <canvas id="game"></canvas>
+<canvas id="game"></canvas>
 
-  <!-- JS -->
-  <script src="js/game.js"></script>
+<script>
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const playerImg = new Image();
+  playerImg.src = "assets/images/player.png";
+
+  const player = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    size: 50,
+    speed: 4
+  };
+
+  let keys = {};
+
+  window.addEventListener("keydown", e => keys[e.key] = true);
+  window.addEventListener("keyup", e => keys[e.key] = false);
+
+  function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (keys["w"] || keys["ArrowUp"]) player.y -= player.speed;
+    if (keys["s"] || keys["ArrowDown"]) player.y += player.speed;
+    if (keys["a"] || keys["ArrowLeft"]) player.x -= player.speed;
+    if (keys["d"] || keys["ArrowRight"]) player.x += player.speed;
+
+    ctx.drawImage(
+      playerImg,
+      player.x - player.size / 2,
+      player.y - player.size / 2,
+      player.size,
+      player.size
+    );
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  gameLoop();
+</script>
+
 </body>
 </html>
