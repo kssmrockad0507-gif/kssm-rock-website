@@ -3,71 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Episode 1 - Lobby</title>
+<title>Game Lobby</title>
 
 <style>
-*{
+html, body{
     margin:0;
     padding:0;
-    box-sizing:border-box;
-    font-family: Arial, sans-serif;
-}
-
-body{
-    background:black;
+    width:100%;
+    height:100%;
     overflow:hidden;
-}
-
-/* PORTRAIT WARNING */
-#rotate{
-    position:fixed;
-    inset:0;
     background:black;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    font-size:22px;
-    z-index:999;
 }
 
-/* GAME CONTAINER */
+/* GAME SCREEN */
 #game{
+    position:relative;
     width:100vw;
     height:100vh;
-    position:relative;
-    background:url('background.jpg') center/cover no-repeat;
-    display:none;
 }
 
-/* DARK OVERLAY */
-#overlay{
+/* BACKGROUND IMAGE */
+#bg{
     position:absolute;
-    inset:0;
-    background:rgba(0,0,0,0.4);
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:1;
 }
 
-/* AVATAR BANNER */
-#avatar{
-    position:absolute;
-    top:15px;
-    left:15px;
-    padding:10px 16px;
-    background:rgba(0,0,0,0.6);
-    color:white;
-    border-radius:10px;
-    z-index:2;
-    font-size:14px;
-}
-
-/* CHARACTER */
+/* CHARACTER IMAGE */
 #character{
     position:absolute;
-    bottom:80px;
+    bottom:60px;
     left:50%;
     transform:translateX(-50%);
-    height:70vh;
+    height:75%;
     z-index:2;
 }
 
@@ -79,15 +49,12 @@ body{
     transform:translateX(-50%);
     padding:14px 40px;
     font-size:20px;
-    background:#ff9f1c;
     border:none;
     border-radius:30px;
+    background:#ff9800;
+    color:black;
     cursor:pointer;
-    z-index:2;
-}
-
-#startBtn:active{
-    transform:translateX(-50%) scale(0.95);
+    z-index:3;
 }
 
 /* STORY SCREEN */
@@ -102,67 +69,39 @@ body{
     text-align:center;
     padding:30px;
     font-size:22px;
-    line-height:1.6;
+    z-index:5;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ROTATE SCREEN -->
-<div id="rotate">
-    <p>
-        📱 Please rotate your phone<br><br>
-        Landscape mode only
-    </p>
-</div>
-
 <div id="game">
 
-    <div id="overlay"></div>
+    <!-- BACKGROUND -->
+    <img id="bg" src="background.jpg">
 
-    <div id="avatar">PLAYER</div>
-
+    <!-- CHARACTER -->
     <img id="character" src="character.png">
 
+    <!-- START BUTTON -->
     <button id="startBtn">START</button>
 
+    <!-- STORY -->
     <div id="story">
         <div>
-            <p>
-                World collapse ஆன பிறகு…<br><br>
-                Cities எல்லாம் abandoned.<br><br>
-                ஒரு weak signal இந்த நகரத்திலிருந்து வருகிறது…<br><br>
-                <b>Episode 1 begins…</b>
-            </p>
+            World collapse ஆன பிறகு…<br><br>
+            ஒரு signal இந்த நகரத்திலிருந்து வருகிறது…<br><br>
+            <b>Episode 1 Begins</b>
         </div>
     </div>
 
 </div>
 
 <script>
-const rotate = document.getElementById("rotate");
-const game = document.getElementById("game");
-const startBtn = document.getElementById("startBtn");
-const story = document.getElementById("story");
-
-function checkOrientation(){
-    if(window.innerWidth > window.innerHeight){
-        rotate.style.display = "none";
-        game.style.display = "block";
-    }else{
-        rotate.style.display = "flex";
-        game.style.display = "none";
-    }
-}
-
-checkOrientation();
-window.addEventListener("resize", checkOrientation);
-window.addEventListener("orientationchange", checkOrientation);
-
-startBtn.addEventListener("click",()=>{
-    story.style.display="flex";
-});
+document.getElementById("startBtn").onclick = function(){
+    document.getElementById("story").style.display = "flex";
+};
 </script>
 
 </body>
