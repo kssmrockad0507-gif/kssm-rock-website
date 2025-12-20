@@ -1,26 +1,22 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Battle Royale – Third Person</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="css/style.css">
+  <title>Battle Royale Demo</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="game">
-  <div id="world">
-    <div id="player"></div>
-  </div>
+<canvas id="game"></canvas>
 
-  <!-- Controls -->
-  <div id="joystick">
-    <div id="stick"></div>
-  </div>
-
-  <div id="shoot">SHOOT</div>
+<!-- JOYSTICK -->
+<div id="joystick">
+  <div id="stick"></div>
 </div>
 
-<script src="js/game.js"></script>
+<!-- SHOOT BUTTON -->
+<button id="shootBtn">SHOOT</button>
+
+<script src="game.js"></script>
 </body>
 </html>
