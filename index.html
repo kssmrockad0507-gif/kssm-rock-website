@@ -11,14 +11,16 @@ html, body{
     padding:0;
     width:100%;
     height:100%;
-    overflow:hidden;
     background:black;
 }
 
+/* REAL MOBILE HEIGHT FIX */
 #game{
-    position:relative;
-    width:100vw;
-    height:100vh;
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
 }
 
 /* BACKGROUND */
@@ -34,33 +36,36 @@ html, body{
 /* CHARACTER */
 #character{
     position:absolute;
-    bottom:80px;
+    bottom:120px; /* 🔥 lifted up */
     left:50%;
     transform:translateX(-50%);
     height:70%;
     z-index:2;
-
-    /* 🔥 IMPORTANT FIX */
     pointer-events:none;
 }
 
 /* START BUTTON */
 #startBtn{
     position:absolute;
-    bottom:20px;
     left:50%;
     transform:translateX(-50%);
-    padding:14px 42px;
+    bottom:40px;
+
+    padding:14px 44px;
     font-size:20px;
     border:none;
     border-radius:30px;
     background:#ff9800;
     color:black;
     cursor:pointer;
-    z-index:10; /* 🔥 ABOVE ALL */
+
+    z-index:10;
+
+    /* 🔥 SAFE AREA FIX */
+    margin-bottom: env(safe-area-inset-bottom);
 }
 
-/* STORY SCREEN */
+/* STORY */
 #story{
     position:absolute;
     inset:0;
@@ -88,8 +93,8 @@ html, body{
 
     <div id="story">
         <div>
-            World collapse ஆன பிறகு…<br><br>
-            ஒரு signal இந்த நகரத்திலிருந்து வருகிறது…<br><br>
+            Signal வந்தது…<br><br>
+            இந்த நகரம் இன்னும் உயிரோட இருக்கு…<br><br>
             <b>Episode 1 Begins</b>
         </div>
     </div>
@@ -97,9 +102,9 @@ html, body{
 </div>
 
 <script>
-document.getElementById("startBtn").addEventListener("click", ()=>{
+document.getElementById("startBtn").onclick = ()=>{
     document.getElementById("story").style.display = "flex";
-});
+};
 </script>
 
 </body>
