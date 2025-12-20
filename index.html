@@ -1,134 +1,26 @@
 <!DOCTYPE html>
 <html lang="ta">
 <head>
-<meta charset="UTF-8">
-<title>Battle Royale Test</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body {
-  margin: 0;
-  overflow: hidden;
-  background: #222;
-}
-canvas {
-  display: block;
-}
-
-/* JOYSTICK */
-#joystick {
-  position: fixed;
-  left: 20px;
-  bottom: 20px;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-}
-#stick {
-  width: 50px;
-  height: 50px;
-  background: rgba(0,255,0,0.8);
-  border-radius: 50%;
-  position: absolute;
-  left: 35px;
-  top: 35px;
-}
-
-/* SHOOT */
-#shoot {
-  position: fixed;
-  right: 30px;
-  bottom: 40px;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: red;
-  opacity: 0.7;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Battle Royale – Third Person</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<canvas id="game"></canvas>
+<div id="game">
+  <div id="world">
+    <div id="player"></div>
+  </div>
 
-<div id="joystick">
-  <div id="stick"></div>
+  <!-- Controls -->
+  <div id="joystick">
+    <div id="stick"></div>
+  </div>
+
+  <div id="shoot">SHOOT</div>
 </div>
 
-<div id="shoot"></div>
-
-<script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
-
-/* PLAYER */
-const player = { x: canvas.width/2, y: canvas.height/2, r: 20, speed: 3 };
-
-/* BULLETS */
-let bullets = [];
-
-/* JOYSTICK */
-let joy = { dx:0, dy:0 };
-const stick = document.getElementById("stick");
-const joyBase = document.getElementById("joystick");
-
-joyBase.addEventListener("touchmove", e => {
-  const t = e.touches[0];
-  const rect = joyBase.getBoundingClientRect();
-  let x = t.clientX - rect.left - 60;
-  let y = t.clientY - rect.top - 60;
-
-  x = Math.max(-40, Math.min(40, x));
-  y = Math.max(-40, Math.min(40, y));
-
-  stick.style.left = 35 + x + "px";
-  stick.style.top  = 35 + y + "px";
-
-  joy.dx = x / 40;
-  joy.dy = y / 40;
-});
-
-joyBase.addEventListener("touchend", () => {
-  stick.style.left = "35px";
-  stick.style.top = "35px";
-  joy.dx = joy.dy = 0;
-});
-
-/* SHOOT */
-document.getElementById("shoot").addEventListener("touchstart", () => {
-  bullets.push({ x: player.x, y: player.y, vx: 6, vy: 0 });
-});
-
-/* GAME LOOP */
-function loop(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  player.x += joy.dx * player.speed;
-  player.y += joy.dy * player.speed;
-
-  // draw player
-  ctx.beginPath();
-  ctx.arc(player.x, player.y, player.r, 0, Math.PI*2);
-  ctx.fillStyle = "lime";
-  ctx.fill();
-
-  // bullets
-  bullets.forEach(b => {
-    b.x += b.vx;
-    ctx.beginPath();
-    ctx.arc(b.x, b.y, 5, 0, Math.PI*2);
-    ctx.fillStyle = "yellow";
-    ctx.fill();
-  });
-
-  requestAnimationFrame(loop);
-}
-loop();
-</script>
-
+<script src="js/game.js"></script>
 </body>
 </html>
