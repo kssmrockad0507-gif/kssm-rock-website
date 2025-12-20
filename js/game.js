@@ -1,50 +1,48 @@
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const world = document.getElementById("world");
+const joystick = document.getElementById("joystick");
+const stick = document.getElementById("stick");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+/* WORLD POSITION (camera) */
+let worldX = -1200;
+let worldY = -2000;
 
-/* PLAYER IMAGE */
-const playerImg = new Image();
-playerImg.src = "assets/images/player.png";
+/* MOVEMENT */
+let moveX = 0;
+let moveY = 0;
+const speed = 6;
 
-/* PLAYER OBJECT */
-const player = {
-  x: canvas.width / 2,
-  y: canvas.height / 2,
-  r: 25,
-  speed: 4
-};
+/* JOYSTICK CONTROL */
+joystick.addEventListener("touchmove", (e) => {
+  const rect = joystick.getBoundingClientRect();
+  const touch = e.touches[0];
 
-/* CONTROLS */
-let keys = {};
+  let dx = touch.clientX - rect.left - 60;
+  let dy = touch.clientY - rect.top - 60;
 
-window.addEventListener("keydown", e => {
-  keys[e.key] = true;
+  dx = Math.max(-40, Math.min(40, dx));
+  dy = Math.max(-40, Math.min(40, dy));
+
+  stick.style.left = 35 + dx + "px";
+  stick.style.top  = 35 + dy + "px";
+
+  moveX = dx / 40;
+  moveY = dy / 40;
 });
 
-window.addEventListener("keyup", e => {
-  keys[e.key] = false;
+joystick.addEventListener("touchend", () => {
+  stick.style.left = "35px";
+  stick.style.top  = "35px";
+  moveX = moveY = 0;
 });
 
 /* GAME LOOP */
 function gameLoop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Movement
-  if (keys["w"] || keys["ArrowUp"]) player.y -= player.speed;
-  if (keys["s"] || keys["ArrowDown"]) player.y += player.speed;
-  if (keys["a"] || keys["ArrowLeft"]) player.x -= player.speed;
-  if (keys["d"] || keys["ArrowRight"]) player.x += player.speed;
+  /* Camera illusion: world moves, player stays */
+  worldX -= moveX * speed;
+  worldY -= moveY * speed;
 
-  // Draw player
-  ctx.drawImage(
-    playerImg,
-    player.x - player.r,
-    player.y - player.r,
-    player.r * 2,
-    player.r * 2
-  );
+  world.style.transform = `translate(${worldX}px, ${worldY}px)`;
 
   requestAnimationFrame(gameLoop);
 }
