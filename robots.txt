@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://kssmrockad0507-gif.github.io/kssm-rock-website/sitemap.xml
