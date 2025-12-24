@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simple Image Editor</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    margin:0;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+input[type="file"]{
+    display:block;
+    margin:20px auto;
+}
+
+#gallery{
+    display:grid;
+    grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
+    gap:10px;
+    margin-top:20px;
+}
+
+#gallery img{
+    width:100%;
+    border-radius:8px;
+    cursor:pointer;
+    border:2px solid transparent;
+}
+
+#gallery img:hover{
+    border-color:#38bdf8;
+}
+
+#editor{
+    margin-top:30px;
+    text-align:center;
+    display:none;
+}
+
+#editor img{
+    max-width:90%;
+    max-height:300px;
+    margin-bottom:15px;
+    border-radius:10px;
+}
+
+.controls{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.controls label{
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📸 Simple Image Editor</h1>
+
+<input type="file" accept="image/*" multiple id="imageInput">
+
+<div id="gallery"></div>
+
+<div id="editor">
+    <h3>Edit Image</h3>
+    <img id="editImage">
+
+    <div class="controls">
+        <label>
+            Brightness
+            <input type="range" min="50" max="150" value="100" id="brightness">
+        </label>
+
+        <label>
+            Contrast
+            <input type="range" min="50" max="150" value="100" id="contrast">
+        </label>
+
+        <label>
+            Rotate
+            <input type="range" min="0" max="360" value="0" id="rotate">
+        </label>
+    </div>
+</div>
+
+<script>
+const imageInput = document.getElementById("imageInput");
+const gallery = document.getElementById("gallery");
+const editor = document.getElementById("editor");
+const editImage = document.getElementById("editImage");
+
+const brightness = document.getElementById("brightness");
+const contrast = document.getElementById("contrast");
+const rotate = document.getElementById("rotate");
+
+imageInput.addEventListener("change", function(){
+    gallery.innerHTML = "";
+    Array.from(this.files).forEach(file=>{
+        const reader = new FileReader();
+        reader.onload = e=>{
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.onclick = ()=>openEditor(img.src);
+            gallery.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
+function openEditor(src){
+    editor.style.display = "block";
+    editImage.src = src;
+    resetControls();
+}
+
+function resetControls(){
+    brightness.value = 100;
+    contrast.value = 100;
+    rotate.value = 0;
+    applyFilters();
+}
+
+function applyFilters(){
+    editImage.style.filter =
+        `brightness(${brightness.value}%) contrast(${contrast.value}%)`;
+    editImage.style.transform = `rotate(${rotate.value}deg)`;
+}
+
+brightness.oninput = applyFilters;
+contrast.oninput = applyFilters;
+rotate.oninput = applyFilters;
+</script>
+
+</body>
+</html>
