@@ -2,148 +2,142 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Simple Image Editor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Editor</title>
 
 <style>
-body{
-    font-family: Arial, sans-serif;
-    background:#0f172a;
-    color:white;
-    margin:0;
-    padding:20px;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #000;
+  color: #fff;
 }
 
-h1{
-    text-align:center;
-    margin-bottom:20px;
+/* Top Bar */
+.top-bar {
+  height: 55px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
 }
 
-input[type="file"]{
-    display:block;
-    margin:20px auto;
+/* Import Button */
+.import-btn {
+  margin: 20px;
+  padding: 15px;
+  text-align: center;
+  background: #ff2d55;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-#gallery{
-    display:grid;
-    grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
-    gap:10px;
-    margin-top:20px;
+/* Hidden file input */
+input[type="file"] {
+  display: none;
 }
 
-#gallery img{
-    width:100%;
-    border-radius:8px;
-    cursor:pointer;
-    border:2px solid transparent;
+/* Image preview */
+.editor-area {
+  display: none;
+  padding: 10px;
 }
 
-#gallery img:hover{
-    border-color:#38bdf8;
+.editor-area img {
+  width: 100%;
+  border-radius: 10px;
 }
 
-#editor{
-    margin-top:30px;
-    text-align:center;
-    display:none;
+/* Tools */
+.tools {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
 }
 
-#editor img{
-    max-width:90%;
-    max-height:300px;
-    margin-bottom:15px;
-    border-radius:10px;
+.tool {
+  text-align: center;
+  font-size: 14px;
 }
 
-.controls{
-    display:flex;
-    justify-content:center;
-    gap:15px;
-    flex-wrap:wrap;
-}
-
-.controls label{
-    font-size:14px;
+.tool button {
+  background: #222;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 50%;
+  font-size: 16px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>📸 Simple Image Editor</h1>
+<!-- Top -->
+<div class="top-bar">Photo Import</div>
 
-<input type="file" accept="image/*" multiple id="imageInput">
+<!-- Import -->
+<label class="import-btn">
+  Import Photo
+  <input type="file" accept="image/*" onchange="loadImage(event)">
+</label>
 
-<div id="gallery"></div>
+<!-- Editor -->
+<div class="editor-area" id="editor">
+  <img id="preview">
 
-<div id="editor">
-    <h3>Edit Image</h3>
-    <img id="editImage">
-
-    <div class="controls">
-        <label>
-            Brightness
-            <input type="range" min="50" max="150" value="100" id="brightness">
-        </label>
-
-        <label>
-            Contrast
-            <input type="range" min="50" max="150" value="100" id="contrast">
-        </label>
-
-        <label>
-            Rotate
-            <input type="range" min="0" max="360" value="0" id="rotate">
-        </label>
+  <div class="tools">
+    <div class="tool">
+      <button onclick="rotate()">🔄</button>
+      <div>Rotate</div>
     </div>
+
+    <div class="tool">
+      <button onclick="zoom()">🔍</button>
+      <div>Zoom</div>
+    </div>
+
+    <div class="tool">
+      <button onclick="reset()">♻️</button>
+      <div>Reset</div>
+    </div>
+  </div>
 </div>
 
 <script>
-const imageInput = document.getElementById("imageInput");
-const gallery = document.getElementById("gallery");
-const editor = document.getElementById("editor");
-const editImage = document.getElementById("editImage");
+let angle = 0;
+let scale = 1;
 
-const brightness = document.getElementById("brightness");
-const contrast = document.getElementById("contrast");
-const rotate = document.getElementById("rotate");
-
-imageInput.addEventListener("change", function(){
-    gallery.innerHTML = "";
-    Array.from(this.files).forEach(file=>{
-        const reader = new FileReader();
-        reader.onload = e=>{
-            const img = document.createElement("img");
-            img.src = e.target.result;
-            img.onclick = ()=>openEditor(img.src);
-            gallery.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-    });
-});
-
-function openEditor(src){
-    editor.style.display = "block";
-    editImage.src = src;
-    resetControls();
+function loadImage(event) {
+  const img = document.getElementById("preview");
+  img.src = URL.createObjectURL(event.target.files[0]);
+  document.getElementById("editor").style.display = "block";
 }
 
-function resetControls(){
-    brightness.value = 100;
-    contrast.value = 100;
-    rotate.value = 0;
-    applyFilters();
+function rotate() {
+  angle += 90;
+  applyTransform();
 }
 
-function applyFilters(){
-    editImage.style.filter =
-        `brightness(${brightness.value}%) contrast(${contrast.value}%)`;
-    editImage.style.transform = `rotate(${rotate.value}deg)`;
+function zoom() {
+  scale += 0.1;
+  applyTransform();
 }
 
-brightness.oninput = applyFilters;
-contrast.oninput = applyFilters;
-rotate.oninput = applyFilters;
+function reset() {
+  angle = 0;
+  scale = 1;
+  applyTransform();
+}
+
+function applyTransform() {
+  document.getElementById("preview").style.transform =
+    `rotate(${angle}deg) scale(${scale})`;
+}
 </script>
 
 </body>
-</html>
+    </html>
