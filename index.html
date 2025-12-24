@@ -1,104 +1,131 @@
 <!DOCTYPE html>
 <html lang="ta">
 <head>
-  <meta charset="UTF-8">
-  <title>KV Editor - Step 2</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: #111;
-      color: #fff;
-      text-align: center;
-    }
+<meta charset="UTF-8">
+<title>KV Editor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    h2 {
-      padding: 10px;
-    }
+<style>
+/* ========== BASE ========== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+}
 
-    .editor {
-      position: relative;
-      width: 90%;
-      max-width: 400px;
-      margin: auto;
-      border: 2px dashed #444;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #000;
-    }
+/* Gradient background */
+body {
+  min-height: 100vh;
+  background: linear-gradient(180deg,#4a78c2,#9a8ec7,#f4a9b8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    .editor img {
-      width: 100%;
-      display: block;
-    }
+/* ========== MOBILE FRAME (shows when desktop site ON) ========== */
+.app {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100vh;
+  padding: 20px;
+}
 
-    .text-box {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: move;
-      user-select: none;
-    }
+/* Title */
+.header {
+  color: #fff;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
 
-    .controls {
-      margin-top: 15px;
-    }
+/* Create new card */
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px;
+}
 
-    input[type="file"],
-    input[type="text"] {
-      margin: 5px;
-      padding: 6px;
-      width: 90%;
-      max-width: 300px;
-    }
-  </style>
+/* Buttons row */
+.tools {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.tool {
+  flex: 1;
+  text-align: center;
+}
+
+.circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#ffb07c,#ff8a65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  font-size: 24px;
+  color: #fff;
+}
+
+.label {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #444;
+}
+
+/* Section title */
+.section {
+  margin-top: 30px;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* ========== DESKTOP ONLY ========== */
+/* Desktop site ON → phone preview feel */
+@media (min-width: 768px) {
+  body {
+    background: #222;
+  }
+  .app {
+    min-height: 750px;
+    border-radius: 25px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.6);
+    background: linear-gradient(180deg,#4a78c2,#9a8ec7,#f4a9b8);
+  }
+}
+</style>
 </head>
+
 <body>
 
-  <h2>KV Image Editor ✨</h2>
+<div class="app">
 
-  <input type="file" accept="image/*" onchange="loadImage(event)">
+  <div class="header">KV Editor</div>
 
-  <div class="editor" id="editor">
-    <img id="preview">
-    <div class="text-box" id="textBox">Your Text</div>
+  <div class="card">
+    <div class="tools">
+      <div class="tool">
+        <div class="circle">🎬</div>
+        <div class="label">Video</div>
+      </div>
+      <div class="tool">
+        <div class="circle">🖼️</div>
+        <div class="label">Photo</div>
+      </div>
+      <div class="tool">
+        <div class="circle">🧩</div>
+        <div class="label">Collage</div>
+      </div>
+    </div>
   </div>
 
-  <div class="controls">
-    <input type="text" placeholder="Type your text" oninput="updateText(this.value)">
-  </div>
+  <div class="section">WHAT'S NEW</div>
 
-  <script>
-    const textBox = document.getElementById("textBox");
-
-    function loadImage(event) {
-      document.getElementById("preview").src =
-        URL.createObjectURL(event.target.files[0]);
-    }
-
-    function updateText(text) {
-      textBox.innerText = text || "Your Text";
-    }
-
-    // Drag text
-    let isDragging = false;
-
-    textBox.addEventListener("mousedown", () => isDragging = true);
-    document.addEventListener("mouseup", () => isDragging = false);
-
-    document.addEventListener("mousemove", (e) => {
-      if (isDragging) {
-        const rect = document.getElementById("editor").getBoundingClientRect();
-        textBox.style.left = (e.clientX - rect.left) + "px";
-        textBox.style.top = (e.clientY - rect.top) + "px";
-        textBox.style.transform = "translate(0,0)";
-      }
-    });
-  </script>
+</div>
 
 </body>
 </html>
