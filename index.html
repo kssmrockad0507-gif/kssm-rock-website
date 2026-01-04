@@ -3,18 +3,171 @@
 <head>
   <meta charset="UTF-8">
   <title>KSSM Rock Redeem</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      background: #020617;
+      padding: 25px;
+      border-radius: 10px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #22c55e;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+
+    #result {
+      margin-top: 15px;
+      word-break: break-all;
+    }
+  </style>
 </head>
 <body>
 
-  <h2>KSSM ROCK – Free Redeem Code</h2>
+  <div class="box">
+    <h2>KSSM ROCK<br>Free Redeem Code</h2>
 
-  <input type="text" id="instaId" placeholder="Instagram ID">
+    <input type="text" id="instaId" placeholder="Instagram ID">
 
-  <br><br>
+    <button id="createBtn">Create Code</button>
 
-  <button id="createBtn">Create Code</button>
+    <p id="result"></p>
+  </div>
 
-  <p id="result"></p>
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUC-4VsvroAT_D6Yy5qUV7uyXSbpCZs7M",
+      authDomain: "kssm-rock-redeem.firebaseapp.com",
+      projectId: "kssm-rock-redeem",
+      storageBucket: "kssm-rock-redeem.firebasestorage.app",
+      messagingSenderId: "750982235590",
+      appId: "1:750982235590:web:5338b3c4178d67f2da9ec7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const btn = document.getElementById("createBtn");
+    const result = document.getElementById("result");
+
+    function generateCode() {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let code = "KSSM-";
+      for (let i = 0; i < 6; i++) {
+        code += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return code;
+    }
+
+    btn.addEventListener("click", async () => {
+      const instaId = document.getElementById("instaId").value.trim();
+
+      if (instaId === "") {
+        result.textContent = "Instagram ID கொடுக்கவும்";
+        return;
+      }
+
+      btn.disabled = true;
+      result.textContent = "Checking...";
+
+      try {
+        // LIMIT CHECK
+        const counterRef = doc(db, "settings", "counter");
+        const counterSnap = await getDoc(counterRef);
+
+        if (!counterSnap.exists()) {
+          result.textContent = "Counter setup இல்லை";
+          btn.disabled = false;
+          return;
+        }
+
+        const { total_users, max_limit } = counterSnap.data();
+
+        if (total_users >= max_limit) {
+          result.textContent = "Limit reached ❌";
+          btn.disabled = false;
+          return;
+        }
+
+        // USER CHECK
+        const userRef = doc(db, "users", instaId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          result.innerHTML =
+            "Already created code:<br><b>" + userSnap.data().code + "</b>";
+        } else {
+          const newCode = generateCode();
+
+          await setDoc(userRef, {
+            code: newCode,
+            redeemed: false,
+            created_at: new Date()
+          });
+
+          await updateDoc(counterRef, {
+            total_users: total_users + 1
+          });
+
+          result.innerHTML =
+            "Your Code:<br><b>" + newCode + "</b><br>Copy & DM us";
+        }
+      } catch (e) {
+        result.textContent = "Error occurred";
+        console.error(e);
+      }
+
+      btn.disabled = false;
+    });
+  </script>
 
 </body>
 </html>
