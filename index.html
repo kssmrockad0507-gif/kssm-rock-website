@@ -2,77 +2,124 @@
 <html lang="ta">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KSSM Rock Redeem</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #020617, #020617);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
-    .box {
+    .card {
       background: #020617;
-      padding: 25px;
-      border-radius: 10px;
-      width: 320px;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
       text-align: center;
-      box-shadow: 0 0 20px rgba(0,0,0,0.6);
     }
 
-    h2 {
-      margin-bottom: 15px;
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+
+    p.sub {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 20px;
     }
 
     input {
       width: 100%;
-      padding: 10px;
-      border-radius: 6px;
+      padding: 12px;
+      border-radius: 10px;
       border: none;
       outline: none;
-      margin-bottom: 15px;
+      font-size: 1rem;
+      margin-bottom: 14px;
     }
 
     button {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
+      border-radius: 10px;
       border: none;
-      border-radius: 6px;
       background: #22c55e;
-      color: #000;
+      color: #022c22;
+      font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.9;
     }
 
     button:disabled {
-      background: gray;
+      background: #475569;
+      color: #cbd5f5;
       cursor: not-allowed;
     }
 
     #result {
-      margin-top: 15px;
-      word-break: break-all;
+      margin-top: 18px;
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+
+    footer {
+      margin-top: 18px;
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    /* Desktop enhancement */
+    @media (min-width: 768px) {
+      .card {
+        max-width: 420px;
+        padding: 30px;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
     }
   </style>
 </head>
+
 <body>
 
-  <div class="box">
-    <h2>KSSM ROCK<br>Free Redeem Code</h2>
+  <div class="card">
+    <h1>KSSM ROCK</h1>
+    <p class="sub">Free Redeem Code System</p>
 
     <input type="text" id="instaId" placeholder="Instagram ID">
 
     <button id="createBtn">Create Code</button>
 
-    <p id="result"></p>
+    <div id="result"></div>
+
+    <footer>
+      Copy the code and DM us on Instagram
+    </footer>
   </div>
 
-  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import {
@@ -110,21 +157,20 @@
     btn.addEventListener("click", async () => {
       const instaId = document.getElementById("instaId").value.trim();
 
-      if (instaId === "") {
+      if (!instaId) {
         result.textContent = "Instagram ID கொடுக்கவும்";
         return;
       }
 
       btn.disabled = true;
-      result.textContent = "Checking...";
+      result.textContent = "Please wait...";
 
       try {
-        // LIMIT CHECK
         const counterRef = doc(db, "settings", "counter");
         const counterSnap = await getDoc(counterRef);
 
         if (!counterSnap.exists()) {
-          result.textContent = "Counter setup இல்லை";
+          result.textContent = "System not ready";
           btn.disabled = false;
           return;
         }
@@ -137,13 +183,11 @@
           return;
         }
 
-        // USER CHECK
         const userRef = doc(db, "users", instaId);
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists()) {
-          result.innerHTML =
-            "Already created code:<br><b>" + userSnap.data().code + "</b>";
+          result.innerHTML = `Your code:<br><b>${userSnap.data().code}</b>`;
         } else {
           const newCode = generateCode();
 
@@ -157,12 +201,11 @@
             total_users: total_users + 1
           });
 
-          result.innerHTML =
-            "Your Code:<br><b>" + newCode + "</b><br>Copy & DM us";
+          result.innerHTML = `Your code:<br><b>${newCode}</b>`;
         }
-      } catch (e) {
+      } catch (err) {
         result.textContent = "Error occurred";
-        console.error(e);
+        console.error(err);
       }
 
       btn.disabled = false;
