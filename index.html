@@ -1,194 +1,160 @@
 <!DOCTYPE html>
 <html lang="ta">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KSSM Rock Redeem</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KSSM Rock Redeem</title>
 
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #020617;
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .card {
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 14px;
-      padding: 24px;
-      width: 100%;
-      max-width: 380px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-      text-align: center;
-    }
-
-    h1 { margin-bottom: 6px; }
-    p.sub { color: #94a3b8; margin-bottom: 20px; }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      margin-bottom: 14px;
-      font-size: 1rem;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: #22c55e;
-      color: #022c22;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      background: #475569;
-      color: #cbd5f5;
-      cursor: not-allowed;
-    }
-
-    #result {
-      margin-top: 16px;
-      font-size: 0.95rem;
-    }
-
-    footer {
-      margin-top: 18px;
-      font-size: 0.75rem;
-      color: #64748b;
-    }
-  </style>
+<style>
+body{
+  margin:0;
+  background:#020617;
+  color:#fff;
+  font-family:system-ui;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+}
+.card{
+  width:100%;
+  max-width:380px;
+  padding:24px;
+  border-radius:14px;
+  border:1px solid #1e293b;
+  box-shadow:0 10px 40px rgba(0,0,0,.7);
+  text-align:center;
+}
+input,button{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  margin-top:12px;
+}
+button{
+  background:#22c55e;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:disabled{
+  background:#475569;
+}
+#result{margin-top:16px}
+footer{
+  margin-top:18px;
+  font-size:12px;
+  color:#64748b;
+}
+</style>
 </head>
 
 <body>
 
 <div class="card">
-  <h1>KSSM ROCK</h1>
-  <p class="sub">Free Redeem Code System</p>
+  <h2>KSSM ROCK</h2>
+  <p style="color:#94a3b8">Free Redeem Code</p>
 
-  <input type="text" id="instaId" placeholder="Instagram ID">
-
-  <button id="createBtn">Create Code</button>
-
+  <input id="instaId" placeholder="Instagram ID">
+  <button id="btn">Create Code</button>
   <div id="result"></div>
 
-  <footer>Copy the code and DM us on Instagram</footer>
+  <footer>DM us on Instagram</footer>
 </div>
 
-<!-- Hidden Formspree Form -->
-<form id="emailForm" action="https://formspree.io/f/xzdzwarp" method="POST" style="display:none;">
-  <input type="text" name="instagram_id" id="f_insta">
-  <input type="text" name="redeem_code" id="f_code">
-  <input type="text" name="date_time" id="f_time">
-</form>
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-  import {
-    getFirestore,
-    doc,
-    getDoc,
-    setDoc,
-    updateDoc
-  } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAUC-4VsvroAT_D6Yy5qUV7uyXSbpCZs7M",
-    authDomain: "kssm-rock-redeem.firebaseapp.com",
-    projectId: "kssm-rock-redeem",
-    storageBucket: "kssm-rock-redeem.firebasestorage.app",
-    messagingSenderId: "750982235590",
-    appId: "1:750982235590:web:5338b3c4178d67f2da9ec7"
-  };
+emailjs.init("kvfG3cmsf5ZZnSUil");
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+const firebaseConfig = {
+  apiKey: "AIzaSyAUC-4VsvroAT_D6Yy5qUV7uyXSbpCZs7M",
+  authDomain: "kssm-rock-redeem.firebaseapp.com",
+  projectId: "kssm-rock-redeem",
+  storageBucket: "kssm-rock-redeem.appspot.com",
+  messagingSenderId: "750982235590",
+  appId: "1:750982235590:web:5338b3c4178d67f2da9ec7"
+};
 
-  const btn = document.getElementById("createBtn");
-  const result = document.getElementById("result");
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  function generateCode() {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let code = "KSSM-";
-    for (let i = 0; i < 6; i++) {
-      code += chars[Math.floor(Math.random() * chars.length)];
-    }
-    return code;
+const btn = document.getElementById("btn");
+const result = document.getElementById("result");
+
+function generateCode(){
+  const c="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let r="KSSM-";
+  for(let i=0;i<6;i++) r+=c[Math.floor(Math.random()*c.length)];
+  return r;
+}
+
+btn.onclick = async ()=>{
+  const insta = instaId.value.trim();
+  if(!insta){
+    result.textContent="Instagram ID கொடுக்கவும்";
+    return;
   }
 
-  btn.addEventListener("click", async () => {
-    const instaId = document.getElementById("instaId").value.trim();
+  btn.disabled=true;
+  result.textContent="Please wait...";
 
-    if (!instaId) {
-      result.textContent = "Instagram ID கொடுக்கவும்";
+  try{
+    const counterRef = doc(db,"settings","counter");
+    const counterSnap = await getDoc(counterRef);
+    const { total_users, max_limit } = counterSnap.data();
+
+    const userRef = doc(db,"users",insta);
+    const userSnap = await getDoc(userRef);
+
+    // 🔒 EXISTING USER → NO EMAIL
+    if(userSnap.exists()){
+      result.innerHTML=`Your Code:<br><b>${userSnap.data().code}</b>`;
+      btn.disabled=false;
       return;
     }
 
-    btn.disabled = true;
-    result.textContent = "Please wait...";
-
-    try {
-      const counterRef = doc(db, "settings", "counter");
-      const counterSnap = await getDoc(counterRef);
-      const { total_users, max_limit } = counterSnap.data();
-
-      const userRef = doc(db, "users", instaId);
-      const userSnap = await getDoc(userRef);
-
-      // 🔹 USER ALREADY EXISTS
-      if (userSnap.exists()) {
-        result.innerHTML = `Your code:<br><b>${userSnap.data().code}</b>`;
-        btn.disabled = false;
-        return; // ❌ NO EMAIL
-      }
-
-      // 🔹 NEW USER
-      if (total_users >= max_limit) {
-        result.textContent = "Limit reached ❌";
-        btn.disabled = false;
-        return;
-      }
-
-      const newCode = generateCode();
-
-      await setDoc(userRef, {
-        code: newCode,
-        redeemed: false,
-        created_at: new Date()
-      });
-
-      await updateDoc(counterRef, {
-        total_users: total_users + 1
-      });
-
-      // ✅ SEND EMAIL ONLY FIRST TIME
-      document.getElementById("f_insta").value = instaId;
-      document.getElementById("f_code").value = newCode;
-      document.getElementById("f_time").value = new Date().toLocaleString();
-      document.getElementById("emailForm").submit();
-
-      result.innerHTML = `Your code:<br><b>${newCode}</b>`;
-
-    } catch (err) {
-      console.error(err);
-      result.textContent = "Error occurred";
+    if(total_users >= max_limit){
+      result.textContent="Limit reached ❌";
+      btn.disabled=false;
+      return;
     }
 
-    btn.disabled = false;
-  });
+    const code = generateCode();
+
+    await setDoc(userRef,{
+      code,
+      created_at:new Date()
+    });
+
+    await updateDoc(counterRef,{
+      total_users: total_users + 1
+    });
+
+    // 📧 EMAIL ONLY ONCE
+    await emailjs.send(
+      "service_y67yted",
+      "template_b6siey4",
+      {
+        insta_id: insta,
+        redeem_code: code,
+        date_time: new Date().toLocaleString()
+      }
+    );
+
+    result.innerHTML=`Your Code:<br><b>${code}</b>`;
+
+  }catch(e){
+    console.error(e);
+    result.textContent="Error occurred";
+  }
+
+  btn.disabled=false;
+};
 </script>
 
 </body>
