@@ -6,9 +6,7 @@
   <title>KSSM Rock Redeem</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -33,10 +31,7 @@
       text-align: center;
     }
 
-    h1 {
-      font-size: 1.4rem;
-      margin-bottom: 8px;
-    }
+    h1 { font-size: 1.4rem; margin-bottom: 8px; }
 
     p.sub {
       font-size: 0.9rem;
@@ -64,11 +59,6 @@
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      opacity: 0.9;
     }
 
     button:disabled {
@@ -89,128 +79,122 @@
       color: #64748b;
     }
 
-    /* Desktop enhancement */
     @media (min-width: 768px) {
-      .card {
-        max-width: 420px;
-        padding: 30px;
-      }
-
-      h1 {
-        font-size: 1.6rem;
-      }
+      .card { max-width: 420px; padding: 30px; }
+      h1 { font-size: 1.6rem; }
     }
   </style>
+
+  <!-- ✅ EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("YOUR_PUBLIC_KEY");
+    })();
+  </script>
 </head>
 
 <body>
 
-  <div class="card">
-    <h1>KSSM ROCK</h1>
-    <p class="sub">Free Redeem Code System</p>
+<div class="card">
+  <h1>KSSM ROCK</h1>
+  <p class="sub">Free Redeem Code System</p>
 
-    <input type="text" id="instaId" placeholder="Instagram ID">
+  <input type="text" id="instaId" placeholder="Instagram ID">
+  <button id="createBtn">Create Code</button>
 
-    <button id="createBtn">Create Code</button>
+  <div id="result"></div>
 
-    <div id="result"></div>
+  <footer>Copy the code and DM us on Instagram</footer>
+</div>
 
-    <footer>
-      Copy the code and DM us on Instagram
-    </footer>
-  </div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc,
-      updateDoc
-    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyAUC-4VsvroAT_D6Yy5qUV7uyXSbpCZs7M",
+    authDomain: "kssm-rock-redeem.firebaseapp.com",
+    projectId: "kssm-rock-redeem",
+    storageBucket: "kssm-rock-redeem.firebasestorage.app",
+    messagingSenderId: "750982235590",
+    appId: "1:750982235590:web:5338b3c4178d67f2da9ec7"
+  };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAUC-4VsvroAT_D6Yy5qUV7uyXSbpCZs7M",
-      authDomain: "kssm-rock-redeem.firebaseapp.com",
-      projectId: "kssm-rock-redeem",
-      storageBucket: "kssm-rock-redeem.firebasestorage.app",
-      messagingSenderId: "750982235590",
-      appId: "1:750982235590:web:5338b3c4178d67f2da9ec7"
-    };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const btn = document.getElementById("createBtn");
+  const result = document.getElementById("result");
 
-    const btn = document.getElementById("createBtn");
-    const result = document.getElementById("result");
+  function generateCode() {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "KSSM-";
+    for (let i = 0; i < 6; i++) {
+      code += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return code;
+  }
 
-    function generateCode() {
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-      let code = "KSSM-";
-      for (let i = 0; i < 6; i++) {
-        code += chars[Math.floor(Math.random() * chars.length)];
-      }
-      return code;
+  btn.addEventListener("click", async () => {
+    const instaId = document.getElementById("instaId").value.trim();
+    if (!instaId) {
+      result.textContent = "Instagram ID கொடுக்கவும்";
+      return;
     }
 
-    btn.addEventListener("click", async () => {
-      const instaId = document.getElementById("instaId").value.trim();
+    btn.disabled = true;
+    result.textContent = "Please wait...";
 
-      if (!instaId) {
-        result.textContent = "Instagram ID கொடுக்கவும்";
+    try {
+      const counterRef = doc(db, "settings", "counter");
+      const counterSnap = await getDoc(counterRef);
+
+      const { total_users, max_limit } = counterSnap.data();
+      if (total_users >= max_limit) {
+        result.textContent = "Limit reached ❌";
+        btn.disabled = false;
         return;
       }
 
-      btn.disabled = true;
-      result.textContent = "Please wait...";
+      const userRef = doc(db, "users", instaId);
+      const userSnap = await getDoc(userRef);
 
-      try {
-        const counterRef = doc(db, "settings", "counter");
-        const counterSnap = await getDoc(counterRef);
+      let finalCode;
 
-        if (!counterSnap.exists()) {
-          result.textContent = "System not ready";
-          btn.disabled = false;
-          return;
-        }
+      if (userSnap.exists()) {
+        finalCode = userSnap.data().code;
+      } else {
+        finalCode = generateCode();
 
-        const { total_users, max_limit } = counterSnap.data();
+        await setDoc(userRef, {
+          code: finalCode,
+          redeemed: false,
+          created_at: new Date()
+        });
 
-        if (total_users >= max_limit) {
-          result.textContent = "Limit reached ❌";
-          btn.disabled = false;
-          return;
-        }
-
-        const userRef = doc(db, "users", instaId);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          result.innerHTML = `Your code:<br><b>${userSnap.data().code}</b>`;
-        } else {
-          const newCode = generateCode();
-
-          await setDoc(userRef, {
-            code: newCode,
-            redeemed: false,
-            created_at: new Date()
-          });
-
-          await updateDoc(counterRef, {
-            total_users: total_users + 1
-          });
-
-          result.innerHTML = `Your code:<br><b>${newCode}</b>`;
-        }
-      } catch (err) {
-        result.textContent = "Error occurred";
-        console.error(err);
+        await updateDoc(counterRef, {
+          total_users: total_users + 1
+        });
       }
 
-      btn.disabled = false;
-    });
-  </script>
+      // ✅ SEND EMAIL
+      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+        insta_id: instaId,
+        redeem_code: finalCode,
+        date_time: new Date().toLocaleString()
+      });
+
+      result.innerHTML = `Your code:<br><b>${finalCode}</b>`;
+
+    } catch (e) {
+      result.textContent = "Error occurred";
+      console.error(e);
+    }
+
+    btn.disabled = false;
+  });
+</script>
 
 </body>
 </html>
