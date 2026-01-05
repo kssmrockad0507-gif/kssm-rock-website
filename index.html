@@ -143,47 +143,47 @@
     try {
       const counterRef = doc(db, "settings", "counter");
       const counterSnap = await getDoc(counterRef);
-
       const { total_users, max_limit } = counterSnap.data();
 
+      const userRef = doc(db, "users", instaId);
+      const userSnap = await getDoc(userRef);
+
+      // 🔹 USER ALREADY EXISTS
+      if (userSnap.exists()) {
+        result.innerHTML = `Your code:<br><b>${userSnap.data().code}</b>`;
+        btn.disabled = false;
+        return; // ❌ NO EMAIL
+      }
+
+      // 🔹 NEW USER
       if (total_users >= max_limit) {
         result.textContent = "Limit reached ❌";
         btn.disabled = false;
         return;
       }
 
-      const userRef = doc(db, "users", instaId);
-      const userSnap = await getDoc(userRef);
+      const newCode = generateCode();
 
-      let finalCode;
+      await setDoc(userRef, {
+        code: newCode,
+        redeemed: false,
+        created_at: new Date()
+      });
 
-      if (userSnap.exists()) {
-        finalCode = userSnap.data().code;
-      } else {
-        finalCode = generateCode();
+      await updateDoc(counterRef, {
+        total_users: total_users + 1
+      });
 
-        await setDoc(userRef, {
-          code: finalCode,
-          redeemed: false,
-          created_at: new Date()
-        });
-
-        await updateDoc(counterRef, {
-          total_users: total_users + 1
-        });
-      }
-
-      // ===== Send Email via Formspree =====
+      // ✅ SEND EMAIL ONLY FIRST TIME
       document.getElementById("f_insta").value = instaId;
-      document.getElementById("f_code").value = finalCode;
+      document.getElementById("f_code").value = newCode;
       document.getElementById("f_time").value = new Date().toLocaleString();
-
       document.getElementById("emailForm").submit();
 
-      result.innerHTML = `Your code:<br><b>${finalCode}</b>`;
+      result.innerHTML = `Your code:<br><b>${newCode}</b>`;
 
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error(err);
       result.textContent = "Error occurred";
     }
 
