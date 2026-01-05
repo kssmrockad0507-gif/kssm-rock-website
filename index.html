@@ -10,8 +10,8 @@
 
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #020617, #020617);
+      font-family: system-ui, sans-serif;
+      background: #020617;
       color: #fff;
       min-height: 100vh;
       display: flex;
@@ -31,22 +31,16 @@
       text-align: center;
     }
 
-    h1 { font-size: 1.4rem; margin-bottom: 8px; }
-
-    p.sub {
-      font-size: 0.9rem;
-      color: #94a3b8;
-      margin-bottom: 20px;
-    }
+    h1 { margin-bottom: 6px; }
+    p.sub { color: #94a3b8; margin-bottom: 20px; }
 
     input {
       width: 100%;
       padding: 12px;
       border-radius: 10px;
       border: none;
-      outline: none;
-      font-size: 1rem;
       margin-bottom: 14px;
+      font-size: 1rem;
     }
 
     button {
@@ -56,7 +50,6 @@
       border: none;
       background: #22c55e;
       color: #022c22;
-      font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
     }
@@ -68,9 +61,8 @@
     }
 
     #result {
-      margin-top: 18px;
+      margin-top: 16px;
       font-size: 0.95rem;
-      word-break: break-word;
     }
 
     footer {
@@ -78,20 +70,7 @@
       font-size: 0.75rem;
       color: #64748b;
     }
-
-    @media (min-width: 768px) {
-      .card { max-width: 420px; padding: 30px; }
-      h1 { font-size: 1.6rem; }
-    }
   </style>
-
-  <!-- ✅ EmailJS -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <script>
-    (function(){
-      emailjs.init("YOUR_PUBLIC_KEY");
-    })();
-  </script>
 </head>
 
 <body>
@@ -101,6 +80,7 @@
   <p class="sub">Free Redeem Code System</p>
 
   <input type="text" id="instaId" placeholder="Instagram ID">
+
   <button id="createBtn">Create Code</button>
 
   <div id="result"></div>
@@ -108,9 +88,22 @@
   <footer>Copy the code and DM us on Instagram</footer>
 </div>
 
+<!-- Hidden Formspree Form -->
+<form id="emailForm" action="https://formspree.io/f/xzdzwarp" method="POST" style="display:none;">
+  <input type="text" name="instagram_id" id="f_insta">
+  <input type="text" name="redeem_code" id="f_code">
+  <input type="text" name="date_time" id="f_time">
+</form>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAUC-4VsvroAT_D6Yy5qUV7uyXSbpCZs7M",
@@ -138,6 +131,7 @@
 
   btn.addEventListener("click", async () => {
     const instaId = document.getElementById("instaId").value.trim();
+
     if (!instaId) {
       result.textContent = "Instagram ID கொடுக்கவும்";
       return;
@@ -151,6 +145,7 @@
       const counterSnap = await getDoc(counterRef);
 
       const { total_users, max_limit } = counterSnap.data();
+
       if (total_users >= max_limit) {
         result.textContent = "Limit reached ❌";
         btn.disabled = false;
@@ -178,18 +173,18 @@
         });
       }
 
-      // ✅ SEND EMAIL
-      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-        insta_id: instaId,
-        redeem_code: finalCode,
-        date_time: new Date().toLocaleString()
-      });
+      // ===== Send Email via Formspree =====
+      document.getElementById("f_insta").value = instaId;
+      document.getElementById("f_code").value = finalCode;
+      document.getElementById("f_time").value = new Date().toLocaleString();
+
+      document.getElementById("emailForm").submit();
 
       result.innerHTML = `Your code:<br><b>${finalCode}</b>`;
 
     } catch (e) {
-      result.textContent = "Error occurred";
       console.error(e);
+      result.textContent = "Error occurred";
     }
 
     btn.disabled = false;
