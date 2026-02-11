@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Platform</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#fff;
+}
+
+/* 18+ Banner */
+.top-message{
+    background:#000;
+    color:#fff;
+    text-align:center;
+    padding:10px;
+    font-size:14px;
+}
+
+/* Header */
+header{
+    display:flex;
+    align-items:center;
+    padding:15px;
+}
+
+.logo{
+    width:35px;
+    height:35px;
+    background:#000;
+    border-radius:6px;
+    margin-right:10px;
+}
+
+.site-name{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.menu-btn{
+    font-size:24px;
+    cursor:pointer;
+    margin-right:15px;
+}
+
+/* Horizontal Line */
+hr{
+    margin:0;
+}
+
+/* Search */
+.search-box{
+    text-align:center;
+    padding:15px;
+}
+
+input{
+    width:80%;
+    padding:10px;
+    font-size:16px;
+}
+
+/* Grid */
+.container{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    padding:15px;
+}
+
+.card{
+    border:1px solid #ddd;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.card img{
+    width:100%;
+    height:150px;
+    object-fit:cover;
+}
+
+.card p{
+    padding:8px;
+    font-size:14px;
+}
+
+/* Sidebar Menu */
+.sidebar{
+    position:fixed;
+    left:-250px;
+    top:0;
+    width:250px;
+    height:100%;
+    background:#111;
+    color:#fff;
+    padding-top:20px;
+    transition:0.3s;
+    z-index:1000;
+}
+
+.sidebar a{
+    display:block;
+    padding:12px 20px;
+    color:white;
+    text-decoration:none;
+}
+
+.sidebar a:hover{
+    background:#333;
+}
+
+.close-btn{
+    text-align:right;
+    padding:0 15px;
+    font-size:22px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top-message">
+🔞 18+ Adults Only – You must be 18 years or older to view this site.
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="close-btn" onclick="closeMenu()">✖</div>
+    <a href="#">Contact</a>
+    <a href="#">Disclaimer</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms & Conditions</a>
+</div>
+
+<header>
+    <div class="menu-btn" onclick="openMenu()">☰</div>
+    <div class="logo"></div>
+    <div class="site-name">DemoPlatform</div>
+</header>
+
+<hr>
+
+<div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchVideos()">
+</div>
+
+<div class="container" id="videoContainer"></div>
+
+<script src="data/data.js"></script>
+
+<script>
+let container = document.getElementById("videoContainer");
+let searchInput = document.getElementById("searchInput");
+let itemsToShow = 6;
+let filteredData = [];
+
+/* Menu */
+function openMenu(){
+    document.getElementById("sidebar").style.left="0";
+}
+function closeMenu(){
+    document.getElementById("sidebar").style.left="-250px";
+}
+
+/* Shuffle */
+function shuffle(array){
+    return array.sort(() => Math.random() - 0.5);
+}
+
+/* Load */
+function loadVideos(){
+    container.innerHTML = "";
+    let dataToUse = filteredData.length ? filteredData : videoData;
+    dataToUse = shuffle(dataToUse);
+
+    dataToUse.slice(0, itemsToShow).forEach(video=>{
+        container.innerHTML += `
+        <div class="card">
+            <a href="${video.link}" target="_blank">
+                <img src="${video.image}">
+            </a>
+            <p>${video.title}</p>
+        </div>
+        `;
+    });
+}
+
+/* Search */
+function searchVideos(){
+    let value = searchInput.value.toLowerCase();
+
+    if(value === ""){
+        filteredData = [];
+    } else {
+        filteredData = videoData.filter(video =>
+            video.title.toLowerCase().includes(value)
+        );
+    }
+
+    itemsToShow = 6;
+    loadVideos();
+}
+
+/* Infinite Scroll */
+window.addEventListener("scroll", ()=>{
+    if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 100){
+        itemsToShow += 4;
+        loadVideos();
+    }
+});
+
+/* Initial */
+loadVideos();
+</script>
+
+</body>
+</html>
